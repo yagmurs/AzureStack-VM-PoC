@@ -12,5 +12,4 @@ Resize-Partition -DiskNumber 0 -PartitionNumber 1 -Size $size.SizeMax
 Add-WindowsFeature RSAT-AD-PowerShell, RSAT-ADDS -IncludeAllSubFeature
 Install-PackageProvider nuget -Force
 Rename-LocalUser -Name $username -NewName Administrator
-Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools #-Restart
-
+Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart

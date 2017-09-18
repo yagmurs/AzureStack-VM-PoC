@@ -1,4 +1,5 @@
-!!! ** Template take care of this step.
+  
+  ** Template take care of this step.
 
 Create new Azure VM using this template
 **Set VM's disk size to 256GB
@@ -54,7 +55,7 @@ Follow the setup progress once AzS-BGPNAT01 machine deployed change the NAT adap
 Once the installation completed open https://portal.local.azurestack.external/ from the host.
 
 
-If you face any issue troubleshoot the issue and re-run .\InstallAzureStack.ps1 -Rerun -Verbose to confinue setup.
-Refer to articles on README.md additional datails.
+If you face any issues, troubleshoot the issue and re-run setup using ".\InstallAzureStack.ps1 -Rerun -Verbose"
+Refer to articles on README.md for additional details.
 
 Feel free to post questions and enjoy!

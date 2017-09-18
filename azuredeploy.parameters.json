@@ -14,6 +14,9 @@
         "adminUsername": {
             "value": "<Username>"
         },
+        "adminPassword": {
+            "value": "GEN-PASSWORD"
+        },
         "virtualNetworkName": {
             "value": "AzureStack-VNET"
         },

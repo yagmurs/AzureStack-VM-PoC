@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westeurope"
+        },
+        "virtualMachineName": {
+            "value": "AzureStack-H1"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_E16s_v3"
+        },
+        "adminUsername": {
+            "value": "<Username>"
+        },
+        "virtualNetworkName": {
+            "value": "AzureStack-VNET"
+        },
+        "addressPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "subnetName": {
+            "value": "default"
+        },
+        "subnetPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "publicIpAddressName": {
+            "value": "Host1-IP"
+        },
+        "publicIpAddressType": {
+            "value": "Dynamic"
+        },
+        "autoShutdownStatus": {
+            "value": "Enabled"
+        },
+        "autoShutdownTime": {
+            "value": "23:00"
+        },
+        "autoShutdownTimeZone": {
+            "value": "UTC"
+        },
+        "autoShutdownNotificationStatus": {
+            "value": "Disabled"
+        },
+        "publicDnsName": {
+            "value": "azstacktest"
+        }
+    }
+}

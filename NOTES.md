@@ -3,7 +3,7 @@
 
 Create new Azure VM using this template
 **Set VM's disk size to 256GB
-**Add 4x256 GB disk premium storage
+**Add 4x128GB disk premium storage
 **Add additional disk 64GB to store downloads
 
 RDP to Azure VM

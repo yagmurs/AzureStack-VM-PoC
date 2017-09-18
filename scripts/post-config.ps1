@@ -3,6 +3,7 @@ Param (
     [string]
     $Username
     )
+New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\ -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -Force
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly\ -Name 1 -Value  'WSMAN/*' -Force
 Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Downloads" -Confirm:$false

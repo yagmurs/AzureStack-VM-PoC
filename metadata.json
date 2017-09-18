@@ -1,7 +1,7 @@
 {
     "itemDisplayName": "101-vm-for-azurestack-poc",
     "description": "Creates a new VM for AzureStack PoC, installs most of the pre-requisites using Azure VM custom script extension",
-    "summary": "Creates a new VM for AzureStack PoC",
+    "summary": "Creates a new VM to install AzureStack Develeopment kit (ASDK) to run PoC",
     "githubUsername": "yagmurs",
     "dateUpdated": "2017-09-18"
   }

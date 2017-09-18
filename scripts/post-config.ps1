@@ -9,5 +9,5 @@ Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | 
 Add-WindowsFeature RSAT-AD-PowerShell, RSAT-ADDS -IncludeAllSubFeature
 Install-PackageProvider nuget -Force
 Rename-LocalUser -Name $username -NewName Administrator
-Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
+Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools #-Restart
 

@@ -112,7 +112,7 @@
         "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/",
         "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
         "adminUsername": "__administrator",
-        "dataDiskSizeinGB": 256,
+        "dataDiskSizeinGB": 128,
         "osDiskSizeinGB": 256,
         "location": "[resourceGroup().location]",
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",

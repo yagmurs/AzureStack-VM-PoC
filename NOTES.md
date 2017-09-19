@@ -42,7 +42,7 @@ Follow the setup progress and Enable Time zone sync from Hyper-V integration com
 
 Once the Host joined to the domain, Logon to Host using AzureStackAdmin and run following command to continue setup, if setup fails make sure that all previous steps are done.
 	cd C:\CloudDeployment\Setup  
-	.\InstallAzureStack.ps1 -Rerun -Verbose
+	.\InstallAzureStackPOC.ps1 -Rerun -Verbose
 	
 Follow the setup progress once AzS-BGPNAT01 machine deployed change the NAT adapter virtual switch from PublicSwitch to NatSwitch by running following command
 	$swName = "NATSwitch"

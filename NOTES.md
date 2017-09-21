@@ -23,6 +23,7 @@ Copy CloudDeployment, fwupdate and tools folder from mounted volume to root of C
 Find Microsoft.AzureStack.Solution.Deploy.CloudDeployment.1.0.522.0.nupkg file and change file extension to zip open and find .\content\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1 and edit. Find $isVirtualizedDeployment and remove -not in the is statement (check all if statement there will be 3 of them) save zip file and change ile extension back to nupkg.
 
 **Run following to allow CredSSP
+	New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
 	New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\ -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -Force
 	New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly\ -Name 1 -Value  'WSMAN/*' -Force
 

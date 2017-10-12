@@ -1,4 +1,4 @@
-Creates a new VM to install AzureStack Develeopment kit (ASDK) to run PoC
+Creates a new VM to install AzureStack Development kit (ASDK) to run PoC
 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fmaster%2Fazuredeploy.json" target="_blank">

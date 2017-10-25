@@ -9,7 +9,6 @@ Creates a new VM to install AzureStack Development kit (ASDK) to run PoC
     <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
 </a>
 
-
 This template creates a new VM to easily evaluate AzureStack PoC on an Azure VM, and installs most of the prerequisites such as Failover cluster, hyper-v and management modules.
 
 You can follow these articles to deploy AzureStack on an Azure VM.

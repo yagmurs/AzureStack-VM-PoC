@@ -45,7 +45,7 @@ Once the Host joined to the domain, Logon to Host using AzureStackAdmin and run 
 	cd C:\CloudDeployment\Setup  
 	.\InstallAzureStackPOC.ps1 -Rerun -Verbose
 	
-Follow the setup progress once AzS-BGPNAT01 machine deployed change the NAT adapter virtual switch from PublicSwitch to NatSwitch by running following command
+Follow the setup progress once AzS-BGPNAT01 machine deployed successfully, change the NAT adapter's switch from PublicSwitch to NatSwitch by running following command
 	$swName = "NATSwitch"
 	New-VMSwitch -Name $swName -SwitchType Internal -Verbose
 	$NIC=Get-NetAdapter "vEthernet `($swName`)"
@@ -56,7 +56,7 @@ Follow the setup progress once AzS-BGPNAT01 machine deployed change the NAT adap
 Once the installation completed open https://portal.local.azurestack.external/ from the host.
 
 
-If you face any issues, troubleshoot the issue and re-run setup using ".\InstallAzureStack.ps1 -Rerun -Verbose"
+If you face any issues, troubleshoot the issue and re-run setup using ".\InstallAzureStackPOC.ps1 -Rerun -Verbose"
 Refer to articles on README.md for additional details.
 
 Feel free to post questions and enjoy!

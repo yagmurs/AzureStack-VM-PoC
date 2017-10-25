@@ -13,9 +13,6 @@ function Disable-InternetExplorerESC {
 #Disables Internet Explorer Enhanced Security Configuration
 Disable-InternetExplorerESC
 
-#Downloads Azure Stack Downloader to Local Administrator's Desktop
-Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "F:\AzureStackDownloader.exe"
-
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
 Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Name 1 -Value "wsman/*" -Type STRING -Force
@@ -38,4 +35,9 @@ Install-PackageProvider nuget -Force
 
 Rename-LocalUser -Name $username -NewName Administrator
 
+#Downloads Azure Stack Downloader
+Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
+
+
 Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
+

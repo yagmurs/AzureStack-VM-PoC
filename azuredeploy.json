@@ -177,7 +177,7 @@
                         "count": "[parameters('dataDiskCount')]",
                         "input": {
                             "createOption": "Empty",
-                            "lun": "copyIndex('dataDisks)",
+                            "lun": "[copyIndex('dataDisks)]",
                             "name": "[concat(parameters('virtualMachineName'),'-disk',copyIndex('dataDisks'))]",
                             "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
                             "caching": "ReadOnly",

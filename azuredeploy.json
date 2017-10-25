@@ -185,9 +185,11 @@
                                 "storageAccountType": "Premium_LRS"
                             }
                         }
-                    }],
-                    "dataDisks": [
-                        {
+                    },
+                    {
+                        "name": "dataDisks",
+                        "count": 1,
+                        "input": {                         
                             "createOption": "Empty",
                             "lun": 4,
                             "name": "[concat(parameters('virtualMachineName'),'-downloads')]",
@@ -197,6 +199,7 @@
                                 "storageAccountType": "Premium_LRS"
                             }
                         }
+                    }
                     ]
                 },
                 "networkProfile": {

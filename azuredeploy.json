@@ -172,7 +172,7 @@
                             "storageAccountType": "Premium_LRS"
                         }
                     },
-                    "copy": {
+                    "copy": [{
                         "name": "dataDisks",
                         "count": "[parameters('dataDiskCount')]",
                         "input": {
@@ -185,7 +185,7 @@
                                 "storageAccountType": "Premium_LRS"
                             }
                         }
-                    },
+                    }],
                     "dataDisks": [
                         {
                             "createOption": "Empty",

@@ -34,6 +34,13 @@
                 "name": 256
             }
         },
+        "dataDiskCount": {
+            "type": "int",
+            "defaultValue": 3,
+            "metadata": {
+                "name": 3
+            }
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "AzureStack-VNET",

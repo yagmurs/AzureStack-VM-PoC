@@ -23,6 +23,17 @@
                 "name": "Standard_E16s_v3"
             }
         },
+        "dataDiskSizeinGB": {
+            "type": "int",
+            "allowedValues": [
+                256,
+                128
+            ],
+            "defaultValue": 256,
+            "metadata": {
+                "name": 256
+            }
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "AzureStack-VNET",
@@ -112,7 +123,6 @@
         "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/",
         "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
         "adminUsername": "__administrator",
-        "dataDiskSizeinGB": 128,
         "osDiskSizeinGB": 256,
         "location": "[resourceGroup().location]",
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",
@@ -160,7 +170,7 @@
                             "createOption": "Empty",
                             "lun": 0,
                             "name": "[concat(parameters('virtualMachineName'),'-disk0')]",
-                            "diskSizeGB": "[variables('dataDiskSizeinGB')]",
+                            "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
                             "caching": "ReadOnly",
                             "managedDisk": {
                                 "storageAccountType": "Premium_LRS"
@@ -170,7 +180,7 @@
                             "createOption": "Empty",
                             "lun": 1,
                             "name": "[concat(parameters('virtualMachineName'),'-disk1')]",
-                            "diskSizeGB": "[variables('dataDiskSizeinGB')]",
+                            "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
                             "caching": "ReadOnly",
                             "managedDisk": {
                                 "storageAccountType": "Premium_LRS"
@@ -180,7 +190,7 @@
                             "createOption": "Empty",
                             "lun": 2,
                             "name": "[concat(parameters('virtualMachineName'),'-disk2')]",
-                            "diskSizeGB": "[variables('dataDiskSizeinGB')]",
+                            "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
                             "caching": "ReadOnly",
                             "managedDisk": {
                                 "storageAccountType": "Premium_LRS"
@@ -190,7 +200,7 @@
                             "createOption": "Empty",
                             "lun": 3,
                             "name": "[concat(parameters('virtualMachineName'),'-disk3')]",
-                            "diskSizeGB": "[variables('dataDiskSizeinGB')]",
+                            "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
                             "caching": "ReadOnly",
                             "managedDisk": {
                                 "storageAccountType": "Premium_LRS"

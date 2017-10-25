@@ -36,9 +36,9 @@
         },
         "dataDiskCount": {
             "type": "int",
-            "defaultValue": 3,
+            "defaultValue": 4,
             "metadata": {
-                "name": 3
+                "name": 4
             }
         },
         "virtualNetworkName": {

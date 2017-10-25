@@ -10,6 +10,7 @@ function Disable-InternetExplorerESC {
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
 }
 Disable-InternetExplorerESC
+Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "$env:USERPROFILE\Desktop\AzureStackDownloader.exe"
 New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\ -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -Force
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly\ -Name 1 -Value  'WSMAN/*' -Force

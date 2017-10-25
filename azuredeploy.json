@@ -34,13 +34,6 @@
                 "name": 256
             }
         },
-        "dataDiskCount": {
-            "type": "int",
-            "defaultValue": 3,
-            "metadata": {
-                "name": 3
-            }
-        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "AzureStack-VNET",
@@ -172,23 +165,38 @@
                             "storageAccountType": "Premium_LRS"
                         }
                     },
-                    "copy": [{
-                        "name": "dataDisks",
-                        "count": "[parameters('dataDiskCount')]",
-                        "input": {
+                    "dataDisks": [
+                        {
                             "createOption": "Empty",
-                            "lun": "[copyIndex('dataDisks')]",
-                            "name": "[concat(parameters('virtualMachineName'),'-disk',copyIndex('dataDisks'))]",
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachineName'),'-disk0')]",
                             "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
                             "caching": "ReadOnly",
                             "managedDisk": {
                                 "storageAccountType": "Premium_LRS"
                             }
-                        }
-                    },
-                    {
-                        "count": 1,
-                        "input": {                         
+                        },
+                        {
+                            "createOption": "Empty",
+                            "lun": 1,
+                            "name": "[concat(parameters('virtualMachineName'),'-disk1')]",
+                            "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
+                            "caching": "ReadOnly",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
+                        },
+                        {
+                            "createOption": "Empty",
+                            "lun": 2,
+                            "name": "[concat(parameters('virtualMachineName'),'-disk2')]",
+                            "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
+                            "caching": "ReadOnly",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
+                        },
+                        {
                             "createOption": "Empty",
                             "lun": 4,
                             "name": "[concat(parameters('virtualMachineName'),'-downloads')]",
@@ -198,7 +206,6 @@
                                 "storageAccountType": "Premium_LRS"
                             }
                         }
-                    }
                     ]
                 },
                 "networkProfile": {

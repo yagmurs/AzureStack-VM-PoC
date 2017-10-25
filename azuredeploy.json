@@ -187,7 +187,6 @@
                         }
                     },
                     {
-                        "name": "dataDisks",
                         "count": 1,
                         "input": {                         
                             "createOption": "Empty",

@@ -14,7 +14,7 @@ function Disable-InternetExplorerESC {
 Disable-InternetExplorerESC
 
 #Downloads Azure Stack Downloader to Local Administrator's Desktop
-Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "$env:USERPROFILE\Desktop\AzureStackDownloader.exe"
+Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "F:\AzureStackDownloader.exe"
 
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force

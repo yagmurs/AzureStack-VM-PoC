@@ -25,9 +25,9 @@ Set-Item -Force WSMan:\localhost\Client\TrustedHosts "*"
 Enable-WSManCredSSP -Role Client -DelegateComputer "*" -Force
 
 
-Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Downloads" -Confirm:$false
-$size = Get-Disk -Number 0 | Get-Partition | Get-PartitionSupportedSize
-Resize-Partition -DiskNumber 0 -PartitionNumber 1 -Size $size.SizeMax
+#Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Downloads" -Confirm:$false
+#$size = Get-Disk -Number 0 | Get-Partition | Get-PartitionSupportedSize
+#Resize-Partition -DiskNumber 0 -PartitionNumber 1 -Size $size.SizeMax
 
 Add-WindowsFeature RSAT-AD-PowerShell, RSAT-ADDS -IncludeAllSubFeature
 

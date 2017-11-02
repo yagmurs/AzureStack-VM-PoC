@@ -8,6 +8,7 @@ $BGPNATVMNetworkAdapterName = "NAT"
 $logFileFullPath = "C:\AzureStackonAzureVM\workaroundProgress.log"
     
 Add-Content -Path $logFileFullPath -Value "Starting the service"
+Write-Verbose "Starting the service" -Verbose
 
 while ($true)
 {
@@ -69,8 +70,9 @@ while ($true)
     }
     if (-not ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        $BgpNatVm = Get-VM -Name "AzS-BGPNAT01" -ErrorAction SilentlyContinue
-        if ($?)
+        Write-Verbose "denme" -Verbose
+        $BgpNatVm = Get-VM -Name "AzS-BGPNAT01" | ? state -eq running
+        if ($BgpNatVm)
         {
             $BgpNatVm | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
             Add-Content -Path $logFileFullPath -Value "The VM`s NAT network adapter has been Connected to $swName"

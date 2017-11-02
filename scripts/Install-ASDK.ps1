@@ -121,6 +121,7 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
 #region Variables
 
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+$options = New-ScheduledJobOption -RequireNetwork
 
 do {
 $adminPass = Read-Host -Prompt "Enter for Administrator Password" -AsSecureString
@@ -265,7 +266,7 @@ else
 {
     Write-Error "$zipfile1 cannot be found"
 }
-$st = Register-ScheduledJob -Trigger $AtStartup -FilePath "c:\AzureStackonAzureVM\Install-ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service"
+$st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "c:\AzureStackonAzureVM\Install-ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
 $st.StartJob()
 
 cd C:\CloudDeployment\Setup

@@ -141,7 +141,7 @@ $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.Int
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $adminPass)
 $aadcred = New-Object System.Management.Automation.PSCredential ($("$aadAdmin" + '@' + "$aadTenant"), $aadPass)
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
-$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider)).ResolvedAddresses.ipaddresstostring | Get-Random
+$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"

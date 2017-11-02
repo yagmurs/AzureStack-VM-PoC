@@ -39,7 +39,7 @@ Rename-LocalUser -Name $username -NewName Administrator
 #Downloads Azure Stack Downloader
 New-Item -Path c:\AzureStackonAzureVM -ItemType Directory -Force
 Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/Install-ASDK.ps1 -OutFile C:\AzureStackonAzureVM\Install-ASDK.ps1
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/Install-ASDK.ps1" -OutFile "C:\AzureStackonAzureVM\Install-ASDK.ps1"
 
 Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
 

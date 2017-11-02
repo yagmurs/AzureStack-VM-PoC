@@ -35,6 +35,7 @@ Install-PackageProvider nuget -Force
 
 Rename-LocalUser -Name $username -NewName Administrator
 
+Set-ExecutionPolicy unrestricted -Force
 
 #Downloads Azure Stack Downloader
 New-Item -Path c:\AzureStackonAzureVM -ItemType Directory -Force

@@ -110,14 +110,38 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
 #region Variables
 
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-$adminpass = ConvertTo-SecureString 12345678qqqQ -AsPlainText -Force
-$localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $adminpass)
-$aadpass = ConvertTo-SecureString rHn9j0hn4A45hiz4qHoa -AsPlainText -Force
-$aadcred = New-Object System.Management.Automation.PSCredential ($("$aadAdmin" + '@' + "$aadTenant"), $aadpass)
-$aadAdmin = "adm"
-$aadTenant = "yagmursas1.onmicrosoft.com"
+
+do {
+$adminPass = Read-Host -Prompt "Enter for Administrator Password" -AsSecureString
+$adminPass1 = Read-Host -Prompt "Re-Enter for Administrator Password" -AsSecureString
+$adminPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($adminPass))
+$adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($adminPass1))
+    if ($adminPass_text -cne $adminpass1_text)
+    {
+        Write-Output "Password does not match, re-enter password"
+    }
+
+} until ($adminPass_text -ceq $adminpass1_text)
+
+$aadAdmin = Read-Host -Prompt "Azure AD username. ex: adm"
+$aadTenant = Read-Host -Prompt "Azure AD domainname. ex: <aadName>.onmicrosoft.com"
+
+do {
+$aadPass = Read-Host -Prompt "Enter for Azure AD Global Administrator Password" -AsSecureString
+$aadPass1 = Read-Host -Prompt "Re-Enter for Azure AD Global Administrator Password" -AsSecureString
+$aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass))
+$aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass1))
+    if ($aadPass_text -cne $aadpass1_text)
+    {
+        Write-Output "Password does not match, re-enter password"
+    }
+
+} until ($aadPass_text -ceq $aadpass1_text)
+
+$localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $adminPass)
+$aadcred = New-Object System.Management.Automation.PSCredential ($("$aadAdmin" + '@' + "$aadTenant"), $aadPass)
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
-$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider -InformationLevel Detailed).RemoteAddress.IPAddressToString
+$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider)).ResolvedAddresses.ipaddresstostring | Get-Random
 
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"

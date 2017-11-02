@@ -94,6 +94,7 @@ function Print-Output ($message)
 
 function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemToFind, $ReplaceWith)
 {
+        $ZipFileFullPath = Resolve-Path $ZipFileFullPath
         $file = $FilenameFullPath.split("/")[-1]
         $tempFileFullPath = Join-Path -Path $env:temp -ChildPath $file
         Add-Type -Assembly System.IO.Compression.FileSystem
@@ -244,7 +245,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
 
 
 Print-Output -Message "Tweaking some nupkg files to run ASDK on Azure VM"
-$zipFile1 = 'C:\CloudDeployment\NuGetStore\Microsoft.AzureStack.Solution.Deploy.CloudDeployment.1.0.590.8.nupkg'
+$zipFile1 = 'C:\CloudDeployment\NuGetStore\Microsoft.AzureStack.Solution.Deploy.CloudDeployment.*.nupkg'
 if (Test-Path $zipFile1)
 {
     FindReplace-ZipFileContent -ZipFileFullPath $zipFile1 -FilenameFullPath 'content/Roles/PhysicalMachines/Tests/BareMetal.Tests.ps1' -ItemToFind '-not \$isVirtualizedDeployment' -ReplaceWith '$isVirtualizedDeployment'

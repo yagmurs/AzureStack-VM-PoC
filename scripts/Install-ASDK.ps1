@@ -22,6 +22,8 @@ while ($true)
                 $null = New-VMSwitch -Name $swName -SwitchType Internal -Verbose
                 if ($?)
                 {
+
+                    Add-Content -Path $logFileFullPath -Value "`'$swName`' switch and `'$privateAdapterName`' Adapter have been created successfully"    
                     Write-Verbose "`'$swName`' switch and `'$privateAdapterName`' Adapter have been created successfully"  -Verbose
                 }
             }
@@ -54,7 +56,9 @@ while ($true)
             $privateAdapter.EnableSharing(1)
 
             [System.Environment]::SetEnvironmentVariable('ICSEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
-
+            
+            Add-Content -Path $logFileFullPath -Value "ICS now enabled"
+            Write-Verbose "ICS now enabled"  -Verbose
         }
         else
         {
@@ -69,6 +73,8 @@ while ($true)
         if ($?)
         {
             $BgpNatVm | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
+            Add-Content -Path $logFileFullPath -Value "The VM`s NAT network adapter has been Connected to $swName"
+            Write-Verbose "The VM`s NAT network adapter has been Connected to $swName" -Verbose
             [System.Environment]::SetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', $true, [System.EnvironmentVariableTarget]::Machine)
         }
     }
@@ -79,7 +85,9 @@ while ($true)
         Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
         break
     }
+    Start-Sleep -Seconds 5
 }
+
 '@
 
 $serviceScript | Out-File "c:\AzureStackonAzureVM\Install-ASDKCompanionService.ps1" -Force

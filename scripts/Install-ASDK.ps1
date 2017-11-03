@@ -1,7 +1,63 @@
 #region service script
 $serviceScript = @'
 
-$swName = "ICSAdapter"
+function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
+{
+    # Create a NetSharingManager object
+    $m = New-Object -ComObject HNetCfg.HNetShare
+
+    # Find connection
+    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+
+
+    # Get sharing configuration
+    $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
+    $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
+        
+    Start-Sleep -Seconds 2
+
+    # Disable sharing
+    $publicAdapter.DisableSharing()
+    $privateAdapter.DisableSharing()
+
+    # Enable sharing (0 - public, 1 - private)
+
+    # Enable sharing public on Network_1
+    $publicAdapter.EnableSharing(0)
+
+    # Enable sharing private on Network_2
+    $privateAdapter.EnableSharing(1)
+
+}
+    
+
+function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
+{
+    # Register the HNetCfg library (once)
+    regsvr32 /s hnetcfg.dll
+
+    # Create a NetSharingManager object
+    $m = New-Object -ComObject HNetCfg.HNetShare
+
+    # Find connection
+    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+
+
+    # Get sharing configuration
+    $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
+    $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
+        
+    # Disable sharing
+    $publicAdapter.DisableSharing()
+    $privateAdapter.DisableSharing()
+}
+
+# Register the HNetCfg library (once)
+regsvr32 /s hnetcfg.dll
+
+$swName = "deneme"
 $publicAdapterName = "Deployment"
 $privateAdapterName = "vEthernet `($swName`)"
 $BGPNATVMNetworkAdapterName = "NAT"
@@ -12,7 +68,7 @@ Write-Verbose "Starting the service" -Verbose
 
 while ($true)
 {
-    if (-not ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+    if (-not ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine)))
     {
         $null = Get-NetAdapter -Name $publicAdapterName -ErrorAction SilentlyContinue  
         if ($?)
@@ -29,33 +85,7 @@ while ($true)
                 }
             }
 
-            # Register the HNetCfg library (once)
-            regsvr32 /s hnetcfg.dll
-
-            # Create a NetSharingManager object
-            $m = New-Object -ComObject HNetCfg.HNetShare
-
-            # Find connection
-            $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-            $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
-
-
-            # Get sharing configuration
-            $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
-            $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
-        
-            # Disable sharing
-            $publicAdapter.DisableSharing()
-            $privateAdapter.DisableSharing()
-
-            # Enable sharing (0 - public, 1 - private)
-
-            # Enable sharing public on Network_1
-            $publicAdapter.EnableSharing(0)
-
-            # Enable sharing private on Network_2
-            $privateAdapter.EnableSharing(1)
-
+            Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
             [System.Environment]::SetEnvironmentVariable('ICSEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
             
             Add-Content -Path $logFileFullPath -Value "ICS now enabled"
@@ -70,7 +100,7 @@ while ($true)
     }
     if (-not ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Verbose "denme" -Verbose
+        Write-Verbose "Checking AzS-BGPNAT01 VM's presence and state" -Verbose
         $BgpNatVm = Get-VM -Name "AzS-BGPNAT01" | ? state -eq running
         if ($BgpNatVm)
         {
@@ -80,7 +110,26 @@ while ($true)
             [System.Environment]::SetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', $true, [System.EnvironmentVariableTarget]::Machine)
         }
     }
-    if (([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+    if (-not ([System.Environment]::GetEnvironmentVariable('ICSConvertedToNAT', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+    {
+        Write-Verbose "Checking AzS-CA01 VM's presence and state" -Verbose
+        $CAVm = Get-VM -Name "AzS-CA01" | ? state -eq running
+        if ($CAVm -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+        {
+            Disable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
+            Start-Sleep -Seconds 5
+            Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
+            New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress "192.168.137.1" -PrefixLength 24 -AddressFamily IPv4
+            Get-NetNat | Remove-NetNat -Confirm:$false
+            New-NetNat -Name "NAT" -InternalIPInterfaceAddressPrefix "192.168.137.0/24"
+            Add-Content -Path $logFileFullPath -Value "ICS have now been disabled and converted to NAT"
+            Write-Verbose "ICS have now been disabled and converted to NAT" -Verbose
+            [System.Environment]::SetEnvironmentVariable('ICSConvertedToNAT', $true, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable('ICSEnabled', $false, [System.EnvironmentVariableTarget]::Machine)
+        }
+    }
+
+    if (([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $false) -and ([System.Environment]::SetEnvironmentVariable('ICSConvertedToNAT', $true, [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
         Write-Verbose "Workaround Fully Applied"  -Verbose
         Add-Content -Path $logFileFullPath -Value "Workaround Fully Applied, check back, BGPNATVMVMNetAdapterFixed and ICSEnabled Envrionment variables"

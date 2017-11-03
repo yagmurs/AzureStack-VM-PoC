@@ -23,6 +23,7 @@ Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\Credenti
 Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation -Name ConcatenateDefaults_AllowFreshNTLMOnly -Value 1 -Type DWORD -Force
 Set-Item -Force WSMan:\localhost\Client\TrustedHosts "*"
 Enable-WSManCredSSP -Role Client -DelegateComputer "*" -Force
+Enable-WSManCredSSP -Role Server -Force
 
 
 #Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Downloads" -Confirm:$false

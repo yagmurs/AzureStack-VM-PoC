@@ -112,16 +112,16 @@ while ($true)
     }
     if (-not ([System.Environment]::GetEnvironmentVariable('ICSConvertedToNAT', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Verbose "Checking AzS-CA01 VM's presence and state" -Verbose
-        $CAVm = Get-VM -Name "AzS-CA01" | ? state -eq running
-        if ($CAVm -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+        Write-Verbose "Checking AzS-WASP01 VM's presence and state" -Verbose
+        $WASP01Vm = Get-VM -Name "AzS-WASP01" | ? state -eq running
+        if ($WASP01VM -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
         {
             Disable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
             Start-Sleep -Seconds 5
             Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
             New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress "192.168.137.1" -PrefixLength 24 -AddressFamily IPv4
             Get-NetNat | Remove-NetNat -Confirm:$false
-            New-NetNat -Name "NAT" -InternalIPInterfaceAddressPrefix "192.168.137.0/24"
+            New-NetNat -Name "NAT for BGPNAT Network" -InternalIPInterfaceAddressPrefix "192.168.137.0/24"
             Add-Content -Path $logFileFullPath -Value "ICS have now been disabled and converted to NAT"
             Write-Verbose "ICS have now been disabled and converted to NAT" -Verbose
             [System.Environment]::SetEnvironmentVariable('ICSConvertedToNAT', $true, [System.EnvironmentVariableTarget]::Machine)

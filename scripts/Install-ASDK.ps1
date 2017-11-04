@@ -70,7 +70,7 @@ function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
 #endregion
 
 #region Variables
-#$VerbosePreference = "Continue"
+$VerbosePreference = "Continue"
 $swName = "NATSw"
 $publicAdapterName = "Deployment"
 $privateAdapterName = "vEthernet `($swName`)"
@@ -82,7 +82,7 @@ $writeLogParams = @{
     LogFilePath = $logFileFullPath
 }
 $NATIp = "192.168.137.1/28"
-$NATIp = "192.168.137.0/28"
+$NATNetwork = "192.168.137.0/28"
 
 #endregion
 
@@ -94,9 +94,9 @@ Write-Log @writeLogParams -Message "Starting the service"
 $loopCount = 0
 while ($true)
 {
-    if (-not ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine)))
+    if (-not ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        #Wait for Network Adapter presence than create new Internal Virtual Switch  
+        #Wait for Network Adapter presence if so will create new Internal Virtual Switch  
         $null = Get-NetAdapter -Name $publicAdapterName -ErrorAction SilentlyContinue  
         if ($?)
         {
@@ -107,7 +107,7 @@ while ($true)
                 if ($?)
                 {
                     Write-Log @writeLogParams -Message $o
-                    Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter have been created successfully"
+                    Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter created successfully"
                     Start-Sleep 10
                     $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
                     $ip = $NATIp.split("/")[0]
@@ -116,7 +116,7 @@ while ($true)
                     if ($?)
                     {
                         Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set for adapter `'$privateAdapterName`'"
-                        Write-Log @writeLogParams -Message "Saving to Environment Variable `(VMSwitchCreated`)"
+                        Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(VMSwitchCreated`)"
                         [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
                     }
                     Write-Log @writeLogParams -Message $o
@@ -139,10 +139,16 @@ while ($true)
         $BgpNatVmObj = Get-VM -Name $BgpNatVm | ? state -eq running
         if ($BgpNatVmObj)
         {
-            Start-Sleep -Seconds 300
-            $BgpNatVmObj | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
-            Write-Log @writeLogParams -Message "$BgpNatVm's $BGPNATVMNetworkAdapterName network adapter plugged to $swName"
-            [System.Environment]::SetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', $true, [System.EnvironmentVariableTarget]::Machine)
+            $null = Get-NetAdapter -Name $privateAdapterName -ErrorAction SilentlyContinue  
+            if ($?)
+            {
+                Write-Log @writeLogParams -Message "Waiting for network adapter idle"
+                Start-Sleep -Seconds 30
+                $BgpNatVmObj | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
+                Write-Log @writeLogParams -Message "$BgpNatVm's $BGPNATVMNetworkAdapterName network adapter plugged to $swName"
+                Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(BGPNATVMVMNetAdapterFixed`)"
+                [System.Environment]::SetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', $true, [System.EnvironmentVariableTarget]::Machine)
+            }
         }
     }
     if (-not ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
@@ -158,6 +164,8 @@ while ($true)
                 $o = New-NetNat -Name "Nat for BGPNAT Network" -InternalIPInterfaceAddressPrefix $NATNetwork
                 Write-Log @writeLogParams -Message "All Previous NATs removed and following NAT created"
                 Write-Log @writeLogParams -Message $o
+                Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
+                [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
             }
             Start-Sleep -Seconds 5
         }
@@ -166,7 +174,7 @@ while ($true)
     if (
         ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
         ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
-        ([System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine) -eq $true))
+        ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
         Write-Log @writeLogParams -Message "All Workarounds applied, Unregistering the service"
         Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
@@ -175,6 +183,7 @@ while ($true)
     Start-Sleep -Seconds 5
     $loopCount++
 }
+
 
 '@
 

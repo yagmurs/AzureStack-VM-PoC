@@ -230,12 +230,12 @@ $adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.I
 
 } until ($adminPass_text -ceq $adminpass1_text)
 
-$aadAdmin = Read-Host -Prompt "Azure AD username. ex: adm"
-$aadTenant = Read-Host -Prompt "Azure AD domainname. ex: <aadName>.onmicrosoft.com"
+$aadAdmin = Read-Host -Prompt "Enter Azure AD Global Administrator account name. ex: adm"
+$aadTenant = Read-Host -Prompt "Enter Azure AD domain name. ex: <aadName>.onmicrosoft.com"
 
 do {
-$aadPass = Read-Host -Prompt "Enter for Azure AD Global Administrator Password" -AsSecureString
-$aadPass1 = Read-Host -Prompt "Re-Enter for Azure AD Global Administrator Password" -AsSecureString
+$aadPass = Read-Host -Prompt "Enter Azure AD Global Administrator Password" -AsSecureString
+$aadPass1 = Read-Host -Prompt "Re-Enter Azure AD Global Administrator Password" -AsSecureString
 $aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass))
 $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass1))
     if ($aadPass_text -cne $aadpass1_text)

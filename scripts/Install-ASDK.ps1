@@ -83,6 +83,7 @@ $writeLogParams = @{
 }
 $NATIp = "192.168.137.1/28"
 $NATNetwork = "192.168.137.0/28"
+[int]$defaultPollIntervalInSeconds = 60
 
 #endregion
 
@@ -108,7 +109,7 @@ while ($true)
                 {
                     Write-Log @writeLogParams -Message $o
                     Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter created successfully"
-                    Start-Sleep 10
+                    Start-Sleep -Seconds 10
                     $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
                     $ip = $NATIp.split("/")[0]
                     $prefixLength = $NATIp.split("/")[1]
@@ -130,9 +131,9 @@ while ($true)
             {
                 Write-Log @writeLogParams -Message "Waiting for `'$publicAdapterName`' adapter's presence"
             }
-            Start-Sleep -Seconds 5
         }
     }
+
     if (-not ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
         Write-Log @writeLogParams -Message  "Checking $BgpNatVm VM's presence and state"
@@ -142,8 +143,8 @@ while ($true)
             $null = Get-NetAdapter -Name $privateAdapterName -ErrorAction SilentlyContinue  
             if ($?)
             {
-                Write-Log @writeLogParams -Message "Waiting for network adapter idle"
-                Start-Sleep -Seconds 30
+                Write-Log @writeLogParams -Message "Waiting for NIC configurations to complete for $defaultPollIntervalInSeconds seconds"
+                Start-Sleep -Seconds $defaultPollIntervalInSeconds
                 $BgpNatVmObj | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
                 Write-Log @writeLogParams -Message "$BgpNatVm's $BGPNATVMNetworkAdapterName network adapter plugged to $swName"
                 Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(BGPNATVMVMNetAdapterFixed`)"
@@ -151,9 +152,10 @@ while ($true)
             }
         }
     }
+
     if (-not ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Log @writeLogParams -Message "Checking if AZs-ACS01 deployed"
+        Write-Log @writeLogParams -Message "Waiting for $enableNatCheckFile to confirm AZs-ACS01 deployment state"
         $file = Resolve-Path -Path $enableNatCheckFile
         if ($file)
         {
@@ -167,7 +169,6 @@ while ($true)
                 Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
                 [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
             }
-            Start-Sleep -Seconds 5
         }
     }
 
@@ -180,10 +181,9 @@ while ($true)
         Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
         break
     }
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds $defaultPollIntervalInSeconds
     $loopCount++
 }
-
 
 '@
 

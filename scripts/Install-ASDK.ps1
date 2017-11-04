@@ -1,6 +1,7 @@
 #region service script
 $serviceScript = @'
 
+#region function Definition
 function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
 {
     # Create a NetSharingManager object
@@ -31,7 +32,6 @@ function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
 
 }
     
-
 function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
 {
     # Register the HNetCfg library (once)
@@ -54,89 +54,126 @@ function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
     $privateAdapter.DisableSharing()
 }
 
-# Register the HNetCfg library (once)
-regsvr32 /s hnetcfg.dll
+function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
+{
+    $t = Get-Date -Format "yyyy-MM-dd hh:mm:ss"
+    Write-Verbose "$Message - $t"
+    if ($Overwrite)
+    {
+        Set-Content -Path $LogFilePath -Value "$Message - $t"
+    }
+    else
+    {
+        Add-Content -Path $LogFilePath -Value "$Message - $t"
+    }
+}
+#endregion
 
-$swName = "deneme"
+#region Variables
+#$VerbosePreference = "Continue"
+$swName = "NATSw"
 $publicAdapterName = "Deployment"
 $privateAdapterName = "vEthernet `($swName`)"
 $BGPNATVMNetworkAdapterName = "NAT"
+$BgpNatVm = "AzS-BGPNAT01"
 $logFileFullPath = "C:\AzureStackonAzureVM\workaroundProgress.log"
-    
-Add-Content -Path $logFileFullPath -Value "Starting the service"
-Write-Verbose "Starting the service" -Verbose
+$enableNatCheckFile = "C:\CompleteBootDSCStatus\AZs-ACS01.*.xml"
+$writeLogParams = @{
+    LogFilePath = $logFileFullPath
+}
+$NATIp = "192.168.137.1/28"
+$NATIp = "192.168.137.0/28"
 
+#endregion
+
+# Register the HNetCfg library (once)
+regsvr32 /s hnetcfg.dll
+
+Write-Log @writeLogParams -Message "Starting the service"
+
+$loopCount = 0
 while ($true)
 {
-    if (-not ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine)))
+    if (-not ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine)))
     {
+        #Wait for Network Adapter presence than create new Internal Virtual Switch  
         $null = Get-NetAdapter -Name $publicAdapterName -ErrorAction SilentlyContinue  
         if ($?)
         {
             $null = Get-VMSwitch -Name $swName -ErrorAction SilentlyContinue
             if (-not ($?))
             {
-                $null = New-VMSwitch -Name $swName -SwitchType Internal -Verbose
+                $o = New-VMSwitch -Name $swName -SwitchType Internal -Verbose
                 if ($?)
                 {
-
-                    Add-Content -Path $logFileFullPath -Value "`'$swName`' switch and `'$privateAdapterName`' Adapter have been created successfully"    
-                    Write-Verbose "`'$swName`' switch and `'$privateAdapterName`' Adapter have been created successfully"  -Verbose
+                    Write-Log @writeLogParams -Message $o
+                    Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter have been created successfully"
+                    Start-Sleep 10
+                    $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
+                    $ip = $NATIp.split("/")[0]
+                    $prefixLength = $NATIp.split("/")[1]
+                    $o = New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress $ip -PrefixLength $prefixLength -AddressFamily IPv4
+                    if ($?)
+                    {
+                        Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set for adapter `'$privateAdapterName`'"
+                        Write-Log @writeLogParams -Message "Saving to Environment Variable `(VMSwitchCreated`)"
+                        [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
+                    }
+                    Write-Log @writeLogParams -Message $o
                 }
             }
 
-            Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
-            [System.Environment]::SetEnvironmentVariable('ICSEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
-            
-            Add-Content -Path $logFileFullPath -Value "ICS now enabled"
-            Write-Verbose "ICS now enabled"  -Verbose
         }
         else
         {
-            Add-Content -Path $logFileFullPath -Value "Waiting for `'$publicAdapterName`' adapter the become available"
-            Write-Verbose "Waiting for `'$publicAdapterName`' adapter the become available"  -Verbose
+            if ($loopCount -eq 0)
+            {
+                Write-Log @writeLogParams -Message "Waiting for `'$publicAdapterName`' adapter's presence"
+            }
             Start-Sleep -Seconds 5
         }
     }
     if (-not ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Verbose "Checking AzS-BGPNAT01 VM's presence and state" -Verbose
-        $BgpNatVm = Get-VM -Name "AzS-BGPNAT01" | ? state -eq running
-        if ($BgpNatVm)
+        Write-Log @writeLogParams -Message  "Checking $BgpNatVm VM's presence and state"
+        $BgpNatVmObj = Get-VM -Name $BgpNatVm | ? state -eq running
+        if ($BgpNatVmObj)
         {
-            $BgpNatVm | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
-            Add-Content -Path $logFileFullPath -Value "The VM`s NAT network adapter has been Connected to $swName"
-            Write-Verbose "The VM`s NAT network adapter has been Connected to $swName" -Verbose
+            Start-Sleep -Seconds 300
+            $BgpNatVmObj | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
+            Write-Log @writeLogParams -Message "$BgpNatVm's $BGPNATVMNetworkAdapterName network adapter plugged to $swName"
             [System.Environment]::SetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', $true, [System.EnvironmentVariableTarget]::Machine)
         }
     }
-    if (-not ([System.Environment]::GetEnvironmentVariable('ICSConvertedToNAT', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+    if (-not ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Verbose "Checking AzS-WASP01 VM's presence and state" -Verbose
-        $WASP01Vm = Get-VM -Name "AzS-WASP01" | ? state -eq running
-        if ($WASP01VM -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
+        Write-Log @writeLogParams -Message "Checking if AZs-ACS01 deployed"
+        $file = Resolve-Path -Path $enableNatCheckFile
+        if ($file)
         {
-            Disable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
+            [xml]$r = Get-Content -Path $file
+            if ($r.DeploymentDSC.status -like "?*")
+            {
+                Get-NetNat | Remove-NetNat -Confirm:$false
+                $o = New-NetNat -Name "Nat for BGPNAT Network" -InternalIPInterfaceAddressPrefix $NATNetwork
+                Write-Log @writeLogParams -Message "All Previous NATs removed and following NAT created"
+                Write-Log @writeLogParams -Message $o
+            }
             Start-Sleep -Seconds 5
-            Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
-            New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress "192.168.137.1" -PrefixLength 24 -AddressFamily IPv4
-            Get-NetNat | Remove-NetNat -Confirm:$false
-            New-NetNat -Name "NAT for BGPNAT Network" -InternalIPInterfaceAddressPrefix "192.168.137.0/24"
-            Add-Content -Path $logFileFullPath -Value "ICS have now been disabled and converted to NAT"
-            Write-Verbose "ICS have now been disabled and converted to NAT" -Verbose
-            [System.Environment]::SetEnvironmentVariable('ICSConvertedToNAT', $true, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable('ICSEnabled', $false, [System.EnvironmentVariableTarget]::Machine)
         }
     }
 
-    if (([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and ([System.Environment]::GetEnvironmentVariable('ICSEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $false) -and ([System.Environment]::SetEnvironmentVariable('ICSConvertedToNAT', $true, [System.EnvironmentVariableTarget]::Machine) -eq $true))
+    if (
+        ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
+        ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
+        ([System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Verbose "Workaround Fully Applied"  -Verbose
-        Add-Content -Path $logFileFullPath -Value "Workaround Fully Applied, check back, BGPNATVMVMNetAdapterFixed and ICSEnabled Envrionment variables"
+        Write-Log @writeLogParams -Message "All Workarounds applied, Unregistering the service"
         Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
         break
     }
     Start-Sleep -Seconds 5
+    $loopCount++
 }
 
 '@
@@ -220,7 +257,7 @@ $InstallAzSPOCParams = @{
     AdminPassword = $adminpass
     InfraAzureDirectoryTenantAdminCredential = $aadcred 
     InfraAzureDirectoryTenantName = $aadTenant
-    NATIPv4Subnet = "192.168.137.0/24"
+    NATIPv4Subnet = "192.168.137.0/28"
     NATIPv4Address = "192.168.137.11"
     NATIPv4DefaultGateway = "192.168.137.1"
     TimeServer = $timeServer

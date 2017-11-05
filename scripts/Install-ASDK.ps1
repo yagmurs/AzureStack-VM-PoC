@@ -76,13 +76,18 @@ $publicAdapterName = "Deployment"
 $privateAdapterName = "vEthernet `($swName`)"
 $BGPNATVMNetworkAdapterName = "NAT"
 $BgpNatVm = "AzS-BGPNAT01"
-$logFileFullPath = "C:\AzureStackonAzureVM\workaroundProgress.log"
+$logFileFullPath = "C:\AzureStackonAzureVM\CompanionServiceProgress.log"
 $enableNatCheckFile = "C:\CompleteBootDSCStatus\AZs-ACS01.*.xml"
 $writeLogParams = @{
     LogFilePath = $logFileFullPath
 }
 $NATIp = "192.168.137.1/28"
-$NATNetwork = "192.168.137.0/28"
+
+$IP = $natip.split("/")
+$Octet = $IP[0].split(".")
+$Octet[3] = 0
+$NATNetwork = ($Octet -join ".") + "/" + $ip[1]
+
 [int]$defaultPollIntervalInSeconds = 60
 $ICS = $true
 
@@ -111,23 +116,15 @@ while ($true)
                     Write-Log @writeLogParams -Message $o
                     Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter created successfully"
                     Start-Sleep -Seconds 10
-                    if ($ICS -eq $true)
+                    $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
+                    $ip = $NATIp.split("/")[0]
+                    $prefixLength = $NATIp.split("/")[1]
+                    $o = New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress $ip -PrefixLength $prefixLength -AddressFamily IPv4
+                    if ($?)
                     {
+                        Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set to adapter `'$privateAdapterName`'"
                         Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(VMSwitchCreated`)"
                         [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
-                    }
-                    else
-                    {
-                        $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
-                        $ip = $NATIp.split("/")[0]
-                        $prefixLength = $NATIp.split("/")[1]
-                        $o = New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress $ip -PrefixLength $prefixLength -AddressFamily IPv4
-                        if ($?)
-                        {
-                            Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set to adapter `'$privateAdapterName`'"
-                            Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(VMSwitchCreated`)"
-                            [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
-                        }
                     }
                     Write-Log @writeLogParams -Message $o
                 }

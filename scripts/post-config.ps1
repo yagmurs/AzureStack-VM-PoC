@@ -41,7 +41,7 @@ Set-ExecutionPolicy unrestricted -Force
 #Downloads Azure Stack Downloader
 New-Item -Path c:\AzureStackonAzureVM -ItemType Directory -Force
 Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/Install-ASDK.ps1" -OutFile "C:\AzureStackonAzureVM\Install-ASDK.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/Install-ASDK.ps1" -OutFile "C:\AzureStackonAzureVM\Install-ASDK.ps1"
 New-Item -ItemType SymbolicLink -Path "C:\users\Public\Desktop" -Name "Install-ASDK" -Value "C:\AzureStackonAzureVM\Install-ASDK.ps1"
 
 

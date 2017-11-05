@@ -4,9 +4,9 @@
     "parameters": {
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "Host1",
+            "defaultValue": "AzS-HOST1",
             "metadata": {
-                "name": "Host1"
+                "name": "AzS-HOST1"
             }
         },
         "virtualMachineSize": {

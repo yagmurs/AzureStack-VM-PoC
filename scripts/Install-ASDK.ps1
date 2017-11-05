@@ -84,6 +84,7 @@ $writeLogParams = @{
 $NATIp = "192.168.137.1/28"
 $NATNetwork = "192.168.137.0/28"
 [int]$defaultPollIntervalInSeconds = 60
+$ICS = $true
 
 #endregion
 
@@ -110,15 +111,23 @@ while ($true)
                     Write-Log @writeLogParams -Message $o
                     Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter created successfully"
                     Start-Sleep -Seconds 10
-                    $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
-                    $ip = $NATIp.split("/")[0]
-                    $prefixLength = $NATIp.split("/")[1]
-                    $o = New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress $ip -PrefixLength $prefixLength -AddressFamily IPv4
-                    if ($?)
+                    if ($ICS -eq $true)
                     {
-                        Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set for adapter `'$privateAdapterName`'"
                         Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(VMSwitchCreated`)"
                         [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
+                    }
+                    else
+                    {
+                        $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
+                        $ip = $NATIp.split("/")[0]
+                        $prefixLength = $NATIp.split("/")[1]
+                        $o = New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress $ip -PrefixLength $prefixLength -AddressFamily IPv4
+                        if ($?)
+                        {
+                            Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set to adapter `'$privateAdapterName`'"
+                            Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(VMSwitchCreated`)"
+                            [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
+                        }
                     }
                     Write-Log @writeLogParams -Message $o
                 }
@@ -162,12 +171,25 @@ while ($true)
             [xml]$r = Get-Content -Path $file
             if ($r.DeploymentDSC.status -like "?*")
             {
-                Get-NetNat | Remove-NetNat -Confirm:$false
-                $o = New-NetNat -Name "Nat for BGPNAT Network" -InternalIPInterfaceAddressPrefix $NATNetwork
-                Write-Log @writeLogParams -Message "All Previous NATs removed and following NAT created"
-                Write-Log @writeLogParams -Message $o
-                Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
-                [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
+                if ($ICS -eq $true)
+                {
+                    Get-NetNat | Remove-NetNat -Confirm:$false
+                    $o = Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
+                    Write-Log @writeLogParams -Message "All Previous NATs removed and ICS Enabled instead"
+                    Write-Log @writeLogParams -Message $o
+                    Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
+                    [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
+
+                }
+                else
+                {
+                    Get-NetNat | Remove-NetNat -Confirm:$false
+                    $o = New-NetNat -Name "Nat for BGPNAT Network" -InternalIPInterfaceAddressPrefix $NATNetwork
+                    Write-Log @writeLogParams -Message "All Previous NATs removed and following NAT created"
+                    Write-Log @writeLogParams -Message $o
+                    Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
+                    [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
+                }
             }
         }
     }
@@ -234,8 +256,8 @@ $aadAdmin = Read-Host -Prompt "Enter Azure AD Global Administrator account name.
 $aadTenant = Read-Host -Prompt "Enter Azure AD domain name. ex: <aadName>.onmicrosoft.com"
 
 do {
-$aadPass = Read-Host -Prompt "Enter Azure AD Global Administrator Password" -AsSecureString
-$aadPass1 = Read-Host -Prompt "Re-Enter Azure AD Global Administrator Password" -AsSecureString
+$aadPass = Read-Host -Prompt "Enter password for $aadAdmin@$aadTenant" -AsSecureString
+$aadPass1 = Read-Host -Prompt "Re-Enter password for $aadAdmin@$aadTenant" -AsSecureString
 $aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass))
 $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass1))
     if ($aadPass_text -cne $aadpass1_text)

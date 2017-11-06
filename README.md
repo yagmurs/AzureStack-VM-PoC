@@ -8,7 +8,13 @@ Creates a new VM and installs prerequisites to install AzureStack Development ki
     <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
 </a>
 
-This template creates a new VM to easily evaluate AzureStack PoC on an Azure VM, and installs and configures all prerequisites. Run Install-ASDK.ps1 on desktop with PowerShell, fill out information
+
+This template creates a new Azure VM, and installs and configures all prerequisites to install Azure Stack Development Kit to evaluate Azure Stack functionality. 
+
+ --Highlighted steps--
+ * Deploy the template
+ * Logon to Azure VM
+ * Run Install-ASDK.ps1 script
 
 Please read the following article for details
 https://blogs.technet.microsoft.com/yagmurs/deploying-azure-stack-development-kit-asdk-straight-on-azure-vm

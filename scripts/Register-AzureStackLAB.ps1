@@ -13,7 +13,7 @@ param (
 )
 
 Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted 
-Get-Module -ListAvailable | where-Object {$_.Name -like “Azure*”} | Uninstall-Module 
+Get-Module -ListAvailable | where-Object {$_.Name -like "Azure*"} | Uninstall-Module 
 
 # Install the AzureRM.Bootstrapper module. Select Yes when prompted to install NuGet  
 Install-Module -Name AzureRm.BootStrapper 
@@ -23,7 +23,7 @@ Install-Module -Name AzureRm.BootStrapper
 Use-AzureRmProfile -Profile 2017-03-09-profile -Force 
 Install-Module -Name AzureStack -RequiredVersion 1.2.11 
 
-Get-Module -ListAvailable | where-Object {$_.Name -like “Azure*”} 
+Get-Module -ListAvailable | where-Object {$_.Name -like "Azure*"} 
 
 Login-AzureRmAccount -EnvironmentName "AzureCloud"
 Register-AzureRmResourceProvider -ProviderNamespace Microsoft.AzureStack 

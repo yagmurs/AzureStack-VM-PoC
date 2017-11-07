@@ -176,7 +176,6 @@ while ($true)
                     Write-Log @writeLogParams -Message $o
                     Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
                     [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
-
                 }
                 else
                 {
@@ -196,9 +195,20 @@ while ($true)
         ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
         ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
-        Write-Log @writeLogParams -Message "All Workarounds applied, Unregistering the service"
-        Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
-        break
+        if ($ICS -eq $true)
+        {
+            $o = Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
+            Write-Log @writeLogParams -Message "ICS Enabled"
+            Write-Log @writeLogParams -Message $o
+            Write-Log @writeLogParams -Message "All Workarounds applied, as a workaround service will start on next reboot to re-enable ICS"
+            break
+        }
+        else
+        {
+            Write-Log @writeLogParams -Message "All Workarounds applied, Unregistering the service"
+            Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
+            break
+        }
     }
     Start-Sleep -Seconds $defaultPollIntervalInSeconds
     $loopCount++

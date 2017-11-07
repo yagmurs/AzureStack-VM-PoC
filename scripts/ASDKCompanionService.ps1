@@ -87,13 +87,14 @@ $NATNetwork = ($Octet -join ".") + "/" + $ip[1]
 
 [int]$defaultPollIntervalInSeconds = 60
 $ICS = $true
+$serviceVersion = "1.0"
 
 #endregion
 
 # Register the HNetCfg library (once)
 regsvr32 /s hnetcfg.dll
 
-Write-Log @writeLogParams -Message "Starting the service"
+Write-Log @writeLogParams -Message "Starting the service `($serviceVersion`)"
 
 $loopCount = 0
 while ($true)
@@ -197,7 +198,7 @@ while ($true)
             $o = Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
             Write-Log @writeLogParams -Message "ICS Enabled"
             Write-Log @writeLogParams -Message $o
-            Write-Log @writeLogParams -Message "All fixes applied, as a workaround service will start on next reboot to re-enable ICS"
+            Write-Log @writeLogParams -Message "All fixes applied, as a workaround service will start on next boot to re-enable ICS"
             break
         }
         else

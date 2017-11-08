@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 param (
            # Param1 help description
         [Parameter(Mandatory=$true)]

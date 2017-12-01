@@ -19,6 +19,24 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$tempFileFullPath,$FilenameFullPath,"Optimal") | Out-Null
         $zip.Dispose()
 }
+
+function findLatestASDK ($version, $asdkURIRoot, $asdkFileList)
+{
+    try
+    {
+        $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
+        if ($r -eq 200)
+        {
+            $version
+        }
+    }
+    catch [System.Net.WebException],[System.Exception]
+    {
+        $i++
+        $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
+        findLatestASDK -version $version -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
+    }
+}
 #endregion
 
 #region Variables
@@ -60,8 +78,6 @@ $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAd
 
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"
-$version = get-date -Format "yyMM"
-$versionPrevious = get-date (Get-Date).AddMonths(-1) -Format "yyMM"
 $asdkDownloadPath = "D:"
 $asdkExtractFolder = "Azure Stack Development Kit"
 $asdkDownloaderFile = "AzureStackDownloader.exe"
@@ -99,25 +115,8 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         $testPathResult = (Test-Path $AsdkFiles)
         if ($testPathResult -contains $false)
         {
-            try
-            {
-                $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode 
-            }
-            catch [System.Net.WebException],[System.Exception]
-            {
-                $r = 404
-            }
-
-            if ($r -eq 200)
-            {
-                Write-Verbose "Downloading This month's release of ASDK `($version`)" -Verbose
-                $asdkFileList | % {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
-            }
-            else
-            {
-                Write-Verbose "Downloading last month's release of ASDK `($versionPrevious`)" -Verbose
-                $asdkFileList | % {Start-BitsTransfer -Source $($asdkURIRoot + $versionPrevious + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
-            }
+            $version = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
+            $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
         }
 
         $i = 0

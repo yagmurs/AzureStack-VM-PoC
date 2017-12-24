@@ -143,7 +143,7 @@ $vhdxFullPath = Join-Path -Path $asdkDownloadPath -ChildPath (Join-Path -Path $a
 $foldersToCopy = 'CloudDeployment', 'fwupdate', 'tools'
 $destPath = 'C:\'
 $InstallAzSPOCParams = @{
-    AdminPassword = $adminpass
+    AdminPassword = $localAdminPass
     InfraAzureDirectoryTenantAdminCredential = $aadcred 
     InfraAzureDirectoryTenantName = $aadTenant
     NATIPv4Subnet = "192.168.137.0/28"
@@ -201,7 +201,18 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
     if (Test-Path -Path $vhdxFullPath)
     {
         Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
-        $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | ? size -gt 500MB | Select-Object -ExpandProperty driveletter
+        Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
+        try {
+            $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+            Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
+        }
+        catch {
+            Write-Log @writeLogParams -Message "an error occured while mounting cloudbuilder.vhdxf file"
+            Write-Log @writeLogParams -Message $error[0].Exception
+            throw "an error occured while mounting cloudbuilder.vhdxf file"
+        }
+        $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+        Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
         foreach ($folder in $foldersToCopy)
         {
             Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"
@@ -228,6 +239,10 @@ else
 
 #Download Azure Stack DEvelopment Kit Companion Service script
 Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"
+if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
+{
+    Get-ScheduledJob -name "ASDK Installer Companion Service" | Unregister-ScheduledJob -Force
+}
 $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "$defaultLocalPath\ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
 $st.StartJob()
 

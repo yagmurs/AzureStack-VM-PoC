@@ -56,12 +56,17 @@ $adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.I
 
 } until ($adminPass_text -ceq $adminpass1_text)
 
-$aadAdmin = Read-Host -Prompt "Enter Azure AD Global Administrator account name. ex: adm"
-$aadTenant = Read-Host -Prompt "Enter Azure AD domain name. ex: <aadName>.onmicrosoft.com"
+do {
+$aadAdminUser = Read-Host -Prompt "`nMake sure the user will have Global Administrator Permission on Azure Active Directory`nThe username format must be as follows: <Tenant Admin>@<Tenant name>.onmicrosoft.com`n`nEnter Azure AD user"
+
+} until ($aadAdminUser -match "(^[A-Z0-9._-]{1,64})@([A-Z0-9]{1,27}\.)onmicrosoft\.com$")
+
+$aadAdmin  = $aadAdminUser.Split("@")[0]
+$aadTenant = $aadAdminUser.Split("@")[1]
 
 do {
-$aadPass = Read-Host -Prompt "Enter password for $aadAdmin@$aadTenant" -AsSecureString
-$aadPass1 = Read-Host -Prompt "Re-Enter password for $aadAdmin@$aadTenant" -AsSecureString
+$aadPass = Read-Host -Prompt "Enter password for $aadAdminUser" -AsSecureString
+$aadPass1 = Read-Host -Prompt "Re-Enter password for $aadAdminUser" -AsSecureString
 $aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass))
 $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass1))
     if ($aadPass_text -cne $aadpass1_text)
@@ -72,7 +77,7 @@ $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.Int
 } until ($aadPass_text -ceq $aadpass1_text)
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $adminPass)
-$aadcred = New-Object System.Management.Automation.PSCredential ($("$aadAdmin" + '@' + "$aadTenant"), $aadPass)
+$aadcred = New-Object System.Management.Automation.PSCredential ($aadAdminUser, $aadPass)
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 
@@ -116,6 +121,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         if ($testPathResult -contains $false)
         {
             $version = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
+            Print-Output -message "Start downloading ASDK$version"
             $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
         }
 
@@ -177,5 +183,5 @@ $st.StartJob()
 #Download Azure Stack Register script
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/Register-AzureStackLAB.ps1" -OutFile "C:\AzureStackonAzureVM\Register-AzureStackLAB.ps1"
 
-cd C:\CloudDeployment\Setup
+Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams

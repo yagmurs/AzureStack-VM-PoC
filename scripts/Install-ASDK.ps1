@@ -1,214 +1,3 @@
-#region service script
-$serviceScript = @'
-
-#region function Definition
-function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
-{
-    # Create a NetSharingManager object
-    $m = New-Object -ComObject HNetCfg.HNetShare
-
-    # Find connection
-    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
-
-
-    # Get sharing configuration
-    $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
-    $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
-        
-    Start-Sleep -Seconds 2
-
-    # Disable sharing
-    $publicAdapter.DisableSharing()
-    $privateAdapter.DisableSharing()
-
-    # Enable sharing (0 - public, 1 - private)
-
-    # Enable sharing public on Network_1
-    $publicAdapter.EnableSharing(0)
-
-    # Enable sharing private on Network_2
-    $privateAdapter.EnableSharing(1)
-
-}
-    
-function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
-{
-    # Register the HNetCfg library (once)
-    regsvr32 /s hnetcfg.dll
-
-    # Create a NetSharingManager object
-    $m = New-Object -ComObject HNetCfg.HNetShare
-
-    # Find connection
-    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
-
-
-    # Get sharing configuration
-    $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
-    $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
-        
-    # Disable sharing
-    $publicAdapter.DisableSharing()
-    $privateAdapter.DisableSharing()
-}
-
-function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
-{
-    $t = Get-Date -Format "yyyy-MM-dd hh:mm:ss"
-    Write-Verbose "$Message - $t"
-    if ($Overwrite)
-    {
-        Set-Content -Path $LogFilePath -Value "$Message - $t"
-    }
-    else
-    {
-        Add-Content -Path $LogFilePath -Value "$Message - $t"
-    }
-}
-#endregion
-
-#region Variables
-$VerbosePreference = "Continue"
-$swName = "NATSw"
-$publicAdapterName = "Deployment"
-$privateAdapterName = "vEthernet `($swName`)"
-$BGPNATVMNetworkAdapterName = "NAT"
-$BgpNatVm = "AzS-BGPNAT01"
-$logFileFullPath = "C:\AzureStackonAzureVM\CompanionServiceProgress.log"
-$enableNatCheckFile = "C:\CompleteBootDSCStatus\AZs-ACS01.*.xml"
-$writeLogParams = @{
-    LogFilePath = $logFileFullPath
-}
-$NATIp = "192.168.137.1/28"
-
-$IP = $natip.split("/")
-$Octet = $IP[0].split(".")
-$Octet[3] = 0
-$NATNetwork = ($Octet -join ".") + "/" + $ip[1]
-
-[int]$defaultPollIntervalInSeconds = 60
-$ICS = $true
-
-#endregion
-
-# Register the HNetCfg library (once)
-regsvr32 /s hnetcfg.dll
-
-Write-Log @writeLogParams -Message "Starting the service"
-
-$loopCount = 0
-while ($true)
-{
-    if (-not ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine) -eq $true))
-    {
-        #Wait for Network Adapter presence if so will create new Internal Virtual Switch  
-        $null = Get-NetAdapter -Name $publicAdapterName -ErrorAction SilentlyContinue  
-        if ($?)
-        {
-            $null = Get-VMSwitch -Name $swName -ErrorAction SilentlyContinue
-            if (-not ($?))
-            {
-                $o = New-VMSwitch -Name $swName -SwitchType Internal -Verbose
-                if ($?)
-                {
-                    Write-Log @writeLogParams -Message $o
-                    Write-Log @writeLogParams -Message "`'$swName`' switch and `'$privateAdapterName`' Adapter created successfully"
-                    Start-Sleep -Seconds 10
-                    $o = Remove-NetIPAddress -InterfaceAlias "$privateAdapterName" -Confirm:$false
-                    $ip = $NATIp.split("/")[0]
-                    $prefixLength = $NATIp.split("/")[1]
-                    $o = New-NetIPAddress -InterfaceAlias "$privateAdapterName" -IPAddress $ip -PrefixLength $prefixLength -AddressFamily IPv4
-                    if ($?)
-                    {
-                        Write-Log @writeLogParams -Message "IP address `($ip`) and PrefixLength `($prefixLength`) successfully set to adapter `'$privateAdapterName`'"
-                        Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(VMSwitchCreated`)"
-                        [System.Environment]::SetEnvironmentVariable('VMSwitchCreated', $true, [System.EnvironmentVariableTarget]::Machine)
-                    }
-                    Write-Log @writeLogParams -Message $o
-                }
-            }
-
-        }
-        else
-        {
-            if ($loopCount -eq 0)
-            {
-                Write-Log @writeLogParams -Message "Waiting for `'$publicAdapterName`' adapter's presence"
-            }
-        }
-    }
-
-    if (-not ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true))
-    {
-        Write-Log @writeLogParams -Message  "Checking $BgpNatVm VM's presence and state"
-        $BgpNatVmObj = Get-VM -Name $BgpNatVm | ? state -eq running
-        if ($BgpNatVmObj)
-        {
-            $null = Get-NetAdapter -Name $privateAdapterName -ErrorAction SilentlyContinue  
-            if ($?)
-            {
-                Write-Log @writeLogParams -Message "Waiting for NIC configurations to complete for $defaultPollIntervalInSeconds seconds"
-                Start-Sleep -Seconds $defaultPollIntervalInSeconds
-                $BgpNatVmObj | Get-VMNetworkAdapter -Name $BGPNATVMNetworkAdapterName | Connect-VMNetworkAdapter -SwitchName $swName
-                Write-Log @writeLogParams -Message "$BgpNatVm's $BGPNATVMNetworkAdapterName network adapter plugged to $swName"
-                Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(BGPNATVMVMNetAdapterFixed`)"
-                [System.Environment]::SetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', $true, [System.EnvironmentVariableTarget]::Machine)
-            }
-        }
-    }
-
-    if (-not ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
-    {
-        Write-Log @writeLogParams -Message "Waiting for $enableNatCheckFile to confirm AZs-ACS01 deployment state"
-        $file = Resolve-Path -Path $enableNatCheckFile
-        if ($file)
-        {
-            [xml]$r = Get-Content -Path $file
-            if ($r.DeploymentDSC.status -like "?*")
-            {
-                if ($ICS -eq $true)
-                {
-                    Get-NetNat | Remove-NetNat -Confirm:$false
-                    $o = Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
-                    Write-Log @writeLogParams -Message "All Previous NATs removed and ICS Enabled instead"
-                    Write-Log @writeLogParams -Message $o
-                    Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
-                    [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
-
-                }
-                else
-                {
-                    Get-NetNat | Remove-NetNat -Confirm:$false
-                    $o = New-NetNat -Name "Nat for BGPNAT Network" -InternalIPInterfaceAddressPrefix $NATNetwork
-                    Write-Log @writeLogParams -Message "All Previous NATs removed and following NAT created"
-                    Write-Log @writeLogParams -Message $o
-                    Write-Log @writeLogParams -Message "This step completed. Saving to Environment Variable `(NATEnabled`)"
-                    [System.Environment]::SetEnvironmentVariable('NATEnabled', $true, [System.EnvironmentVariableTarget]::Machine)
-                }
-            }
-        }
-    }
-
-    if (
-        ([System.Environment]::GetEnvironmentVariable('VMSwitchCreated', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
-        ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
-        ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
-    {
-        Write-Log @writeLogParams -Message "All Workarounds applied, Unregistering the service"
-        Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
-        break
-    }
-    Start-Sleep -Seconds $defaultPollIntervalInSeconds
-    $loopCount++
-}
-
-'@
-
-$serviceScript | Out-File "c:\AzureStackonAzureVM\Install-ASDKCompanionService.ps1" -Force
-#endregion
-
 #region Fuctions
 function Print-Output ($message)
 {
@@ -230,10 +19,28 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$tempFileFullPath,$FilenameFullPath,"Optimal") | Out-Null
         $zip.Dispose()
 }
+
+function findLatestASDK ($version, $asdkURIRoot, $asdkFileList)
+{
+    try
+    {
+        $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
+        if ($r -eq 200)
+        {
+            $version
+        }
+    }
+    catch [System.Net.WebException],[System.Exception]
+    {
+        $i++
+        $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
+        findLatestASDK -version $version -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
+    }
+}
 #endregion
 
 #region Variables
-
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 
@@ -249,12 +56,17 @@ $adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.I
 
 } until ($adminPass_text -ceq $adminpass1_text)
 
-$aadAdmin = Read-Host -Prompt "Enter Azure AD Global Administrator account name. ex: adm"
-$aadTenant = Read-Host -Prompt "Enter Azure AD domain name. ex: <aadName>.onmicrosoft.com"
+do {
+$aadAdminUser = Read-Host -Prompt "`nMake sure the user will have Global Administrator Permission on Azure Active Directory`nThe username format must be as follows: <Tenant Admin>@<Tenant name>.onmicrosoft.com`n`nEnter Azure AD user"
+
+} until ($aadAdminUser -match "(^[A-Z0-9._-]{1,64})@([A-Z0-9]{1,27}\.)onmicrosoft\.com$")
+
+$aadAdmin  = $aadAdminUser.Split("@")[0]
+$aadTenant = $aadAdminUser.Split("@")[1]
 
 do {
-$aadPass = Read-Host -Prompt "Enter password for $aadAdmin@$aadTenant" -AsSecureString
-$aadPass1 = Read-Host -Prompt "Re-Enter password for $aadAdmin@$aadTenant" -AsSecureString
+$aadPass = Read-Host -Prompt "Enter password for $aadAdminUser" -AsSecureString
+$aadPass1 = Read-Host -Prompt "Re-Enter password for $aadAdminUser" -AsSecureString
 $aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass))
 $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass1))
     if ($aadPass_text -cne $aadpass1_text)
@@ -265,14 +77,12 @@ $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.Int
 } until ($aadPass_text -ceq $aadpass1_text)
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $adminPass)
-$aadcred = New-Object System.Management.Automation.PSCredential ($("$aadAdmin" + '@' + "$aadTenant"), $aadPass)
+$aadcred = New-Object System.Management.Automation.PSCredential ($aadAdminUser, $aadPass)
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"
-$version = get-date -Format "yyMM"
-$versionPrevious = get-date (Get-Date).AddMonths(-1) -Format "yyMM"
 $asdkDownloadPath = "D:"
 $asdkExtractFolder = "Azure Stack Development Kit"
 $asdkDownloaderFile = "AzureStackDownloader.exe"
@@ -310,25 +120,9 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         $testPathResult = (Test-Path $AsdkFiles)
         if ($testPathResult -contains $false)
         {
-            try
-            {
-                $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode 
-            }
-            catch [System.Net.WebException],[System.Exception]
-            {
-                $r = 404
-            }
-
-            if ($r -eq 200)
-            {
-                Write-Verbose "Downloading This month's release of ASDK `($version`)" -Verbose
-                $asdkFileList | % {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
-            }
-            else
-            {
-                Write-Verbose "Downloading last month's release of ASDK `($versionPrevious`)" -Verbose
-                $asdkFileList | % {Start-BitsTransfer -Source $($asdkURIRoot + $versionPrevious + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
-            }
+            $version = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
+            Print-Output -message "Start downloading ASDK$version"
+            $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
         }
 
         $i = 0
@@ -380,8 +174,14 @@ else
 {
     Write-Error "$zipfile1 cannot be found"
 }
-$st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "c:\AzureStackonAzureVM\Install-ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
+
+#Download Azure Stack DEvelopment Kit Companion Service script
+Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "C:\AzureStackonAzureVM\ASDKCompanionService.ps1"
+$st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "c:\AzureStackonAzureVM\ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
 $st.StartJob()
 
-cd C:\CloudDeployment\Setup
+#Download Azure Stack Register script
+Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "C:\AzureStackonAzureVM\Register-AzureStackLAB.ps1"
+
+Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams

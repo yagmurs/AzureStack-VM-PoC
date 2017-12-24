@@ -207,11 +207,10 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
             Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
         }
         catch {
-            Write-Log @writeLogParams -Message "an error occured while mounting cloudbuilder.vhdxf file"
+            Write-Log @writeLogParams -Message "an error occured while mounting cloudbuilder.vhdx file"
             Write-Log @writeLogParams -Message $error[0].Exception
             throw "an error occured while mounting cloudbuilder.vhdxf file"
         }
-        $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
         Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
         foreach ($folder in $foldersToCopy)
         {

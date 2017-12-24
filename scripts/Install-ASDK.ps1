@@ -109,6 +109,10 @@ if ($interactive -eq $true)
 $aadAdmin  = $AadAdminUser.Split("@")[0]
 $aadTenant = $AadAdminUser.Split("@")[1]
 
+if ($Interactive -eq $true)
+{
+    Read-Host -Prompt "We are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use `n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or ctrl+c to cancel and starover"    
+}
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
 $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)

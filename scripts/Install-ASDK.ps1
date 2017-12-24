@@ -40,7 +40,7 @@ function findLatestASDK ($version, $asdkURIRoot, $asdkFileList)
 #endregion
 
 #region Variables
-
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 
@@ -176,12 +176,12 @@ else
 }
 
 #Download Azure Stack DEvelopment Kit Companion Service script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/ASDKCompanionService.ps1" -OutFile "C:\AzureStackonAzureVM\ASDKCompanionService.ps1"
+Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "C:\AzureStackonAzureVM\ASDKCompanionService.ps1"
 $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "c:\AzureStackonAzureVM\ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
 $st.StartJob()
 
 #Download Azure Stack Register script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/Register-AzureStackLAB.ps1" -OutFile "C:\AzureStackonAzureVM\Register-AzureStackLAB.ps1"
+Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "C:\AzureStackonAzureVM\Register-AzureStackLAB.ps1"
 
 Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams

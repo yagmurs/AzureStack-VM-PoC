@@ -1,3 +1,16 @@
+param (
+    [bool]
+    $Interactive = $true,
+    [Security.SecureString]
+    $LocalAadminPass,
+    [string]
+    $AadAdminUser,
+    [Security.SecureString]
+    $AadPassword,
+    [string]
+    $LocalAdminUsername = "Administrator"
+)
+
 #region Fuctions
 function Print-Output ($message)
 {
@@ -40,49 +53,68 @@ function findLatestASDK ($version, $asdkURIRoot, $asdkFileList)
 #endregion
 
 #region Variables
+$defaultLocalPath = "C:\AzureStackonAzureVM"
 $gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 
-do {
-$adminPass = Read-Host -Prompt "Enter for Administrator Password" -AsSecureString
-$adminPass1 = Read-Host -Prompt "Re-Enter for Administrator Password" -AsSecureString
-$adminPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($adminPass))
-$adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($adminPass1))
-    if ($adminPass_text -cne $adminpass1_text)
-    {
-        Write-Output "Password does not match, re-enter password"
-    }
+Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
+$localCredValidated = $false
+if ($interactive -eq $true)
+{
+    do {
+    $localAdminPass = Read-Host -Prompt "Enter password for the user `'Administrator`'" -AsSecureString
+    $localAdminPass1 = Read-Host -Prompt "Re-Enter password for the user `'Administrator`'" -AsSecureString
+    $adminPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($localAdminPass))
+    $adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($localAdminPass1))
+        if ($adminPass_text -cne $adminpass1_text)
+        {
+            Write-Verbose "Password does not match, re-enter password" -Verbose
+        }
+        else
+        {
+            if ($DS.ValidateCredentials($LocalAdminUsername, $adminPass_text) -eq $true)
+            {
+                $localCredValidated =  $true
+                Write-Verbose "Password validated for user: $LocalAdminUsername" -Verbose
+            }
+            else
+            {
+                Write-Verbose "Password cannot be validated for user: $LocalAdminUsername" -Verbose
+            }
+        }
 
-} until ($adminPass_text -ceq $adminpass1_text)
+    } while ($localCredValidated -eq $false)
 
-do {
-$aadAdminUser = Read-Host -Prompt "`nMake sure the user will have Global Administrator Permission on Azure Active Directory`nThe username format must be as follows: <Tenant Admin>@<Tenant name>.onmicrosoft.com`n`nEnter Azure AD user"
+    do {
+    $AadAdminUser = Read-Host -Prompt "`nMake sure the user will have Global Administrator Permission on Azure Active Directory`nThe username format must be as follows:`n`n<Tenant Admin>@<Tenant name>.onmicrosoft.com`n`nEnter Azure AD user"
 
-} until ($aadAdminUser -match "(^[A-Z0-9._-]{1,64})@([A-Z0-9]{1,27}\.)onmicrosoft\.com$")
+    } until ($AadAdminUser -match "(^[A-Z0-9._-]{1,64})@([A-Z0-9]{1,27}\.)onmicrosoft\.com$")
 
-$aadAdmin  = $aadAdminUser.Split("@")[0]
-$aadTenant = $aadAdminUser.Split("@")[1]
+    do {
+    $AadPassword = Read-Host -Prompt "Enter password for $AadAdminUser" -AsSecureString
+    $AadPassword1 = Read-Host -Prompt "Re-Enter password for $AadAdminUser" -AsSecureString
+    $aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($AadPassword))
+    $aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($AadPassword1))
+        if ($aadPass_text -cne $aadpass1_text)
+        {
+            Write-Output "Password does not match, re-enter password"
+        }
 
-do {
-$aadPass = Read-Host -Prompt "Enter password for $aadAdminUser" -AsSecureString
-$aadPass1 = Read-Host -Prompt "Re-Enter password for $aadAdminUser" -AsSecureString
-$aadPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass))
-$aadPass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($aadPass1))
-    if ($aadPass_text -cne $aadpass1_text)
-    {
-        Write-Output "Password does not match, re-enter password"
-    }
+    } until ($aadPass_text -ceq $aadpass1_text)
+}
 
-} until ($aadPass_text -ceq $aadpass1_text)
+$aadAdmin  = $AadAdminUser.Split("@")[0]
+$aadTenant = $AadAdminUser.Split("@")[1]
 
-$localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $adminPass)
-$aadcred = New-Object System.Management.Automation.PSCredential ($aadAdminUser, $aadPass)
+
+$localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
+$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 
-$defaultLocalPath = "C:\AzureStackonAzureVM"
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"
 $asdkDownloadPath = "D:"

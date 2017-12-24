@@ -11,7 +11,11 @@ function Disable-InternetExplorerESC {
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
 }
 
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development"
+$defaultLocalPath = "C:\AzureStackonAzureVM"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/config.ind" -OutFile "$defaultLocalPath\config.ind"
+$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+
 #Disables Internet Explorer Enhanced Security Configuration
 Disable-InternetExplorerESC
 
@@ -41,11 +45,11 @@ Rename-LocalUser -Name $username -NewName Administrator
 Set-ExecutionPolicy unrestricted -Force
 
 #Downloads Azure Stack Downloader
-New-Item -Path c:\AzureStackonAzureVM -ItemType Directory -Force
+New-Item -Path $defaultLocalPath -ItemType Directory -Force
 Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
-Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "C:\AzureStackonAzureVM\Install-ASDK.ps1"
+Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"
 
-New-Item -ItemType SymbolicLink -Path "C:\users\Public\Desktop" -Name "Install-ASDK" -Value "C:\AzureStackonAzureVM\Install-ASDK.ps1"
+New-Item -ItemType SymbolicLink -Path "C:\users\Public\Desktop" -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
 
 
 Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart

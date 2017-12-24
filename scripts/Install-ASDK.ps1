@@ -40,7 +40,8 @@ function findLatestASDK ($version, $asdkURIRoot, $asdkFileList)
 #endregion
 
 #region Variables
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development"
+$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 
@@ -81,6 +82,7 @@ $aadcred = New-Object System.Management.Automation.PSCredential ($aadAdminUser, 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 
+$defaultLocalPath = "C:\AzureStackonAzureVM"
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"
 $asdkDownloadPath = "D:"
@@ -176,12 +178,12 @@ else
 }
 
 #Download Azure Stack DEvelopment Kit Companion Service script
-Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "C:\AzureStackonAzureVM\ASDKCompanionService.ps1"
-$st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "c:\AzureStackonAzureVM\ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
+Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"
+$st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "$defaultLocalPath\ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
 $st.StartJob()
 
 #Download Azure Stack Register script
-Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "C:\AzureStackonAzureVM\Register-AzureStackLAB.ps1"
+Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "$defaultLocalPath\Register-AzureStackLAB.ps1"
 
 Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams

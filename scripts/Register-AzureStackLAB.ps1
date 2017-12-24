@@ -14,6 +14,8 @@ param (
         $PrivilegedEndpoint = "AzS-ERCS01" 
 )
 
+$defaultLocalPath = "C:\AzureStackonAzureVM"
+
 Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Get-Module -ListAvailable | where-Object {$_.Name -like "Azure*"} | Uninstall-Module 
 
@@ -30,7 +32,7 @@ Get-Module -ListAvailable | where-Object {$_.Name -like "Azure*"}
 Login-AzureRmAccount -EnvironmentName "AzureCloud"
 Register-AzureRmResourceProvider -ProviderNamespace Microsoft.AzureStack 
 
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Azure/AzureStack-Tools/master/Registration/RegisterWithAzure.psm1" -OutFile "C:\AzureStackonAzureVM\RegisterWithAzure.psm1" 
-Import-Module "c:\AzureStackonAzureVM\RegisterWithAzure.psm1" 
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Azure/AzureStack-Tools/master/Registration/RegisterWithAzure.psm1" -OutFile "$defaultLocalPath\RegisterWithAzure.psm1" 
+Import-Module "$defaultLocalPath\RegisterWithAzure.psm1" 
 
 Add-AzsRegistration -CloudAdminCredential $CloudAdminCredential -AzureDirectoryTenantName $AzureDirectoryTenantName  -AzureSubscriptionId $AzureSubscriptionId -PrivilegedEndpoint $PrivilegedEndpoint -BillingModel Development

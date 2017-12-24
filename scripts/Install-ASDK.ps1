@@ -173,7 +173,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         {
             $version = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
             Write-Log @writeLogParams -Message "Download process for ASDK$version started"
-            $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
+            $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_) -DisplayName $_}
         }
 
         $i = 0

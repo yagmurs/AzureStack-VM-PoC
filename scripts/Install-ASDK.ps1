@@ -12,10 +12,18 @@ param (
 )
 
 #region Fuctions
-function Print-Output ($message)
+function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
 {
-    $t = get-date -Format "yyyy-MM-dd hh:mm:ss"
-    Write-Verbose "$message - $t" -Verbose
+    $t = Get-Date -Format "yyyy-MM-dd hh:mm:ss"
+    Write-Verbose "$Message - $t" -Verbose
+    if ($Overwrite)
+    {
+        Set-Content -Path $LogFilePath -Value "$Message - $t"
+    }
+    else
+    {
+        Add-Content -Path $LogFilePath -Value "$Message - $t"
+    }
 }
 
 function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemToFind, $ReplaceWith)
@@ -58,7 +66,10 @@ $gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
-
+$logFileFullPath = "$defaultLocalPath\Install-ASDK.log"
+$writeLogParams = @{
+    LogFilePath = $logFileFullPath
+}
 Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
 $localCredValidated = $false
@@ -89,7 +100,7 @@ if ($interactive -eq $true)
     } while ($localCredValidated -eq $false)
 
     do {
-    $AadAdminUser = Read-Host -Prompt "`nMake sure the user will have Global Administrator Permission on Azure Active Directory`nThe username format must be as follows:`n`n<Tenant Admin>@<Tenant name>.onmicrosoft.com`n`nEnter Azure AD user"
+    $AadAdminUser = Read-Host -Prompt "`nMake sure the user has Global Administrator Permission on Azure Active Directory`nThe username format must be as follows:`n`n<Tenant Admin>@<Tenant name>.onmicrosoft.com`n`nEnter Azure AD user"
 
     } until ($AadAdminUser -match "(^[A-Z0-9._-]{1,64})@([A-Z0-9]{1,27}\.)onmicrosoft\.com$")
 
@@ -111,14 +122,16 @@ $aadTenant = $AadAdminUser.Split("@")[1]
 
 if ($Interactive -eq $true)
 {
-    Read-Host -Prompt "We are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use `n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or ctrl+c to cancel and starover"    
+    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or ctrl+c to cancel and startover"    
 }
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
 $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
-$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 
+$timeServiceProvider = @("pool.ntp.org") | Get-Random
+Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
+$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+Write-Log @writeLogParams -Message "Time server is now $timeServer"
 $asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
 $asdkURIRoot = "https://azurestack.azureedge.net/asdk"
 $asdkDownloadPath = "D:"
@@ -159,7 +172,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         if ($testPathResult -contains $false)
         {
             $version = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
-            Print-Output -message "Start downloading ASDK$version"
+            Write-Log @writeLogParams -Message "Download process for ASDK$version started"
             $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_)}
         }
 
@@ -169,7 +182,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         {
             if ($i%45 -eq 0) 
             {
-                Print-Output -Message "Waiting for Azure Stack Development kit files on `'$asdkDownloadPath`'"
+                Write-Log @writeLogParams -Message "Waiting for Azure Stack Development kit files on `'$asdkDownloadPath`'"
             }
     
             Start-Sleep -Seconds 1
@@ -177,7 +190,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
             $i++ 
         }
         
-        Print-Output -message "Extracting Azure Stack Development kit files"
+        Write-Log @writeLogParams -Message "Extracting Azure Stack Development kit files"
     
         $f = Join-Path -Path $asdkDownloadPath -ChildPath "AzureStackDevelopmentKit.exe"
         $o = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
@@ -187,13 +200,13 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
     #if ASDK CloudBuilder.vhdx file present, mount and copy files from
     if (Test-Path -Path $vhdxFullPath)
     {
-        Print-Output -Message "About to Start Copying ASDK files to C:\"
+        Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
         $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | ? size -gt 500MB | Select-Object -ExpandProperty driveletter
         foreach ($folder in $foldersToCopy)
         {
-            Print-Output -message "Copying folder $folder to $destPath"
+            Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"
             Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination $destPath -Recurse -Force
-            Print-Output -message "$folder done..."
+            Write-Log @writeLogParams -Message "$folder done..."
         }
         Dismount-VHD -Path $vhdxFullPath       
     }
@@ -201,7 +214,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
 }
 
 
-Print-Output -Message "Tweaking some nupkg files to run ASDK on Azure VM"
+Write-Log @writeLogParams -Message "Tweaking some nupkg files to run ASDK on Azure VM"
 $zipFile1 = 'C:\CloudDeployment\NuGetStore\Microsoft.AzureStack.Solution.Deploy.CloudDeployment.*.nupkg'
 if (Test-Path $zipFile1)
 {

@@ -20,6 +20,9 @@ $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbr
 #Disables Internet Explorer Enhanced Security Configuration
 Disable-InternetExplorerESC
 
+#Enable Internet Explorer File download
+Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0
+
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
 Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Name 1 -Value "wsman/*" -Type STRING -Force

@@ -15,7 +15,7 @@ param (
 function Print-Output ($message)
 {
     $t = get-date -Format "yyyy-MM-dd hh:mm:ss"
-    Write-Output "$message - $t"
+    Write-Verbose "$message - $t" -Verbose
 }
 
 function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemToFind, $ReplaceWith)

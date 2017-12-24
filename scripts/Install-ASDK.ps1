@@ -122,7 +122,7 @@ $aadTenant = $AadAdminUser.Split("@")[1]
 
 if ($Interactive -eq $true)
 {
-    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or ctrl+c to cancel and startover"    
+    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
 }
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)

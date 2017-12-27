@@ -22,6 +22,7 @@ Disable-InternetExplorerESC
 
 #Enable Internet Explorer File download
 New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -Force
+New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -Force
 
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
@@ -34,11 +35,6 @@ Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\Credenti
 Set-Item -Force WSMan:\localhost\Client\TrustedHosts "*"
 Enable-WSManCredSSP -Role Client -DelegateComputer "*" -Force
 Enable-WSManCredSSP -Role Server -Force
-
-
-#Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Downloads" -Confirm:$false
-#$size = Get-Disk -Number 0 | Get-Partition | Get-PartitionSupportedSize
-#Resize-Partition -DiskNumber 0 -PartitionNumber 1 -Size $size.SizeMax
 
 Add-WindowsFeature RSAT-AD-PowerShell, RSAT-ADDS -IncludeAllSubFeature
 

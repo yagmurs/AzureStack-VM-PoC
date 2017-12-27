@@ -236,7 +236,7 @@ else
     Write-Error "$zipfile1 cannot be found"
 }
 
-#Download Azure Stack DEvelopment Kit Companion Service script
+#Download Azure Stack Development Kit Companion Service script
 Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"
 if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
 {
@@ -248,5 +248,16 @@ $st.StartJob()
 #Download Azure Stack Register script
 Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "$defaultLocalPath\Register-AzureStackLAB.ps1"
 
+#Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
+$Shell = New-Object -ComObject ("WScript.Shell")
+$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url")
+$Favorite.TargetPath = "https://adminportal.local.azurestack.external";
+$Favorite.Save()
+$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url")
+$Favorite.TargetPath = "https://portal.local.azurestack.external";
+$Favorite.Save()
+
+#Azure Stack PoC installer setup
 Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams
+

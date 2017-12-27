@@ -48,10 +48,11 @@ Rename-LocalUser -Name $username -NewName Administrator
 
 Set-ExecutionPolicy unrestricted -Force
 
-#Download Azure Stack Downloader
+#Download Install-ASDK.ps1 (installer)
 Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"
 
-New-Item -ItemType SymbolicLink -Path "C:\users\Public\Desktop" -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
+#Creating desktop shortcut for Install-ASDK.ps1
+New-Item -ItemType SymbolicLink -Path ($env:USERPROFILE + "\Desktop\Public\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
 
 Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
 

@@ -256,6 +256,9 @@ $Favorite.Save()
 $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url")
 $Favorite.TargetPath = "https://portal.local.azurestack.external";
 $Favorite.Save()
+$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url")
+$Favorite.TargetPath = "https://portal.azure.com";
+$Favorite.Save()
 
 #Azure Stack PoC installer setup
 Set-Location C:\CloudDeployment\Setup

@@ -51,7 +51,7 @@ Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultL
 Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
 
 #Creating desktop shortcut for Install-ASDK.ps1
-New-Item -ItemType SymbolicLink -Path ($env:USERPROFILE + "\Desktop\Public\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
+New-Item -ItemType SymbolicLink -Path ($env:USERPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
 
 Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
 

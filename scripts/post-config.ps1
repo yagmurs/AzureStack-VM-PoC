@@ -52,9 +52,8 @@ Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\
 
 #Download and extract Mobaxterm
 Invoke-WebRequest -Uri "https://aka.ms/mobaxtermLatest" -OutFile "$defaultLocalPath\Mobaxterm.zip"
-Expand-Archive -Path "$defaultLocalPath\Mobaxterm.zip" -DestinationPath $defaultLocalPath
+Expand-Archive -Path "$defaultLocalPath\Mobaxterm.zip" -DestinationPath "$defaultLocalPath\Mobaxterm"
 Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
-
 
 #Creating desktop shortcut for Install-ASDK.ps1
 New-Item -ItemType SymbolicLink -Path ($env:USERPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"

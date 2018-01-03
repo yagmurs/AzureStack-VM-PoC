@@ -259,6 +259,10 @@ $Favorite.Save()
 $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url")
 $Favorite.TargetPath = "https://portal.azure.com";
 $Favorite.Save()
+$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url")
+$Favorite.TargetPath = "http://azs-xrp01:19007";
+$Favorite.Save()
+
 
 #Azure Stack PoC installer setup
 Set-Location C:\CloudDeployment\Setup

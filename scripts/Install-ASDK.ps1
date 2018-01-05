@@ -104,10 +104,6 @@ Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
 $localCredValidated = $false
 
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
-Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
-$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
-Write-Log @writeLogParams -Message "Time server is now $timeServer"
 
 $asdkfileList = @("AzureStackDevelopmentKit.exe")
 1..10 | ForEach-Object {$asdkfileList += "AzureStackDevelopmentKit-$_" + ".bin"}
@@ -121,16 +117,6 @@ $vhdxName = 'CloudBuilder.vhdx'
 $vhdxFullPath = Join-Path -Path $asdkDownloadPath -ChildPath (Join-Path -Path $asdkExtractFolder -ChildPath $vhdxName)
 $foldersToCopy = 'CloudDeployment', 'fwupdate', 'tools'
 $destPath = 'C:\'
-$InstallAzSPOCParams = @{
-    AdminPassword = $localAdminPass
-    InfraAzureDirectoryTenantAdminCredential = $aadcred 
-    InfraAzureDirectoryTenantName = $aadTenant
-    NATIPv4Subnet = "192.168.137.0/28"
-    NATIPv4Address = "192.168.137.11"
-    NATIPv4DefaultGateway = "192.168.137.1"
-    TimeServer = $timeServer
-    DNSForwarder = "8.8.8.8"
-}
 
 $versionArray = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkfileList $asdkfileList
 
@@ -306,6 +292,22 @@ $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabri
 $Favorite.TargetPath = "http://azs-xrp01:19007";
 $Favorite.Save()
 
+
+$timeServiceProvider = @("pool.ntp.org") | Get-Random
+Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
+$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+Write-Log @writeLogParams -Message "Time server is now $timeServer"
+
+$InstallAzSPOCParams = @{
+    AdminPassword = $localAdminPass
+    InfraAzureDirectoryTenantAdminCredential = $aadcred 
+    InfraAzureDirectoryTenantName = $aadTenant
+    NATIPv4Subnet = "192.168.137.0/28"
+    NATIPv4Address = "192.168.137.11"
+    NATIPv4DefaultGateway = "192.168.137.1"
+    TimeServer = $timeServer
+    DNSForwarder = "8.8.8.8"
+}
 
 #Azure Stack PoC installer setup
 Set-Location C:\CloudDeployment\Setup

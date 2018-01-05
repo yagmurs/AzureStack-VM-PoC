@@ -179,7 +179,8 @@ while ($version -notin $versionArray)
 
 if ($Interactive -eq $true)
 {
-    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
+    Clear-Host
+    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nASDK Version to Install: $version`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
 }
 
 #endregion

@@ -170,6 +170,13 @@ $aadTenant = $AadAdminUser.Split("@")[1]
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
 $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
 
+$version = $null
+$versionArray
+while ($version -notin $versionArray)
+{
+    $version = Read-Host -Prompt "Select ASDK Version"
+}
+
 
 #endregion
 
@@ -189,12 +196,6 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         $testPathResult = (Test-Path $AsdkFiles)
         if ($testPathResult -contains $false)
         {
-            $version = $null
-            $versionArray
-            while ($version -notin $versionArray)
-            {
-                $version = Read-Host -Prompt "Select ASDK Version"
-            }
             Write-Log @writeLogParams -Message "Download process for ASDK$version started"
             
             $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $asdkDownloadPath}

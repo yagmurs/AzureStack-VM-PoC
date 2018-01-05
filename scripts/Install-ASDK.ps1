@@ -177,6 +177,10 @@ while ($version -notin $versionArray)
     $version = Read-Host -Prompt "Select ASDK Version"
 }
 
+if ($Interactive -eq $true)
+{
+    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
+}
 
 #endregion
 
@@ -288,10 +292,7 @@ $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabri
 $Favorite.TargetPath = "http://azs-xrp01:19007";
 $Favorite.Save()
 
-if ($Interactive -eq $true)
-{
-    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
-}
+
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"

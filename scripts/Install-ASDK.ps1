@@ -198,9 +198,9 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
     #Test if ASDK CloudBuilder.vhdx file is present if not download ASDK files
     if (-not (Test-Path -Path $vhdxFullPath))
     {
+        $downloadList = testASDKFilesPresence -asdkURIRoot $asdkURIRoot -version $version -asdkfileList $asdkfileList
         $AsdkFiles = @()
-
-        foreach ($AsdkFile in $ASDKFileList)
+        foreach ($AsdkFile in Split-Path $downloadList -Leaf)
         {
             $AsdkFiles += Join-Path -Path $asdkDownloadPath -ChildPath $AsdkFile
         }
@@ -216,8 +216,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
             }
             Write-Log @writeLogParams -Message "Download process for ASDK$version started"
             
-            $downloadList = testASDKFilesPresence -asdkURIRoot $asdkURIRoot -version $version -asdkfileList $asdkfileList
-            $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination d:}
+            $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $asdkDownloadPath}
         }
 
         $i = 0

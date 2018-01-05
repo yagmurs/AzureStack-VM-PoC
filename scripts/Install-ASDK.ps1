@@ -41,26 +41,87 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
         $zip.Dispose()
 }
 
-function findLatestASDK ($version, $asdkURIRoot, $asdkFileList)
+function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 4)
 {
-    try
+    $versionArray = @()
+    $version = Get-Date -Format "yyMM"
+    for ($i = 0; $i -lt $count; $i++)
     {
-        $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
-        if ($r -eq 200)
+        $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
+        try
         {
-            $version
+            $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
+            if ($r -eq 200)
+            {
+                Write-Verbose "ASDK$version is available." -Verbose
+                $versionArray += $version
+            }
+        }
+        catch [System.Net.WebException],[System.Exception]
+        {
+            Write-Verbose "ASDK$version cannot be located." -Verbose
+            $r = 404
         }
     }
-    catch [System.Net.WebException],[System.Exception]
-    {
-        $i++
-        $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
-        findLatestASDK -version $version -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
-    }
+    return $versionArray
 }
+
+function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfileList) 
+{
+    $Uris = @()
+    foreach ($file in $asdkfileList)
+    {
+        try
+        {
+            $Uri = ($asdkURIRoot + $version + '/' + $file)
+            $r = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -DisableKeepAlive -Method head -ErrorAction SilentlyContinue).statuscode
+            if ($r -eq 200)
+            {
+                $Uris += $Uri
+            }    
+        }
+        catch
+        {
+            $r = 404
+        }
+    }
+    return $Uris
+}
+
 #endregion
 
 #region Variables
+
+$timeServiceProvider = @("pool.ntp.org") | Get-Random
+Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
+$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+Write-Log @writeLogParams -Message "Time server is now $timeServer"
+
+$asdkfileList = @("AzureStackDevelopmentKit.exe")
+1..10 | ForEach-Object {$asdkfileList += "AzureStackDevelopmentKit-$_" + ".bin"}
+
+$asdkURIRoot = "https://azurestack.azureedge.net/asdk"
+$asdkDownloadPath = "D:"
+$asdkExtractFolder = "Azure Stack Development Kit"
+$asdkDownloaderFile = "AzureStackDownloader.exe"
+$asdkDownloaderFullPath = Join-Path -Path $asdkDownloadPath -ChildPath $asdkDownloaderFile
+$vhdxName = 'CloudBuilder.vhdx'
+$vhdxFullPath = Join-Path -Path $asdkDownloadPath -ChildPath (Join-Path -Path $asdkExtractFolder -ChildPath $vhdxName)
+$foldersToCopy = 'CloudDeployment', 'fwupdate', 'tools'
+$destPath = 'C:\'
+$InstallAzSPOCParams = @{
+    AdminPassword = $localAdminPass
+    InfraAzureDirectoryTenantAdminCredential = $aadcred 
+    InfraAzureDirectoryTenantName = $aadTenant
+    NATIPv4Subnet = "192.168.137.0/28"
+    NATIPv4Address = "192.168.137.11"
+    NATIPv4DefaultGateway = "192.168.137.1"
+    TimeServer = $timeServer
+    DNSForwarder = "8.8.8.8"
+}
+
+$versionArray = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkfileList $asdkfileList
+
 $defaultLocalPath = "C:\AzureStackonAzureVM"
 $gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
@@ -128,30 +189,6 @@ if ($Interactive -eq $true)
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
 $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
 
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
-Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
-$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
-Write-Log @writeLogParams -Message "Time server is now $timeServer"
-$asdkFileList = @("AzureStackDevelopmentKit.exe","AzureStackDevelopmentKit-1.bin","AzureStackDevelopmentKit-2.bin","AzureStackDevelopmentKit-3.bin","AzureStackDevelopmentKit-4.bin","AzureStackDevelopmentKit-5.bin","AzureStackDevelopmentKit-6.bin")
-$asdkURIRoot = "https://azurestack.azureedge.net/asdk"
-$asdkDownloadPath = "D:"
-$asdkExtractFolder = "Azure Stack Development Kit"
-$asdkDownloaderFile = "AzureStackDownloader.exe"
-$asdkDownloaderFullPath = Join-Path -Path $asdkDownloadPath -ChildPath $asdkDownloaderFile
-$vhdxName = 'CloudBuilder.vhdx'
-$vhdxFullPath = Join-Path -Path $asdkDownloadPath -ChildPath (Join-Path -Path $asdkExtractFolder -ChildPath $vhdxName)
-$foldersToCopy = 'CloudDeployment', 'fwupdate', 'tools'
-$destPath = 'C:\'
-$InstallAzSPOCParams = @{
-    AdminPassword = $localAdminPass
-    InfraAzureDirectoryTenantAdminCredential = $aadcred 
-    InfraAzureDirectoryTenantName = $aadTenant
-    NATIPv4Subnet = "192.168.137.0/28"
-    NATIPv4Address = "192.168.137.11"
-    NATIPv4DefaultGateway = "192.168.137.1"
-    TimeServer = $timeServer
-    DNSForwarder = "8.8.8.8"
-}
 
 #endregion
 
@@ -171,9 +208,16 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         $testPathResult = (Test-Path $AsdkFiles)
         if ($testPathResult -contains $false)
         {
-            $version = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkFileList $asdkFileList
+            $version = $null
+            $versionArray
+            while ($version -notin $versionArray)
+            {
+                $version = Read-Host -Prompt "Select ASDK Version"
+            }
             Write-Log @writeLogParams -Message "Download process for ASDK$version started"
-            $asdkFileList | ForEach-Object {Start-BitsTransfer -Source $($asdkURIRoot + $version + '/' + $_) -Destination $(Join-Path -Path $asdkDownloadPath -ChildPath $_) -DisplayName $_}
+            
+            $downloadList = testASDKFilesPresence -asdkURIRoot $asdkURIRoot -version $version -asdkfileList $asdkfileList
+            $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination d:}
         }
 
         $i = 0

@@ -170,17 +170,19 @@ $aadTenant = $AadAdminUser.Split("@")[1]
 $localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
 $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
 
+Write-Log @writeLogParams -Message "Available ASDK versions found"
+Write-Log @writeLogParams -Message $versionArray
 $version = $null
 $versionArray
 while ($version -notin $versionArray)
 {
-    $version = Read-Host -Prompt "Select ASDK Version"
+    $version = Read-Host -Prompt "Enter Above ASDK Version to Install"
 }
 
 if ($Interactive -eq $true)
 {
     Clear-Host
-    Read-Host -Prompt "`n`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nASDK Version to Install: $version`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
+    Read-Host -Prompt "`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nASDK Version to Install: $version`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
 }
 
 #endregion
@@ -201,9 +203,13 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         $testPathResult = (Test-Path $AsdkFiles)
         if ($testPathResult -contains $false)
         {
-            Write-Log @writeLogParams -Message "Download process for ASDK$version started"
+            Write-Log @writeLogParams -Message "Download process for ASDK $version started"
             
             $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $asdkDownloadPath}
+        }
+        else
+        {
+            Write-Log @writeLogParams -Message "Local ASDK setup files found. Local files will be used for ASDK setup"
         }
 
         $i = 0
@@ -293,8 +299,6 @@ $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabri
 $Favorite.TargetPath = "http://azs-xrp01:19007";
 $Favorite.Save()
 
-
-
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
@@ -314,4 +318,3 @@ $InstallAzSPOCParams = @{
 #Azure Stack PoC installer setup
 Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams
-

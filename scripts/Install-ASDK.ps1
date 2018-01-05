@@ -91,6 +91,18 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
 #endregion
 
 #region Variables
+$defaultLocalPath = "C:\AzureStackonAzureVM"
+$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+$AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+$options = New-ScheduledJobOption -RequireNetwork
+$logFileFullPath = "$defaultLocalPath\Install-ASDK.log"
+$writeLogParams = @{
+    LogFilePath = $logFileFullPath
+}
+Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
+$localCredValidated = $false
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
@@ -122,18 +134,6 @@ $InstallAzSPOCParams = @{
 
 $versionArray = findLatestASDK -asdkURIRoot $asdkURIRoot -asdkfileList $asdkfileList
 
-$defaultLocalPath = "C:\AzureStackonAzureVM"
-$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
-$AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-$options = New-ScheduledJobOption -RequireNetwork
-$logFileFullPath = "$defaultLocalPath\Install-ASDK.log"
-$writeLogParams = @{
-    LogFilePath = $logFileFullPath
-}
-Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
-$localCredValidated = $false
 if ($interactive -eq $true)
 {
     do {

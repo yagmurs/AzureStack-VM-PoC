@@ -228,10 +228,9 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         
         Write-Log @writeLogParams -Message "Extracting Azure Stack Development kit files"
     
-        $f = Join-Path -Path $asdkDownloadPath -ChildPath "AzureStackDevelopmentKit.exe"
+        $f = Join-Path -Path $asdkDownloadPath -ChildPath $AsdkFiles[0]
         $o = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
-        
-        Start-Process -FilePath $f -ArgumentList "/dir=`"$o`"", "/silent" -Wait
+        Start-Process -FilePath $f -ArgumentList "/dir=`"$o`"", "/SILENT", "/NOCANCEL" -Wait
     }
     #if ASDK CloudBuilder.vhdx file present, mount and copy files from
     if (Test-Path -Path $vhdxFullPath)

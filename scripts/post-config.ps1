@@ -11,6 +11,8 @@ function Disable-InternetExplorerESC {
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
 }
 
+$defaultLocalPath = "C:\AzureStackOnAzureVM"
+
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development"
 #Disables Internet Explorer Enhanced Security Configuration
 Disable-InternetExplorerESC

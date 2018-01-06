@@ -8,7 +8,8 @@ param (
     [Security.SecureString]
     $AadPassword,
     [string]
-    $LocalAdminUsername = "Administrator"
+    $LocalAdminUsername = "Administrator",
+    $Version
 )
 
 #region Fuctions
@@ -91,6 +92,7 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
 #endregion
 
 #region Variables
+$defaultLocalPath = "C:\AzureStackOnAzureVM"
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
@@ -171,23 +173,26 @@ $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, 
 Write-Log @writeLogParams -Message "Available ASDK versions found"
 Write-Log @writeLogParams -Message $versionArray
 
-do {
-    Clear-Host
-    $i = 1
-    Write-Host ""
-    foreach ($v in $versionArray)
-    {
-        Write-Host "$($i)`. ASDK version: $v"
-        $i++
+if ($version -eq $null)
+{
+    do {
+        Clear-Host
+        $i = 1
+        Write-Host ""
+        foreach ($v in $versionArray)
+        {
+            Write-Host "$($i)`. ASDK version: $v"
+            $i++
+        }
+        $s = (Read-Host -Prompt "Select ASDK version to install")
+        if ($s -match "\d")
+        {
+            $s = $s - 1
+        }
     }
-    $s = (Read-Host -Prompt "Select ASDK version to install")
-    if ($s -match "\d")
-    {
-        $s = $s - 1
-    }
+    until ($versionArray[$s] -in $versionArray)
+    $version = $versionArray[$s]
 }
-until ($versionArray[$s] -in $versionArray)
-$version = $versionArray[$s] 
 
 if ($Interactive -eq $true)
 {

@@ -169,7 +169,7 @@ $aadAdmin  = $AadAdminUser.Split("@")[0]
 $aadTenant = $AadAdminUser.Split("@")[1]
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $localAdminPass)
-$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdmin, $AadPassword)
+$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
 
 Write-Log @writeLogParams -Message "Available ASDK versions found"
 Write-Log @writeLogParams -Message $versionArray

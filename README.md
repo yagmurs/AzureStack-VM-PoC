@@ -8,13 +8,17 @@ Creates a new VM and installs prerequisites to install AzureStack Development ki
     <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
 </a>
 
-
 This template creates a new Azure VM, and installs, configures all prerequisites that is required to install Azure Stack Development Kit to ease the process to evaluate all Azure Stack functionalities. 
 
  --High level steps to follow--
   - Deploy the template
   - Logon to Azure VM
   - Run Install-ASDK.ps1 script on the desktop
+
+*** updates on 06.01.2018
+ - New options to select ASDK version to install
+ - Tested with ASDK 1712
+ - Lots of fixes to better detect ASDK files and paths
 
 For more details, please read the following article for details
 https://blogs.technet.microsoft.com/yagmurs/deploying-azure-stack-development-kit-asdk-straight-on-azure-vm

@@ -91,13 +91,7 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
 #endregion
 
 #region Variables
-<<<<<<< HEAD
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master"
-=======
-$defaultLocalPath = "C:\AzureStackonAzureVM"
-$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
->>>>>>> development
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 $logFileFullPath = "$defaultLocalPath\Install-ASDK.log"

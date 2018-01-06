@@ -11,16 +11,7 @@ function Disable-InternetExplorerESC {
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
 }
 
-<<<<<<< HEAD
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master"
-=======
-$defaultLocalPath = "C:\AzureStackonAzureVM"
-New-Item -Path $defaultLocalPath -ItemType Directory -Force
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/config.ind" -OutFile "$defaultLocalPath\config.ind"
-$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
-
->>>>>>> development
 #Disables Internet Explorer Enhanced Security Configuration
 Disable-InternetExplorerESC
 

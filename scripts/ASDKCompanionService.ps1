@@ -68,12 +68,13 @@ function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
 
 #region Variables
 $VerbosePreference = "Continue"
+$defaultLocalPath = "C:\AzureStackonAzureVM"
 $swName = "NATSw"
 $publicAdapterName = "Deployment"
 $privateAdapterName = "vEthernet `($swName`)"
 $BGPNATVMNetworkAdapterName = "NAT"
 $BgpNatVm = "AzS-BGPNAT01"
-$logFileFullPath = "C:\AzureStackonAzureVM\CompanionServiceProgress.log"
+$logFileFullPath = "$defaultLocalPath\CompanionServiceProgress.log"
 $enableNatCheckFile = "C:\CompleteBootDSCStatus\AZs-ACS01.*.xml"
 $writeLogParams = @{
     LogFilePath = $logFileFullPath

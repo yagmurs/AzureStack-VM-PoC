@@ -11,9 +11,22 @@ function Disable-InternetExplorerESC {
     Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
 }
 
+<<<<<<< HEAD
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master"
+=======
+$defaultLocalPath = "C:\AzureStackonAzureVM"
+New-Item -Path $defaultLocalPath -ItemType Directory -Force
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/config.ind" -OutFile "$defaultLocalPath\config.ind"
+$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+
+>>>>>>> development
 #Disables Internet Explorer Enhanced Security Configuration
 Disable-InternetExplorerESC
+
+#Enable Internet Explorer File download
+New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -Force
+New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -Force
 
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
 New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
@@ -27,11 +40,6 @@ Set-Item -Force WSMan:\localhost\Client\TrustedHosts "*"
 Enable-WSManCredSSP -Role Client -DelegateComputer "*" -Force
 Enable-WSManCredSSP -Role Server -Force
 
-
-#Get-Disk | Where-Object {$_.partitionstyle -eq 'raw' -and $_.size -eq "64GB"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Downloads" -Confirm:$false
-#$size = Get-Disk -Number 0 | Get-Partition | Get-PartitionSupportedSize
-#Resize-Partition -DiskNumber 0 -PartitionNumber 1 -Size $size.SizeMax
-
 Add-WindowsFeature RSAT-AD-PowerShell, RSAT-ADDS -IncludeAllSubFeature
 
 Install-PackageProvider nuget -Force
@@ -40,13 +48,19 @@ Rename-LocalUser -Name $username -NewName Administrator
 
 Set-ExecutionPolicy unrestricted -Force
 
-#Downloads Azure Stack Downloader
-New-Item -Path c:\AzureStackonAzureVM -ItemType Directory -Force
+#Download Install-ASDK.ps1 (installer)
+Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"
+
+#Download ASDK Downloader
 Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
-Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "C:\AzureStackonAzureVM\Install-ASDK.ps1"
 
-New-Item -ItemType SymbolicLink -Path "C:\users\Public\Desktop" -Name "Install-ASDK" -Value "C:\AzureStackonAzureVM\Install-ASDK.ps1"
+#Download and extract Mobaxterm
+Invoke-WebRequest -Uri "https://aka.ms/mobaxtermLatest" -OutFile "$defaultLocalPath\Mobaxterm.zip"
+Expand-Archive -Path "$defaultLocalPath\Mobaxterm.zip" -DestinationPath "$defaultLocalPath\Mobaxterm"
+Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 
+#Creating desktop shortcut for Install-ASDK.ps1
+New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
 
 Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
 

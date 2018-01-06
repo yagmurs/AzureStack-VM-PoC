@@ -127,7 +127,7 @@
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
         "scriptFileName": "post-config.ps1",
-        "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/",
+        "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/",
         "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
         "adminUsername": "__administrator",
         "osDiskSizeinGB": 256,

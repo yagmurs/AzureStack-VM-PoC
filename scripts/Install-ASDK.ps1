@@ -93,7 +93,8 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
 
 #region Variables
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development"
+$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
+$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 $logFileFullPath = "$defaultLocalPath\Install-ASDK.log"
@@ -167,8 +168,8 @@ if ($interactive -eq $true)
 $aadAdmin  = $AadAdminUser.Split("@")[0]
 $aadTenant = $AadAdminUser.Split("@")[1]
 
-$localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
-$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
+$localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $localAdminPass)
+$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdmin, $AadPassword)
 
 Write-Log @writeLogParams -Message "Available ASDK versions found"
 Write-Log @writeLogParams -Message $versionArray

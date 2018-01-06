@@ -2,13 +2,14 @@ param (
     [bool]
     $Interactive = $true,
     [Security.SecureString]
-    $LocalAadminPass,
+    $LocalAdminPass,
     [string]
     $AadAdminUser,
     [Security.SecureString]
     $AadPassword,
     [string]
-    $LocalAdminUsername = "Administrator"
+    $LocalAdminUsername = "Administrator",
+    $Version
 )
 
 #region Fuctions
@@ -167,29 +168,32 @@ if ($interactive -eq $true)
 $aadAdmin  = $AadAdminUser.Split("@")[0]
 $aadTenant = $AadAdminUser.Split("@")[1]
 
-$localAdminCred = New-Object System.Management.Automation.PSCredential ("Administrator", $localAdminPass)
-$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
+$localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $localAdminPass)
+$aadcred = New-Object System.Management.Automation.PSCredential ($AadAdmin, $AadPassword)
 
 Write-Log @writeLogParams -Message "Available ASDK versions found"
 Write-Log @writeLogParams -Message $versionArray
 
-do {
-    Clear-Host
-    $i = 1
-    Write-Host ""
-    foreach ($v in $versionArray)
-    {
-        Write-Host "$($i)`. ASDK version: $v"
-        $i++
+if ($version -eq $null)
+{
+    do {
+        Clear-Host
+        $i = 1
+        Write-Host ""
+        foreach ($v in $versionArray)
+        {
+            Write-Host "$($i)`. ASDK version: $v"
+            $i++
+        }
+        $s = (Read-Host -Prompt "Select ASDK version to install")
+        if ($s -match "\d")
+        {
+            $s = $s - 1
+        }
     }
-    $s = (Read-Host -Prompt "Select ASDK version to install")
-    if ($s -match "\d")
-    {
-        $s = $s - 1
-    }
+    until ($versionArray[$s] -in $versionArray)
+    $version = $versionArray[$s]
 }
-until ($versionArray[$s] -in $versionArray)
-$version = $versionArray[$s] 
 
 if ($Interactive -eq $true)
 {

@@ -2,7 +2,7 @@ param (
     [bool]
     $Interactive = $true,
     [Security.SecureString]
-    $LocalAadminPass,
+    $LocalAdminPass,
     [string]
     $AadAdminUser,
     [Security.SecureString]

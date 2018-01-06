@@ -172,12 +172,24 @@ $aadcred = New-Object System.Management.Automation.PSCredential ($AadAdminUser, 
 
 Write-Log @writeLogParams -Message "Available ASDK versions found"
 Write-Log @writeLogParams -Message $versionArray
-$version = $null
-$versionArray
-while ($version -notin $versionArray)
-{
-    $version = Read-Host -Prompt "Enter Above ASDK Version to Install"
+
+do {
+    Clear-Host
+    $i = 1
+    Write-Host ""
+    foreach ($v in $versionArray)
+    {
+        Write-Host "$($i)`. ASDK version: $v"
+        $i++
+    }
+    $s = (Read-Host -Prompt "Select ASDK version to install")
+    if ($s -match "\d")
+    {
+        $s = $s - 1
+    }
 }
+until ($versionArray[$s] -in $versionArray)
+$version = $versionArray[$s] 
 
 if ($Interactive -eq $true)
 {

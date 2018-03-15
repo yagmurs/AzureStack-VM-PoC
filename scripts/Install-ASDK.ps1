@@ -19,7 +19,8 @@ param (
 
 #region Variables
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
-$gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
+$gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
+$gitbranchcode = $gitbranchconfig.branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 
 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
@@ -121,6 +122,9 @@ if ($version -eq $null)
             Write-Host "$($i)`. ASDK version: $v"
             $i++
         }
+        Write-Host -ForegroundColor Yellow -BackgroundColor Black -NoNewline  -Object "Unless it is instructed select "
+        Write-Host -ForegroundColor Red -BackgroundColor Black -NoNewline -Object $gitbranchconfig.lastversiontested
+        Write-Host -ForegroundColor Yellow -BackgroundColor Black -Object " version" 
         $s = (Read-Host -Prompt "Select ASDK version to install")
         if ($s -match "\d")
         {

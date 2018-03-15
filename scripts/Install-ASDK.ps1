@@ -141,7 +141,8 @@ if ($Interactive -eq $true)
     if ($version -gt $gitbranchconfig.lastversiontested)
     {
         Write-Host -Object ""
-        Write-Host -BackgroundColor white -ForegroundColor Red -Object "This version of ASDK `($version`) is not tested on Azure VM, unless you are an expert, select only latest tested version `($($gitbranchconfig.lastversiontested)`)"
+        Write-Host -BackgroundColor white -ForegroundColor Red -Object "This version of ASDK `($version`) is not tested on Azure VM."
+        Write-Host -BackgroundColor white -ForegroundColor Red -Object "Unless you are an expert, select only latest tested version `($($gitbranchconfig.lastversiontested)`)"
     }
     Write-Host -Object ""
     Write-Host -Object "You are about to start Azure Stack Development Kit installation"

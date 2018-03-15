@@ -13,81 +13,7 @@ param (
 )
 
 #region Fuctions
-function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
-{
-    $t = Get-Date -Format "yyyy-MM-dd hh:mm:ss"
-    Write-Verbose "$Message - $t" -Verbose
-    if ($Overwrite)
-    {
-        Set-Content -Path $LogFilePath -Value "$Message - $t"
-    }
-    else
-    {
-        Add-Content -Path $LogFilePath -Value "$Message - $t"
-    }
-}
-
-function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemToFind, $ReplaceWith)
-{
-        $ZipFileFullPath = Resolve-Path $ZipFileFullPath
-        $file = $FilenameFullPath.split("/")[-1]
-        $tempFileFullPath = Join-Path -Path $env:temp -ChildPath $file
-        Add-Type -Assembly System.IO.Compression.FileSystem
-        $zip = [IO.Compression.ZipFile]::Open($ZipFileFullPath,"update")
-        $zip.Entries | where {$_.Name -eq $file} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, $tempFileFullPath, $true)}
-        (Get-Content $tempFileFullPath) -replace "$ItemToFind", "$ReplaceWith" | Out-File $tempFileFullPath
-        $fileName = [System.IO.Path]::GetFileName($file)
-        ($zip.Entries | where {$_.Name -eq $file}).delete()
-        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$tempFileFullPath,$FilenameFullPath,"Optimal") | Out-Null
-        $zip.Dispose()
-}
-
-function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 4)
-{
-    $versionArray = @()
-    $version = Get-Date -Format "yyMM"
-    for ($i = 0; $i -lt $count; $i++)
-    {
-        $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
-        try
-        {
-            $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
-            if ($r -eq 200)
-            {
-                Write-Verbose "ASDK$version is available." -Verbose
-                $versionArray += $version
-            }
-        }
-        catch [System.Net.WebException],[System.Exception]
-        {
-            Write-Verbose "ASDK$version cannot be located." -Verbose
-            $r = 404
-        }
-    }
-    return $versionArray
-}
-
-function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfileList) 
-{
-    $Uris = @()
-    foreach ($file in $asdkfileList)
-    {
-        try
-        {
-            $Uri = ($asdkURIRoot + $version + '/' + $file)
-            $r = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -DisableKeepAlive -Method head -ErrorAction SilentlyContinue).statuscode
-            if ($r -eq 200)
-            {
-                $Uris += $Uri
-            }    
-        }
-        catch
-        {
-            $r = 404
-        }
-    }
-    return $Uris
-}
+""
 
 #endregion
 
@@ -95,6 +21,16 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
 $gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+
+if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
+{
+    Import-Module "$defaultLocalPath\ASDKHelperModule.psm1"
+}
+else
+{
+    throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
+}
+
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 $logFileFullPath = "$defaultLocalPath\Install-ASDK.log"
@@ -288,7 +224,8 @@ else
 }
 
 #Download Azure Stack Development Kit Companion Service script
-Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"
+DownloadWithRetry -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -DownloadLocation "$defaultLocalPath\ASDKCompanionService.ps1"
+#Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"
 if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
 {
     Get-ScheduledJob -name "ASDK Installer Companion Service" | Unregister-ScheduledJob -Force
@@ -297,7 +234,8 @@ $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -Fi
 $st.StartJob()
 
 #Download Azure Stack Register script
-Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "$defaultLocalPath\Register-AzureStackLAB.ps1"
+DownloadWithRetry -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -DownloadLocation "$defaultLocalPath\Register-AzureStackLAB.ps1"
+#Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "$defaultLocalPath\Register-AzureStackLAB.ps1"
 
 #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
 $Shell = New-Object -ComObject ("WScript.Shell")

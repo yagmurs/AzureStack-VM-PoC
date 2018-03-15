@@ -62,7 +62,7 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
         $zip.Dispose()
 }
 
-function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 4)
+function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
 {
     $versionArray = @()
     $version = Get-Date -Format "yyMM"

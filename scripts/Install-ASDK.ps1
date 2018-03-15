@@ -122,9 +122,10 @@ if ($version -eq $null)
             Write-Host "$($i)`. ASDK version: $v"
             $i++
         }
-        Write-Host -ForegroundColor Yellow -BackgroundColor DarkGray -NoNewline  -Object "Unless it is instructed, select ASDK Version "
+        Write-Host ""
+        Write-Host -ForegroundColor Yellow -BackgroundColor DarkGray -NoNewline  -Object "Unless it is instructed, select only latest tested ASDK Version "
         Write-Host -ForegroundColor Red -BackgroundColor DarkGray -Object $gitbranchconfig.lastversiontested
-
+        Write-Host ""
         $s = (Read-Host -Prompt "Select ASDK version to install")
         if ($s -match "\d")
         {

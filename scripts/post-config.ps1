@@ -41,7 +41,7 @@ DownloadWithRetry -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-
 $gitbranchcode = (Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ",").branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 
-DownloadWithRetry -Uri "$gitbranch/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
+DownloadWithRetry -Uri "$gitbranch/scripts/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
 
 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
 {

@@ -122,9 +122,10 @@ if ($version -eq $null)
             Write-Host "$($i)`. ASDK version: $v"
             $i++
         }
-        Write-Host -ForegroundColor Yellow -BackgroundColor DarkGray -NoNewline  -Object "Unless it is instructed, select ASDK Version "
-        Write-Host -ForegroundColor Red -BackgroundColor DarkGray -Object $gitbranchconfig.lastversiontested
-
+        Write-Host ""
+        Write-Host -ForegroundColor Yellow -BackgroundColor DarkGray -NoNewline  -Object "Unless it is instructed, select only latest tested ASDK Version "
+        Write-Host -ForegroundColor Green -BackgroundColor DarkGray -Object $gitbranchconfig.lastversiontested
+        Write-Host ""
         $s = (Read-Host -Prompt "Select ASDK version to install")
         if ($s -match "\d")
         {
@@ -138,7 +139,31 @@ if ($version -eq $null)
 if ($Interactive -eq $true)
 {
     Clear-Host
-    Read-Host -Prompt "`nWe are about to start Azure Stack Development Kit installation`nCheck and make sure the following information are correct, setup will use`n`nLocalAdmin User: $LocalAdminUsername`nAzure AD Global Administrator user: $AadAdminUser`nAzure AD Tenant: $aadTenant`n`nASDK Version to Install: $version`n`nPress any to continue or `'Ctrl + C`' to cancel and startover"    
+    if ($version -gt $gitbranchconfig.lastversiontested)
+    {
+        Write-Host -Object ""
+        Write-Host -BackgroundColor white -ForegroundColor Red -Object "This version of ASDK `($version`) is not tested on Azure VM."
+        Write-Host -BackgroundColor white -ForegroundColor Red -Object "Unless you are an expert, select only latest tested version `($($gitbranchconfig.lastversiontested)`)"
+    }
+    Write-Host -Object ""
+    Write-Host -Object "You are about to start Azure Stack Development Kit installation"
+    Write-Host -Object ""
+    Write-Host -Object "Check and make sure the following information are correct, setup will use"
+    Write-Host -Object ""
+    Write-Host -Object "LocalAdmin User: $LocalAdminUsername"
+    Write-Host -Object "Azure AD Global Administrator user: $AadAdminUser"
+    Write-Host -Object "Azure AD Tenant: $aadTenant"
+    Write-Host -Object "ASDK Version to Install: $version"
+    Write-Host -Object ""
+
+    while ($true)
+    {
+        $key = Read-Host -Prompt "Press `'C'` to continue or `'Ctrl + C`' to cancel and startover"
+        if ($key -eq "c")
+        {
+            break
+        }
+    }
 }
 
 #endregion

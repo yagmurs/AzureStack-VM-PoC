@@ -54,10 +54,10 @@ function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemT
         $tempFileFullPath = Join-Path -Path $env:temp -ChildPath $file
         Add-Type -Assembly System.IO.Compression.FileSystem
         $zip = [IO.Compression.ZipFile]::Open($ZipFileFullPath,"update")
-        $zip.Entries | where {$_.Name -eq $file} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, $tempFileFullPath, $true)}
+        $zip.Entries | Where-Object {$_.Name -eq $file} | ForEach-Object {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, $tempFileFullPath, $true)}
         (Get-Content $tempFileFullPath) -replace "$ItemToFind", "$ReplaceWith" | Out-File $tempFileFullPath
         $fileName = [System.IO.Path]::GetFileName($file)
-        ($zip.Entries | where {$_.Name -eq $file}).delete()
+        ($zip.Entries | Where-Object {$_.Name -eq $file}).delete()
         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$tempFileFullPath,$FilenameFullPath,"Optimal") | Out-Null
         $zip.Dispose()
 }

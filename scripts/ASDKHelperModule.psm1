@@ -47,21 +47,6 @@ function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
     }
 }
 
-function FindReplace-ZipFileContent ($ZipFileFullPath, $FilenameFullPath, $ItemToFind, $ReplaceWith)
-{
-        $ZipFileFullPath = Resolve-Path $ZipFileFullPath
-        $file = $FilenameFullPath.split("/")[-1]
-        $tempFileFullPath = Join-Path -Path $env:temp -ChildPath $file
-        Add-Type -Assembly System.IO.Compression.FileSystem
-        $zip = [IO.Compression.ZipFile]::Open($ZipFileFullPath,"update")
-        $zip.Entries | Where-Object {$_.Name -eq $file} | ForEach-Object {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, $tempFileFullPath, $true)}
-        (Get-Content $tempFileFullPath) -replace "$ItemToFind", "$ReplaceWith" | Out-File $tempFileFullPath
-        $fileName = [System.IO.Path]::GetFileName($file)
-        ($zip.Entries | Where-Object {$_.Name -eq $file}).delete()
-        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$tempFileFullPath,$FilenameFullPath,"Optimal") | Out-Null
-        $zip.Dispose()
-}
-
 function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
 {
     $versionArray = @()

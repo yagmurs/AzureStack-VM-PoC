@@ -239,17 +239,24 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
 
 }
 
+Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
+Set-Location C:\CloudDeployment\Setup
+.\BootstrapAzureStackDeployment.ps1
+Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 
-Write-Log @writeLogParams -Message "Tweaking some nupkg files to run ASDK on Azure VM"
-$zipFile1 = 'C:\CloudDeployment\NuGetStore\Microsoft.AzureStack.Solution.Deploy.CloudDeployment.*.nupkg'
-if (Test-Path $zipFile1)
+Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
+$baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
+$baremetalFile = Get-Content -Path $baremetalFilePath
+$baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
+Set-Content -Value $baremetalFile -Path $baremetalFilePath -Force 
+
+if ($version -ge 1802)
 {
-    #FindReplace-ZipFileContent -ZipFileFullPath $zipFile1 -FilenameFullPath 'content/Roles/PhysicalMachines/Tests/BareMetal.Tests.ps1' -ItemToFind '-not \$isVirtualizedDeployment' -ReplaceWith '$isVirtualizedDeployment'
-    FindReplace-ZipFileContent -ZipFileFullPath $zipFile1 -FilenameFullPath 'content/Roles/PhysicalMachines/Tests/BareMetal.Tests.ps1' -ItemToFind '\$isvirtualizedDeployment = \(\$Parameters.OEMModel -eq ''Hyper-V''\)' -ReplaceWith '$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode'
-}
-else
-{
-    Write-Error "$zipfile1 cannot be found"
+    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+    $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
+    $HelpersFile = Get-Content -Path $HelpersFilePath
+    $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
+    Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force 
 }
 
 #Download Azure Stack Development Kit Companion Service script

@@ -70,6 +70,10 @@ Set-Item -Force WSMan:\localhost\Client\TrustedHosts "*"
 Enable-WSManCredSSP -Role Client -DelegateComputer "*" -Force
 Enable-WSManCredSSP -Role Server -Force
 
+#Enable Long path support to workaround ASDK 1802 installation issues on common/helper.psm1 
+#https://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx?f=255&MSPPError=-2147217396#maxpath
+#Set-ItemProperty -LiteralPath HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem -Name LongPathsEnabled -Value 1 -Type DWORD -Force
+
 Add-WindowsFeature RSAT-AD-PowerShell, RSAT-ADDS -IncludeAllSubFeature
 
 Install-PackageProvider nuget -Force

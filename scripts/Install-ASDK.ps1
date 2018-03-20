@@ -227,7 +227,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
             Write-Log @writeLogParams -Message $error[0].Exception
             throw "an error occured while mounting cloudbuilder.vhdxf file"
         }
-        Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
+
         foreach ($folder in $foldersToCopy)
         {
             Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"

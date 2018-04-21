@@ -96,7 +96,8 @@
             "metadata": {
                 "description": "Uri of the your user image",
                 "name": "https://azurestackvhd.blob.core.windows.net/vhds/asdk1803_120gb.vhd"
-            },
+            }
+        },
         "autoShutdownStatus": {
             "type": "string",
             "defaultValue": "Disabled",
@@ -180,8 +181,8 @@
                         "osType": "Windows",
                         "osState": "Generalized",
                         "blobUri": "[parameters('osDiskVhdUri')]",
+                        "createOption":"FromImage",
                         "storageAccountType": "Premium_LRS"
-                      }
                     },
                     "copy": [{
                         "name": "dataDisks",

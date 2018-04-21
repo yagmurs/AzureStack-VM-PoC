@@ -256,7 +256,7 @@ if ($version -ge 1802)
     $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
     $HelpersFile = Get-Content -Path $HelpersFilePath
     $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
-    Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force 
+    Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force
 }
 
 #Download Azure Stack Development Kit Companion Service script

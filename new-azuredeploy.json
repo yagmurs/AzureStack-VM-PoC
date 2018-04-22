@@ -99,11 +99,11 @@
             }
         },
         "postConfigScript": { 
-            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/post-config.ps1",
+            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/new-post-config.ps1",
             "type": "string",
             "metadata": {
                 "description": "Uri of the post config script",
-                "name": "ttps://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/new-post-config.ps1"
+                "name": "ttps://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/new-post-config.ps1"
             }
         },
         "autoShutdownStatus": {

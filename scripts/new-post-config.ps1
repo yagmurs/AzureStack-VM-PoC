@@ -71,4 +71,7 @@ Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 #Creating desktop shortcut for Install-ASDK.ps1
 New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
 
+$size = Get-Volume -DriveLetter c | Get-PartitionSupportedSize
+Resize-Partition -DriveLetter c -Size $size.sizemax
+
 Rename-LocalUser -Name $username -NewName Administrator

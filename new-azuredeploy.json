@@ -98,12 +98,20 @@
                 "name": "https://azurestackvhd.blob.core.windows.net/vhds/asdk1803_120gb.vhd"
             }
         },
-        "postConfigScript": { 
-            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/new-post-config.ps1",
+        "postConfigScriptLocation": { 
+            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts",
             "type": "string",
             "metadata": {
-                "description": "Uri of the post config script",
-                "name": "ttps://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/new-post-config.ps1"
+                "description": "the post config script location",
+                "name": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts"
+            }
+        },
+        "postConfigScriptFilename": { 
+            "defaultValue": "new-post-config.ps1",
+            "type": "string",
+            "metadata": {
+                "description": "the post config script file name",
+                "name": "new-post-config.ps1"
             }
         },
         "autoShutdownStatus": {
@@ -146,9 +154,7 @@
     "variables": {
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
-        "scriptFileName": "post-config.ps1",
-        "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/",
-        "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
+        "fileUri": "[concat(parameters('postConfigScriptLocation'), '/', parameters('postConfigScriptFileName'))]",
         "adminUsername": "__administrator",
         "osDiskSizeinGB": 256,
         "location": "[resourceGroup().location]",
@@ -179,6 +185,10 @@
             "name": "[parameters('virtualMachineName')]",
             "apiVersion": "2016-04-30-preview",
             "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[concat('Microsoft.Compute/images/', variables('imageName'))]"
+            ],
             "properties": {
                 "osProfile": {
                     "computerName": "[parameters('virtualMachineName')]",
@@ -193,7 +203,7 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
+                        "id": "[resourceId('Microsoft.Compute/Images', variables('imageName'))]"
                     },
                     "copy": [
                         {
@@ -219,34 +229,8 @@
                         }
                     ]
                 },
-                "licenseType": "Windows_Server",
-                "resources": [
-                    {
-                        "type": "extensions",
-                        "name": "CustomScriptExtension",
-                        "apiVersion": "2017-06-01",
-                        "location": "[resourceGroup().location]",
-                        "dependsOn": [
-                            "[parameters('virtualMachineName')]"
-                        ],
-                        "properties": {
-                            "publisher": "Microsoft.Compute",
-                            "type": "CustomScriptExtension",
-                            "typeHandlerVersion": "1.8",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": {
-                                "fileUris": [
-                                    "[variables('fileUri')]"
-                                ],
-                                "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', variables('adminUsername'))]"
-                            }
-                        }
-                    }
-                ]
+                "licenseType": "Windows_Server"
             },
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
-            ],
             "resources": [
                 {
                     "type": "extensions",
@@ -265,33 +249,33 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', parameters('postConfigScript'), ' ', variables('adminUsername'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', parameters('postConfigScriptFilename'), ' ', variables('adminUsername'))]"
                         }
                     }
-                }
-            ]
-        },
-        {
-            "type": "microsoft.devtestlab/schedules",
-            "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
-            "apiVersion": "2016-05-15",
-            "location": "[variables('location')]",
-            "properties": {
-                "status": "[parameters('autoShutdownStatus')]",
-                "taskType": "ComputeVmShutdownTask",
-                "dailyRecurrence": {
-                    "time": "[parameters('autoShutdownTime')]"
                 },
-                "timeZoneId": "[parameters('autoShutdownTimeZone')]",
-                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                "notificationSettings": {
-                    "status": "[parameters('autoShutdownNotificationStatus')]",
-                    "timeInMinutes": "30"
+                {
+                    "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
+                    "type": "microsoft.devtestlab/schedules",
+                    "apiVersion": "2016-05-15",
+                    "location": "[variables('location')]",
+                    "properties": {
+                        "status": "[parameters('autoShutdownStatus')]",
+                        "taskType": "ComputeVmShutdownTask",
+                        "dailyRecurrence": {
+                            "time": "[parameters('autoShutdownTime')]"
+                        },
+                        "timeZoneId": "[parameters('autoShutdownTimeZone')]",
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
+                        "notificationSettings": {
+                            "status": "[parameters('autoShutdownNotificationStatus')]",
+                            "timeInMinutes": "30"
+                        }
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                    ]
                 }
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
-            ]
+            ]           
         },
         {
             "type": "Microsoft.Network/virtualNetworks",

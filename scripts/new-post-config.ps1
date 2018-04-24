@@ -54,6 +54,9 @@ else
 
 Set-ExecutionPolicy unrestricted -Force
 
+#Disables Internet Explorer Enhanced Security Configuration
+Disable-InternetExplorerESC
+
 #Download Install-ASDK.ps1 (installer)
 DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
 #Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"

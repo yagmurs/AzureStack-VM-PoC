@@ -52,8 +52,6 @@ else
     throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
 }
 
-Rename-LocalUser -Name $username -NewName Administrator
-
 Set-ExecutionPolicy unrestricted -Force
 
 #Download Install-ASDK.ps1 (installer)
@@ -73,3 +71,4 @@ Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 #Creating desktop shortcut for Install-ASDK.ps1
 New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
 
+Rename-LocalUser -Name $username -NewName Administrator

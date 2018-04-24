@@ -183,7 +183,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('virtualMachineName')]",
-            "apiVersion": "2016-04-30-preview",
+            "apiVersion": "2017-03-30",
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
@@ -205,8 +205,14 @@
                     "imageReference": {
                         "id": "[resourceId('Microsoft.Compute/Images', variables('imageName'))]"
                     },
-                    "copy": [
-                        {
+                    "osDisk": {
+                        "createOption":"FromImage",
+                        "diskSizeGB": "[variables('osDiskSizeinGB')]",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                    }
+                    },
+                    "copy": [{
                             "name": "dataDisks",
                             "count": "[parameters('dataDiskCount')]",
                             "input": {
@@ -235,7 +241,7 @@
                 {
                     "type": "extensions",
                     "name": "CustomScriptExtension",
-                    "apiVersion": "2016-04-30-preview",
+                    "apiVersion": "2017-12-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
                         "[parameters('virtualMachineName')]"
@@ -275,7 +281,7 @@
                         "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
                     ]
                 }
-            ]           
+            ] 
         },
         {
             "type": "Microsoft.Network/virtualNetworks",

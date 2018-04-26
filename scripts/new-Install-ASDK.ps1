@@ -1,12 +1,14 @@
 param (
-    [bool]
-    $Interactive = $true,
     [Security.SecureString]
     $LocalAdminPass,
     [string]
     $AADTenant,
     [string]
-    $LocalAdminUsername = "Administrator"
+    $LocalAdminUsername = "Administrator",
+    [switch]
+    $ADFS,
+    [switch]
+    $AAD
 )
 
 #region Variables
@@ -28,7 +30,7 @@ Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
 $localCredValidated = $false
 
-if ($interactive -eq $true)
+if (!(LocalAdminPass))
 {
     do {
     $localAdminPass = Read-Host -Prompt "Enter password for the user `'Administrator`'" -AsSecureString
@@ -54,8 +56,10 @@ if ($interactive -eq $true)
 
     } while ($localCredValidated -eq $false)
 }
-
-$AADTenant = Read-Host -Prompt "Enter AAD Tenant Directory Name"
+if (!($AADTenant))
+{
+    $AADTenant = Read-Host -Prompt "Enter AAD Tenant Directory Name"
+}
 
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork

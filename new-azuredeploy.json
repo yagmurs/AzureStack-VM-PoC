@@ -208,6 +208,7 @@
                     "osDisk": {
                         "createOption":"FromImage",
                         "diskSizeGB": "[variables('osDiskSizeinGB')]",
+                        "name": "[concat(parameters('virtualMachineName'),'-osdisk')]",
                         "managedDisk": {
                             "storageAccountType": "Premium_LRS"
                     }

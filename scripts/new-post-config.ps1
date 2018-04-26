@@ -71,9 +71,22 @@ Expand-Archive -Path "$defaultLocalPath\Mobaxterm.zip" -DestinationPath "$defaul
 Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 
 #Creating desktop shortcut for Install-ASDK.ps1
-New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
+New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\new-Install-ASDK.ps1"
 
 $size = Get-Volume -DriveLetter c | Get-PartitionSupportedSize
 Resize-Partition -DriveLetter c -Size $size.sizemax
 
 Rename-LocalUser -Name $username -NewName Administrator
+
+Set-Location C:\CloudDeployment\Setup
+.\BootstrapAzureStackDeployment.ps1
+
+$baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
+$baremetalFile = Get-Content -Path $baremetalFilePath
+$baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
+Set-Content -Value $baremetalFile -Path $baremetalFilePath -Force 
+
+$HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
+$HelpersFile = Get-Content -Path $HelpersFilePath
+$HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
+#Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force

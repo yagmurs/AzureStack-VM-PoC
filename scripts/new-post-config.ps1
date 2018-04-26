@@ -58,12 +58,11 @@ Set-ExecutionPolicy unrestricted -Force
 Disable-InternetExplorerESC
 
 #Download Install-ASDK.ps1 (installer)
-DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
+DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\new-Install-ASDK.ps1"
 #Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"
 
-#Download ASDK Downloader
-DownloadWithRetry -Uri "https://aka.ms/azurestackdevkitdownloader" -DownloadLocation "D:\AzureStackDownloader.exe"
-#Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
+#Download Azure Stack Development Kit Companion Service script
+DownloadWithRetry -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -DownloadLocation "$defaultLocalPath\ASDKCompanionService.ps1"
 
 #Download and extract Mobaxterm
 DownloadWithRetry -Uri "https://aka.ms/mobaxtermLatest" -DownloadLocation "$defaultLocalPath\Mobaxterm.zip"

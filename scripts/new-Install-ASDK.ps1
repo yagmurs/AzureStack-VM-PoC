@@ -4,6 +4,8 @@ param (
     [Security.SecureString]
     $LocalAdminPass,
     [string]
+    $AADTenant,
+    [string]
     $LocalAdminUsername = "Administrator"
 )
 
@@ -21,6 +23,10 @@ else
 {
     throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
 }
+
+Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
+$localCredValidated = $false
 
 if ($interactive -eq $true)
 {
@@ -48,15 +54,16 @@ if ($interactive -eq $true)
 
     } while ($localCredValidated -eq $false)
 }
+
+$AADTenant = Read-Host -Prompt "Enter AAD Tenant Directory Name"
+
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
 $options = New-ScheduledJobOption -RequireNetwork
 $logFileFullPath = "$defaultLocalPath\Install-ASDK.log"
 $writeLogParams = @{
     LogFilePath = $logFileFullPath
 }
-Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
-$localCredValidated = $false
+
 
 #endregion
 
@@ -96,6 +103,7 @@ Write-Log @writeLogParams -Message "Time server is now $timeServer"
 
 $InstallAzSPOCParams = @{
     AdminPassword = $localAdminPass
+    InfraAzureDirectoryTenantName = $aadTenant
     NATIPv4Subnet = "192.168.137.0/28"
     NATIPv4Address = "192.168.137.11"
     NATIPv4DefaultGateway = "192.168.137.1"

@@ -1,29 +1,19 @@
-[CmdletBinding(DefaultParameterSetName='AAD')]
+[CmdletBinding()]
 
 param (
-    [Parameter(ParameterSetName='ADFS')]
-    [Parameter(ParameterSetName='AAD')]
     [Security.SecureString]
     $LocalAdminPass,
 
-    [Parameter(ParameterSetName='AAD')]
     [string]
     $AADTenant,
 
-    [Parameter(ParameterSetName='ADFS')]
-    [Parameter(ParameterSetName='AAD')]
     [string]
     $LocalAdminUsername = "Administrator",
 
-    [Parameter(Mandatory=$true,
-            ParameterSetName='ADFS')]
-    [switch]
-    $ADFS,
-
-    [Parameter(Mandatory=$true,
-            ParameterSetName='AAD')]
-    [switch]
-    $AAD
+    [Parameter(Mandatory=$true)]
+    [ValidateSet("AAD", "ADFS")]
+    [string]
+    $DeploymentType
 )
 
 #region Variables
@@ -74,7 +64,7 @@ if (!($LocalAdminPass))
 
 $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $localAdminPass)
 
-if ($AAD)
+if ($DeploymentType -eq "AAD")
 {
     if (!($AADTenant))
     {
@@ -126,7 +116,7 @@ Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceP
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 Write-Log @writeLogParams -Message "Time server is now $timeServer"
 
-if ($AAD)
+if ($DeploymentType -eq "AAD")
 {
     $InstallAzSPOCParams = @{
         AdminPassword = $localAdminPass
@@ -139,7 +129,7 @@ if ($AAD)
     }
 }
 
-if ($ADFS)
+if ($DeploymentType -eq "ADFS")
 {
     $InstallAzSPOCParams = @{
         AdminPassword = $localAdminPass
@@ -148,6 +138,7 @@ if ($ADFS)
         NATIPv4DefaultGateway = "192.168.137.1"
         TimeServer = $timeServer
         DNSForwarder = "8.8.8.8"
+        UseADFS = $true
     }
 }
 

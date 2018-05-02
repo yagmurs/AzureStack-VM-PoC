@@ -1,6 +1,9 @@
 #region function Definition
 function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
 {
+    # Register the HNetCfg library (once)
+    regsvr32 /s hnetcfg.dll
+
     # Create a NetSharingManager object
     $m = New-Object -ComObject HNetCfg.HNetShare
 

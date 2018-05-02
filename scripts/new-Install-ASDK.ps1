@@ -1,12 +1,27 @@
+[CmdletBinding(DefaultParameterSetName='AAD')]
+
 param (
+    [Parameter(ParameterSetName='ADFS')]
+    [Parameter(ParameterSetName='AAD')]
     [Security.SecureString]
     $LocalAdminPass,
+
+    [Parameter(ParameterSetName='AAD')]
     [string]
     $AADTenant,
+
+    [Parameter(ParameterSetName='ADFS')]
+    [Parameter(ParameterSetName='AAD')]
     [string]
     $LocalAdminUsername = "Administrator",
+
+    [Parameter(Mandatory=$true,
+            ParameterSetName='ADFS')]
     [switch]
     $ADFS,
+
+    [Parameter(Mandatory=$true,
+            ParameterSetName='AAD')]
     [switch]
     $AAD
 )
@@ -30,7 +45,7 @@ Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:ComputerName)
 $localCredValidated = $false
 
-if (!(LocalAdminPass))
+if (!($LocalAdminPass))
 {
     do {
     $localAdminPass = Read-Host -Prompt "Enter password for the user `'Administrator`'" -AsSecureString
@@ -56,9 +71,15 @@ if (!(LocalAdminPass))
 
     } while ($localCredValidated -eq $false)
 }
-if (!($AADTenant))
+
+$localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $localAdminPass)
+
+if ($AAD)
 {
-    $AADTenant = Read-Host -Prompt "Enter AAD Tenant Directory Name"
+    if (!($AADTenant))
+    {
+        $AADTenant = Read-Host -Prompt "Enter AAD Tenant Directory Name"
+    }
 }
 
 $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
@@ -105,14 +126,29 @@ Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceP
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 Write-Log @writeLogParams -Message "Time server is now $timeServer"
 
-$InstallAzSPOCParams = @{
-    AdminPassword = $localAdminPass
-    InfraAzureDirectoryTenantName = $aadTenant
-    NATIPv4Subnet = "192.168.137.0/28"
-    NATIPv4Address = "192.168.137.11"
-    NATIPv4DefaultGateway = "192.168.137.1"
-    TimeServer = $timeServer
-    DNSForwarder = "8.8.8.8"
+if ($AAD)
+{
+    $InstallAzSPOCParams = @{
+        AdminPassword = $localAdminPass
+        InfraAzureDirectoryTenantName = $aadTenant
+        NATIPv4Subnet = "192.168.137.0/28"
+        NATIPv4Address = "192.168.137.11"
+        NATIPv4DefaultGateway = "192.168.137.1"
+        TimeServer = $timeServer
+        DNSForwarder = "8.8.8.8"
+    }
+}
+
+if ($ADFS)
+{
+    $InstallAzSPOCParams = @{
+        AdminPassword = $localAdminPass
+        NATIPv4Subnet = "192.168.137.0/28"
+        NATIPv4Address = "192.168.137.11"
+        NATIPv4DefaultGateway = "192.168.137.1"
+        TimeServer = $timeServer
+        DNSForwarder = "8.8.8.8"
+    }
 }
 
 #Azure Stack PoC installer setup

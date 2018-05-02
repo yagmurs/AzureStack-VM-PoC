@@ -8,8 +8,8 @@ function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
     $m = New-Object -ComObject HNetCfg.HNetShare
 
     # Find connection
-    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+    $publicAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
 
 
     # Get sharing configuration
@@ -41,8 +41,8 @@ function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
     $m = New-Object -ComObject HNetCfg.HNetShare
 
     # Find connection
-    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+    $publicAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection | Where-Object{ $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
 
 
     # Get sharing configuration

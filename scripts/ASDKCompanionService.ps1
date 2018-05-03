@@ -203,23 +203,6 @@ while ($true)
             Write-Log @writeLogParams -Message "ICS Enabled"
             Write-Log @writeLogParams -Message $o
             Write-Log @writeLogParams -Message "All fixes applied, as a workaround service will start on next boot to re-enable ICS"
-            
-            #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
-            $Shell = New-Object -ComObject ("WScript.Shell")
-            $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url")
-            $Favorite.TargetPath = "https://adminportal.local.azurestack.external";
-            $Favorite.Save()
-            $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url")
-            $Favorite.TargetPath = "https://portal.local.azurestack.external";
-            $Favorite.Save()
-            $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url")
-            $Favorite.TargetPath = "https://portal.azure.com";
-            $Favorite.Save()
-            $Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url")
-            $Favorite.TargetPath = "http://azs-xrp01:19007";
-            $Favorite.Save()
-            Write-Log @writeLogParams -Message "Desktop shorcuts created for Azure and Azure Stack portals."
-
             break
         }
         else
@@ -228,6 +211,45 @@ while ($true)
             Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
             break
         }
+        #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
+        $Shell = New-Object -ComObject ("WScript.Shell")
+        
+        $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url"
+        if (!(Test-Path -Path $fileName))
+        {
+            $Favorite = $Shell.CreateShortcut($fileName)
+            $Favorite.TargetPath = "https://adminportal.local.azurestack.external";
+            $Favorite.Save()
+            Write-Log @writeLogParams -Message "Desktop shorcut $fileName created."
+        }
+
+        $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url"
+        if (!(Test-Path -Path $fileName))
+        {
+            $Favorite = $Shell.CreateShortcut($fileName)
+            $Favorite.TargetPath = "https://portal.local.azurestack.external";
+            $Favorite.Save()
+            Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+        }
+
+        $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url"
+        if (!(Test-Path -Path $fileName))
+        {
+            $Favorite = $Shell.CreateShortcut($fileName)
+            $Favorite.TargetPath = "https://portal.azure.com";
+            $Favorite.Save()
+            Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+        }
+
+        $fileName = $env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url"
+        if (!(Test-Path -Path $fileName))
+        {
+            $Favorite = $Shell.CreateShortcut($fileName)
+            $Favorite.TargetPath = "http://azs-xrp01:19007";
+            $Favorite.Save()
+            Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+        }
+
     }
     Start-Sleep -Seconds $defaultPollIntervalInSeconds
     $loopCount++

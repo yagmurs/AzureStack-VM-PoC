@@ -273,21 +273,6 @@ $st.StartJob()
 DownloadWithRetry -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -DownloadLocation "$defaultLocalPath\Register-AzureStackLAB.ps1"
 #Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "$defaultLocalPath\Register-AzureStackLAB.ps1"
 
-#Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
-$Shell = New-Object -ComObject ("WScript.Shell")
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url")
-$Favorite.TargetPath = "https://adminportal.local.azurestack.external";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url")
-$Favorite.TargetPath = "https://portal.local.azurestack.external";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url")
-$Favorite.TargetPath = "https://portal.azure.com";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url")
-$Favorite.TargetPath = "http://azs-xrp01:19007";
-$Favorite.Save()
-
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random

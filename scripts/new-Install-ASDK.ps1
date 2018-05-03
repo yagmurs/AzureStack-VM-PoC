@@ -10,7 +10,8 @@ param (
     [string]
     $LocalAdminUsername = "Administrator",
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,
+    HelpMessage="Specify deployment type `'AAD`' or `'ADFS`'")]
     [ValidateSet("AAD", "ADFS")]
     [string]
     $DeploymentType
@@ -95,21 +96,6 @@ if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction Silen
 }
 $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -FilePath "$defaultLocalPath\ASDKCompanionService.ps1" -Name "ASDK Installer Companion Service" -Credential $localAdminCred
 $st.StartJob()
-
-#Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
-$Shell = New-Object -ComObject ("WScript.Shell")
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url")
-$Favorite.TargetPath = "https://adminportal.local.azurestack.external";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url")
-$Favorite.TargetPath = "https://portal.local.azurestack.external";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url")
-$Favorite.TargetPath = "https://portal.azure.com";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url")
-$Favorite.TargetPath = "http://azs-xrp01:19007";
-$Favorite.Save()
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"

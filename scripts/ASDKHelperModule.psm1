@@ -54,6 +54,10 @@ function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
     for ($i = 0; $i -lt $count; $i++)
     {
         $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
+        if ($version -eq 1804)
+        {
+            $version = "$version" + "-1"
+        }
         try
         {
             $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode

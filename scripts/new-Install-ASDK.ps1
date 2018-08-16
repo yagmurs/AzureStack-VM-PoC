@@ -14,7 +14,10 @@ param (
     HelpMessage="Specify deployment type `'AAD`' or `'ADFS`'")]
     [ValidateSet("AAD", "ADFS")]
     [string]
-    $DeploymentType
+    $DeploymentType,
+
+    [switch]
+    $DownloadASDK
 )
 
 #region Variables
@@ -84,12 +87,30 @@ $writeLogParams = @{
 #endregion
 
 #Download Azure Stack Development Kit Companion Service script
-if (!(Test-Path "$defaultLocalPath\ASDKCompanionService.ps1"))
+$ASDKCompanionScriptName = "ASDKCompanionService.ps1"
+if (!(Test-Path "$defaultLocalPath\$ASDKCompanionScriptName"))
 {
-    DownloadWithRetry -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -DownloadLocation "$defaultLocalPath\ASDKCompanionService.ps1"
+    DownloadWithRetry -Uri "$gitbranch/scripts/$ASDKCompanionScriptName" -DownloadLocation "$defaultLocalPath\$ASDKCompanionScriptName"
 }
 
-#Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"
+#Download ASDK files (BINs and EXE)
+if ($DownloadASDK) 
+{
+    $asdkDownloadPath = "d:\"
+    $asdkExtractFolder = "Azure Stack Development Kit"
+    $o = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
+    if ($Version -eq $null -or $Version -eq "")
+    {
+        $asdkFiles = ASDKDownloader -Interactive -Destination $asdkDownloadPath
+    }
+    else
+    {
+        $asdkFiles = ASDKDownloader -Version $Version -Destination $asdkDownloadPath
+    }
+    $asdkFiles[0].Split("/")[-1]
+
+}
+
 if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
 {
     Get-ScheduledJob -name "ASDK Installer Companion Service" | Unregister-ScheduledJob -Force

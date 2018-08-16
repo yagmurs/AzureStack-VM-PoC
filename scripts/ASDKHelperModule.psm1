@@ -79,6 +79,7 @@ function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
 function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfileList) 
 {
     $Uris = @()
+
     foreach ($file in $asdkfileList)
     {
         try
@@ -88,6 +89,7 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
             if ($r -eq 200)
             {
                 $Uris += $Uri
+                Write-Verbose $Uri -Verbose
             }    
         }
         catch
@@ -96,4 +98,71 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
         }
     }
     return $Uris
+}
+
+function ASDKDownloader
+{
+    param
+    (
+        [switch]
+        $Interactive,
+
+        [System.Collections.ArrayList]
+        $AsdkFileList,
+
+        [string]
+        $ASDKURIRoot = "https://azurestack.azureedge.net/asdk",
+
+        [string]
+        $Version,
+
+        [string]
+        $Destination = "D:\"
+    )
+    if (!($AsdkFileList))
+    {
+        $AsdkFileList = @("AzureStackDevelopmentKit.exe")
+        1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
+    }
+
+    if ($Interactive)
+    {
+        $versionArray = findLatestASDK -asdkURIRoot $ASDKURIRoot -asdkFileList $AsdkFileList
+        
+        Write-Verbose "Version is now: $Version" -Verbose
+        Write-Verbose "VersionArray is now: $versionArray" -Verbose
+        if ($Version -eq $null -or $Version -eq "")
+        {
+            do
+            {
+                Clear-Host
+                $i = 1
+                Write-Host ""
+                foreach ($v in $versionArray)
+                {
+                    Write-Host "$($i)`. ASDK version: $v"
+                    $i++
+                }
+                Write-Host ""
+                Write-Host -ForegroundColor Yellow -BackgroundColor DarkGray -NoNewline  -Object "Unless it is instructed, select only latest tested ASDK Version "
+                Write-Host -ForegroundColor Green -BackgroundColor DarkGray -Object $gitbranchconfig.lastversiontested
+                Write-Host ""
+                $s = (Read-Host -Prompt "Select ASDK version to install")
+                if ($s -match "\d")
+                {
+                    $s = $s - 1
+                }
+            }
+            until ($versionArray[$s] -in $versionArray)
+            $version = $versionArray[$s]
+        }
+    }
+        $downloadList = testASDKFilesPresence -asdkURIRoot $ASDKURIRoot -version $Version -asdkfileList $AsdkFileList
+        return $downloadList
+        $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $Destination}      
+}
+
+function ExtractASDK ($Source, $Destination)
+{
+
 }

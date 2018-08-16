@@ -14,11 +14,22 @@ This template creates a new Azure VM, and installs, configures all prerequisites
   - Deploy the template
   - Logon to Azure VM
   - Run Install-ASDK.ps1 script on the desktop
+  - Follow on-screen instructions
+  - Setup will download selected version of ASDK and extract files automatically
+  - ASDK setup will be feeded with required default parameters and parameters collected above
 
 *** updates on 06.01.2018
  - New options to select ASDK version to install
  - Tested with ASDK 1712
  - Lots of fixes to better detect ASDK files and paths
+
+*** updates on 06.06.2018
+ - Tested with ASDK 1805
+ - Auto shutdown option set to disabled by default (enable this one manually during the deployment if you have limited subscription)
+ - 
+*** updates on 17.08.2018
+ - Tested with ASDK 1807
+ 
 
 For more details, please read the following article for details
 https://blogs.technet.microsoft.com/yagmurs/deploying-azure-stack-development-kit-asdk-straight-on-azure-vm

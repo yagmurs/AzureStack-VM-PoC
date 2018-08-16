@@ -87,15 +87,11 @@
             "type": "string"
         },
         "osDiskVhdUri": {
-            "defaultValue": "https://azurestackvhd.blob.core.windows.net/vhds/asdk1803_120gb.vhd",
-            "allowedValues": [
-                "https://azurestackvhd.blob.core.windows.net/vhds/asdk1803_120gb.vhd",
-                "https://azurestackvhd.blob.core.windows.net/vhds/asdk1803.vhd"
-            ],
+            "defaultValue": "https://azurestackvhd.blob.core.windows.net/vhds/asdk_latest.vhd",
             "type": "string",
             "metadata": {
                 "description": "Uri of the your user image",
-                "name": "https://azurestackvhd.blob.core.windows.net/vhds/asdk1803_120gb.vhd"
+                "name": "https://azurestackvhd.blob.core.windows.net/vhds/asdk_latest.vhd"
             }
         },
         "postConfigScriptLocation": { 

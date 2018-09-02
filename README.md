@@ -26,9 +26,13 @@ This template creates a new Azure VM, and installs, configures all prerequisites
 *** updates on 06.06.2018
  - Tested with ASDK 1805
  - Auto shutdown option set to disabled by default (enable this one manually during the deployment if you have limited subscription)
- - 
+
 *** updates on 17.08.2018
  - Tested with ASDK 1807
+
+*** updates on 02.09.2018
+ - Tested with ASDK 1808
+ - findLatestASDK function updated to detect additional ASDK releases to download. ex. 1807 re-released twice 1807-1 and 1807-2 
  
 
 For more details, please read the following article for details

@@ -47,34 +47,44 @@ function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
     }
 }
 
-function findLatestASDK ($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
+function findLatestASDK 
 {
+    [CmdletBinding()]
+    Param($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
     $versionArray = @()
-    $version = Get-Date -Format "yyMM"
+    $versionArrayToTest = @()
+    $version = @(Get-Date -Format "yyMM")
+    $suffix = @('-3','-2','-1','')
+    
     for ($i = 0; $i -lt $count; $i++)
-    {
-        $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
-        if ($version -eq 1804)
-        {
-            $version = "$version" + "-1"
+    {       
+        foreach ($s in $suffix) {
+            $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
+            $versionArrayToTest += "$version" + "$s"
         }
+        Write-Verbose "$versionArrayToTest"
+    }
+
+    foreach ($version in $versionArrayToTest)
+    {
         try
         {
             $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
             if ($r -eq 200)
             {
-                Write-Verbose "ASDK$version is available." -Verbose
+                Write-Verbose "ASDK$version is available."
                 $versionArray += $version
             }
         }
         catch [System.Net.WebException],[System.Exception]
         {
-            Write-Verbose "ASDK$version cannot be located." -Verbose
+            Write-Verbose "ASDK$version cannot be located."
             $r = 404
         }
     }
     return $versionArray
 }
+
 
 function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfileList) 
 {

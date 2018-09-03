@@ -104,6 +104,12 @@ Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 #Creating desktop shortcut for Install-ASDK.ps1
 if ($EnableDownloadASDK)
 {
+    if (!($AsdkFileList))
+    {
+        $AsdkFileList = @("AzureStackDevelopmentKit.exe")
+        1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
+    }
+    
     $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
 
     $WshShell = New-Object -comObject WScript.Shell

@@ -214,7 +214,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', variables('adminUsername'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', variables('adminUsername'), ' ', '-EnableDownloadASDK')]"
                         }
                     }
                 }

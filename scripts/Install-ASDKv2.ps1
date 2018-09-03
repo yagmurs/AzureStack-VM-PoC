@@ -24,6 +24,7 @@ param (
 )
 
 #region Variables
+$VerbosePreference = "Continue"
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
 $gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
 $gitbranchcode = $gitbranchconfig.branch.Trim()
@@ -50,7 +51,7 @@ if (!($LocalAdminPass))
         if ($DS.ValidateCredentials($LocalAdminUsername, $adminPass_text) -eq $true)
         {
             $localCredValidated =  $true
-            Write-Verbose "Password validated for user: $LocalAdminUsername" -Verbose
+            Write-Verbose "Password validated for user: $LocalAdminUsername" 
         }
         else
         {
@@ -95,8 +96,7 @@ if ($DownloadASDK)
 
     $asdkDownloadPath = "d:\"
     $asdkExtractFolder = "Azure Stack Development Kit"
-    $o = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
-    if ($Version -eq $null -or $Version -eq "")
+    if ($null -eq $version -or $Version -eq "")
     {
         $asdkFiles = ASDKDownloader -Interactive -Destination $asdkDownloadPath
     }
@@ -143,7 +143,18 @@ if ($DownloadASDK)
         Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
         Dismount-VHD -Path $vhdxFullPath       
     }
+    
+    Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
+    Set-Location C:\CloudDeployment\Setup
+    .\BootstrapAzureStackDeployment.ps1
 
+    Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
+
+    Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
+    workaround1
+
+    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+    workaround2
 }
 
 if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)

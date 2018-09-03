@@ -36,7 +36,7 @@ function Disable-InternetExplorerESC {
 function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
 {
     $t = Get-Date -Format "yyyy-MM-dd hh:mm:ss"
-    Write-Verbose "$Message - $t" -Verbose
+    Write-Verbose "$Message - $t"
     if ($Overwrite)
     {
         Set-Content -Path $LogFilePath -Value "$Message - $t"
@@ -99,7 +99,7 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
             if ($r -eq 200)
             {
                 $Uris += $Uri
-                Write-Verbose $Uri -Verbose
+                Write-Verbose $Uri
             }    
         }
         catch
@@ -140,9 +140,9 @@ function ASDKDownloader
     {
         $versionArray = findLatestASDK -asdkURIRoot $ASDKURIRoot -asdkFileList $AsdkFileList
         
-        Write-Verbose "Version is now: $Version" -Verbose
-        Write-Verbose "VersionArray is now: $versionArray" -Verbose
-        if ($Version -eq $null -or $Version -eq "")
+        Write-Verbose "Version is now: $Version"
+        Write-Verbose "VersionArray is now: $versionArray"
+        if ($null -eq $Version -or $Version -eq "")
         {
             do
             {
@@ -179,4 +179,22 @@ function ASDKDownloader
 function extractASDK ($File, $Destination)
 {
     Start-Process -FilePath $File -ArgumentList "/dir=`"$destination`"", "/SILENT", "/NOCANCEL" -Wait
+}
+
+function workaround1
+{
+    Write-Verbose ""
+    $baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
+    $baremetalFile = Get-Content -Path $baremetalFilePath
+    $baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
+    Set-Content -Value $baremetalFile -Path $baremetalFilePath -Force
+}
+
+function workaround2
+{
+    Write-Verbose ""
+    $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
+    $HelpersFile = Get-Content -Path $HelpersFilePath
+    $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
+    Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force
 }

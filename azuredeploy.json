@@ -222,7 +222,7 @@
         },
         {
             "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
-            "type": "microsoft.devtestlab/schedules",
+            "type": "Microsoft.DevTestLab/labs/artifactsources",
             "apiVersion": "2016-05-15",
             "location": "[variables('location')]",
             "properties": {

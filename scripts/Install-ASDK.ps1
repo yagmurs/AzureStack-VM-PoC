@@ -242,13 +242,14 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
 Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
 Set-Location C:\CloudDeployment\Setup
 .\BootstrapAzureStackDeployment.ps1
+
 Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 
 Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
-$baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
-$baremetalFile = Get-Content -Path $baremetalFilePath
-$baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
-Set-Content -Value $baremetalFile -Path $baremetalFilePath -Force 
+workaround1
+
+Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+workaround2
 
 if ($version -ge 1802)
 {

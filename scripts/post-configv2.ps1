@@ -61,8 +61,8 @@ Set-ExecutionPolicy unrestricted -Force
 Disable-InternetExplorerESC
 
 #Download Install-ASDK.ps1 (installer)
+DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
 DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDKv2.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDKv2.ps1"
-#Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"
 
 #Download Azure Stack Development Kit Companion Service script
 DownloadWithRetry -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -DownloadLocation "$defaultLocalPath\ASDKCompanionService.ps1"
@@ -126,15 +126,14 @@ Resize-Partition -DriveLetter c -Size $size.sizemax
 
 Rename-LocalUser -Name $username -NewName Administrator
 
+Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
 Set-Location C:\CloudDeployment\Setup
 .\BootstrapAzureStackDeployment.ps1
 
-$baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
-$baremetalFile = Get-Content -Path $baremetalFilePath
-$baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
-Set-Content -Value $baremetalFile -Path $baremetalFilePath -Force 
+Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 
-$HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
-$HelpersFile = Get-Content -Path $HelpersFilePath
-$HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
-#Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force
+Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
+workaround1
+
+#Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+#workaround2

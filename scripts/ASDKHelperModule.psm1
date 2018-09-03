@@ -183,7 +183,7 @@ function extractASDK ($File, $Destination)
 
 function workaround1
 {
-    Write-Verbose ""
+    Write-Verbose "Applying workaround to tweak baremetal detection for Azure VM"
     $baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
     $baremetalFile = Get-Content -Path $baremetalFilePath
     $baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
@@ -192,7 +192,7 @@ function workaround1
 
 function workaround2
 {
-    Write-Verbose ""
+    Write-Verbose "Applying workaround to tweak long path issues started appear after 1802"
     $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
     $HelpersFile = Get-Content -Path $HelpersFilePath
     $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 

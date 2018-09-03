@@ -36,7 +36,7 @@ function Disable-InternetExplorerESC {
 function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
 {
     $t = Get-Date -Format "yyyy-MM-dd hh:mm:ss"
-    Write-Verbose "$Message - $t"
+    Write-Verbose "$Message - $t" -Verbose
     if ($Overwrite)
     {
         Set-Content -Path $LogFilePath -Value "$Message - $t"
@@ -62,7 +62,7 @@ function findLatestASDK
             $version = (Get-Date (Get-Date).AddMonths(-$i) -Format "yyMM")
             $versionArrayToTest += "$version" + "$s"
         }
-        Write-Verbose "$versionArrayToTest"
+        Write-Verbose "$versionArrayToTest" -Verbose
     }
 
     foreach ($version in $versionArrayToTest)
@@ -72,13 +72,13 @@ function findLatestASDK
             $r = (Invoke-WebRequest -Uri $($asdkURIRoot + $version + '/' + $asdkFileList[0]) -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue).StatusCode
             if ($r -eq 200)
             {
-                Write-Verbose "ASDK$version is available."
+                Write-Verbose "ASDK$version is available." -Verbose
                 $versionArray += $version
             }
         }
         catch [System.Net.WebException],[System.Exception]
         {
-            Write-Verbose "ASDK$version cannot be located."
+            Write-Verbose "ASDK$version cannot be located." -Verbose
             $r = 404
         }
     }
@@ -99,7 +99,7 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
             if ($r -eq 200)
             {
                 $Uris += $Uri
-                Write-Verbose $Uri
+                Write-Verbose $Uri -Verbose
             }    
         }
         catch
@@ -140,8 +140,8 @@ function ASDKDownloader
     {
         $versionArray = findLatestASDK -asdkURIRoot $ASDKURIRoot -asdkFileList $AsdkFileList
         
-        Write-Verbose "Version is now: $Version"
-        Write-Verbose "VersionArray is now: $versionArray"
+        Write-Verbose "Version is now: $Version" -Verbose
+        Write-Verbose "VersionArray is now: $versionArray" -Verbose
         if ($null -eq $Version -or $Version -eq "")
         {
             do
@@ -171,7 +171,7 @@ function ASDKDownloader
         $downloadList = testASDKFilesPresence -asdkURIRoot $ASDKURIRoot -version $Version -asdkfileList $AsdkFileList
         $downloadList
         
-        Write-Verbose -Message "Downloading ASDK$Version"
+        Write-Verbose -Message "Downloading ASDK$Version" -Verbose
         
         $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $Destination}      
 }
@@ -183,7 +183,7 @@ function extractASDK ($File, $Destination)
 
 function workaround1
 {
-    Write-Verbose "Applying workaround to tweak baremetal detection for Azure VM"
+    Write-Verbose "Applying workaround to tweak baremetal detection for Azure VM" -Verbose
     $baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
     $baremetalFile = Get-Content -Path $baremetalFilePath
     $baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
@@ -192,7 +192,7 @@ function workaround1
 
 function workaround2
 {
-    Write-Verbose "Applying workaround to tweak long path issues started appear after 1802"
+    Write-Verbose "Applying workaround to tweak long path issues started appear after 1802" -Verbose
     $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
     $HelpersFile = Get-Content -Path $HelpersFilePath
     $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 

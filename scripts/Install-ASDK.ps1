@@ -251,15 +251,6 @@ workaround1
 Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
 workaround2
 
-if ($version -ge 1802)
-{
-    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
-    $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
-    $HelpersFile = Get-Content -Path $HelpersFilePath
-    $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
-    Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force
-}
-
 #Download Azure Stack Development Kit Companion Service script
 DownloadWithRetry -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -DownloadLocation "$defaultLocalPath\ASDKCompanionService.ps1"
 #Invoke-WebRequest -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -OutFile "$defaultLocalPath\ASDKCompanionService.ps1"

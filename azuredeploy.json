@@ -217,29 +217,29 @@
                             "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK')]"
                         }
                     }
-                }
-            ]
-        },
-        {
-            "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
-            "type": "Microsoft.DevTestLab/labs/artifactsources",
-            "apiVersion": "2016-05-15",
-            "location": "[variables('location')]",
-            "properties": {
-                "status": "[parameters('autoShutdownStatus')]",
-                "taskType": "ComputeVmShutdownTask",
-                "dailyRecurrence": {
-                    "time": "[parameters('autoShutdownTime')]"
                 },
-                "timeZoneId": "[parameters('autoShutdownTimeZone')]",
-                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                "notificationSettings": {
-                    "status": "[parameters('autoShutdownNotificationStatus')]",
-                    "timeInMinutes": "30"
+                {
+                    "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
+                    "type": "Microsoft.DevTestLab/schedules",
+                    "apiVersion": "2016-05-15",
+                    "location": "[variables('location')]",
+                    "properties": {
+                        "status": "[parameters('autoShutdownStatus')]",
+                        "taskType": "ComputeVmShutdownTask",
+                        "dailyRecurrence": {
+                            "time": "[parameters('autoShutdownTime')]"
+                        },
+                        "timeZoneId": "[parameters('autoShutdownTimeZone')]",
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
+                        "notificationSettings": {
+                            "status": "[parameters('autoShutdownNotificationStatus')]",
+                            "timeInMinutes": "30"
+                        }
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                    ]
                 }
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
             ]
         },
         {

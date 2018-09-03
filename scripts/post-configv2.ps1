@@ -76,6 +76,8 @@ Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 #Creating desktop shortcut for Install-ASDK.ps1
 if ($EnableDownloadASDK)
 {
+    $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
+
     $WshShell = New-Object -comObject WScript.Shell
     $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
     $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
@@ -95,6 +97,13 @@ if ($EnableDownloadASDK)
     $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
     $Shortcut.WorkingDirectory = "$defaultLocalPath"
     $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DownloadASDK}"
+    $Shortcut.Save()
+
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Latest_Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DownloadASDK -Version $latestASDK}"
     $Shortcut.Save()
 }
 else

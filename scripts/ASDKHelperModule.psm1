@@ -168,7 +168,7 @@ function ASDKDownloader
         }
     }
         $downloadList = testASDKFilesPresence -asdkURIRoot $ASDKURIRoot -version $Version -asdkfileList $AsdkFileList
-        return $downloadList
+        $downloadList
         $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $Destination}      
 }
 

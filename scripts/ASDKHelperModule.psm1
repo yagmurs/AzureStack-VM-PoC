@@ -112,6 +112,7 @@ function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfile
 
 function ASDKDownloader
 {
+    [CmdletBinding()]
     param
     (
         [switch]
@@ -169,10 +170,13 @@ function ASDKDownloader
     }
         $downloadList = testASDKFilesPresence -asdkURIRoot $ASDKURIRoot -version $Version -asdkfileList $AsdkFileList
         $downloadList
+        
+        Write-Verbose -Message "Downloading ASDK$Version"
+        
         $downloadList | ForEach-Object {Start-BitsTransfer -Source $_ -DisplayName $_ -Destination $Destination}      
 }
 
-function ExtractASDK ($Source, $Destination)
+function extractASDK ($File, $Destination)
 {
-
+    Start-Process -FilePath $File -ArgumentList "/dir=`"$destination`"", "/SILENT", "/NOCANCEL" -Wait
 }

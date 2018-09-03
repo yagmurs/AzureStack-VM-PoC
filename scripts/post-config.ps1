@@ -89,11 +89,11 @@ Set-ExecutionPolicy unrestricted -Force
 
 #Download Install-ASDK.ps1 (installer)
 DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
-#Invoke-WebRequest -Uri "$gitbranch/scripts/Install-ASDK.ps1" -OutFile "$defaultLocalPath\Install-ASDK.ps1"
+DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDKv2.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDKv2.ps1"
+
 
 #Download ASDK Downloader
 DownloadWithRetry -Uri "https://aka.ms/azurestackdevkitdownloader" -DownloadLocation "D:\AzureStackDownloader.exe"
-#Invoke-WebRequest -Uri "https://aka.ms/azurestackdevkitdownloader" -OutFile "D:\AzureStackDownloader.exe"
 
 #Download and extract Mobaxterm
 DownloadWithRetry -Uri "https://aka.ms/mobaxtermLatest" -DownloadLocation "$defaultLocalPath\Mobaxterm.zip"
@@ -104,11 +104,49 @@ Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 #Creating desktop shortcut for Install-ASDK.ps1
 if ($EnableDownloadASDK)
 {
-    New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Unrestricted -file $defaultLocalPath\Install-ASDK.ps1 -EnableDownloadASDK"
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DownloadASDK -DeploymentType AAD}"
+    $Shortcut.Save()
+
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DownloadASDK -DeploymentType ADFS}"
+    $Shortcut.Save()
+
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DownloadASDK}"
+    $Shortcut.Save()
 }
 else
 {
-    New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Unrestricted -file $defaultLocalPath\Install-ASDK.ps1"
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DeploymentType AAD}"
+    $Shortcut.Save()
+
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1 -DeploymentType ADFS}"
+    $Shortcut.Save()
+
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
+    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $Shortcut.WorkingDirectory = "$defaultLocalPath"
+    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1"
+    $Shortcut.Save()
 }
 
 

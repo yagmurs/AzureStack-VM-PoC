@@ -17,7 +17,10 @@ param (
     $DeploymentType,
 
     [switch]
-    $DownloadASDK
+    $DownloadASDK,
+
+    [string]
+    $version
 )
 
 #region Variables
@@ -43,24 +46,15 @@ if (!($LocalAdminPass))
 {
     do {
     $localAdminPass = Read-Host -Prompt "Enter password for the user `'Administrator`'" -AsSecureString
-    $localAdminPass1 = Read-Host -Prompt "Re-Enter password for the user `'Administrator`'" -AsSecureString
     $adminPass_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($localAdminPass))
-    $adminpass1_text = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($localAdminPass1))
-        if ($adminPass_text -cne $adminpass1_text)
+        if ($DS.ValidateCredentials($LocalAdminUsername, $adminPass_text) -eq $true)
         {
-            Write-Verbose "Password does not match, re-enter password" -Verbose
+            $localCredValidated =  $true
+            Write-Verbose "Password validated for user: $LocalAdminUsername" -Verbose
         }
         else
         {
-            if ($DS.ValidateCredentials($LocalAdminUsername, $adminPass_text) -eq $true)
-            {
-                $localCredValidated =  $true
-                Write-Verbose "Password validated for user: $LocalAdminUsername" -Verbose
-            }
-            else
-            {
-                Write-Verbose "Password cannot be validated for user: $LocalAdminUsername" -Verbose
-            }
+            Write-Error "Password cannot be validated for user: $LocalAdminUsername"
         }
 
     } while ($localCredValidated -eq $false)
@@ -93,9 +87,12 @@ if (!(Test-Path "$defaultLocalPath\$ASDKCompanionScriptName"))
     DownloadWithRetry -Uri "$gitbranch/scripts/$ASDKCompanionScriptName" -DownloadLocation "$defaultLocalPath\$ASDKCompanionScriptName"
 }
 
-#Download ASDK files (BINs and EXE)
+#Download and extract ASDK files
 if ($DownloadASDK) 
 {
+    #Download ASDK files (BINs and EXE)
+    Write-Log @writeLogParams -Message "Finding available ASDK versions"
+
     $asdkDownloadPath = "d:\"
     $asdkExtractFolder = "Azure Stack Development Kit"
     $o = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
@@ -107,7 +104,45 @@ if ($DownloadASDK)
     {
         $asdkFiles = ASDKDownloader -Version $Version -Destination $asdkDownloadPath
     }
-    $asdkFiles[0].Split("/")[-1]
+    Write-Log @writeLogParams -Message "$asdkFiles"
+      
+    #Extracting Azure Stack Development kit files
+    
+    
+    $f = Join-Path -Path $asdkDownloadPath -ChildPath $asdkFiles[0].Split("/")[-1]
+    $d = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
+
+    Write-Log @writeLogParams -Message "Extracting Azure Stack Development kit files;"
+    Write-Log @writeLogParams -Message "to $d"
+
+    ExtractASDK -File $f -Destination $d
+
+    $vhdxFullPath = Join-Path -Path $d -ChildPath "cloudbuilder.vhdx"
+    $foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
+
+    if (Test-Path -Path $vhdxFullPath)
+    {
+        Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
+        Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
+        try {
+            $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+            Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
+        }
+        catch {
+            Write-Log @writeLogParams -Message "an error occured while mounting cloudbuilder.vhdx file"
+            Write-Log @writeLogParams -Message $error[0].Exception
+            throw "an error occured while mounting cloudbuilder.vhdxf file"
+        }
+
+        foreach ($folder in $foldersToCopy)
+        {
+            Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"
+            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
+            Write-Log @writeLogParams -Message "$folder done..."
+        }
+        Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
+        Dismount-VHD -Path $vhdxFullPath       
+    }
 
 }
 

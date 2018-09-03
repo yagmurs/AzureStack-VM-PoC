@@ -103,11 +103,11 @@
             }
         },
         "postConfigScriptFilename": { 
-            "defaultValue": "new-post-config.ps1",
+            "defaultValue": "post-configv2.ps1",
             "type": "string",
             "metadata": {
                 "description": "the post config script file name",
-                "name": "new-post-config.ps1"
+                "name": "post-configv2.ps1"
             }
         },
         "autoShutdownStatus": {
@@ -252,7 +252,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', parameters('postConfigScriptFilename'), ' ', variables('adminUsername'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', parameters('postConfigScriptFilename'), ' ', '-Username', ' ', variables('adminUsername'))]"
                         }
                     }
                 },

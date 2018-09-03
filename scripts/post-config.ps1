@@ -102,13 +102,13 @@ Expand-Archive -Path "$defaultLocalPath\Mobaxterm.zip" -DestinationPath "$defaul
 Remove-Item -Path "$defaultLocalPath\Mobaxterm.zip" -Force
 
 #Creating desktop shortcut for Install-ASDK.ps1
-if ($DownloadASDK)
+if ($EnableDownloadASDK)
 {
     New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Unrestricted -file $defaultLocalPath\Install-ASDK.ps1 -EnableDownloadASDK"
 }
 else
 {
-    New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "$defaultLocalPath\Install-ASDK.ps1"
+    New-Item -ItemType SymbolicLink -Path ($env:ALLUSERSPROFILE + "\Desktop") -Name "Install-ASDK" -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Unrestricted -file $defaultLocalPath\Install-ASDK.ps1"
 }
 
 

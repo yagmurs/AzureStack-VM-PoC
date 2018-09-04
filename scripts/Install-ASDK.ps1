@@ -235,7 +235,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
             Write-Log @writeLogParams -Message "$folder done..."
         }
         Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
-        Dismount-DiskImage -Path $vhdxFullPath       
+        Dismount-DiskImage -ImagePath $vhdxFullPath       
     } 
     
 

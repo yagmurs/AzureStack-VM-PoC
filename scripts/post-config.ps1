@@ -161,7 +161,7 @@ if ($AutoDownloadASDK -eq "true")
             Write-Log @writeLogParams -Message "$folder done..."
         }
         Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
-        Dismount-DiskImage -Path $vhdxFullPath       
+        Dismount-DiskImage -ImagePath $vhdxFullPath       
     } 
     
     Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"

@@ -121,6 +121,17 @@
             "metadata": {
                 "name": "Disabled"
             }
+        },
+        "autoDownloadASDK": {
+            "type": "bool",
+            "defaultValue": false,
+            "allowedValues": [
+                true,
+                false
+            ],
+            "metadata": {
+                "name": false
+            }
         }
     },
     "variables": {
@@ -214,7 +225,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK')]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK', ' ', '-AutoDownloadASDK', ' ', parameters('autoDownloadASDK'))]"
                         }
                     }
                 },

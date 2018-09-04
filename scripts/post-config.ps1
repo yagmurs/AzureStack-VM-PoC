@@ -145,7 +145,7 @@ if ($AutoDownloadASDK -eq "true")
         Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
         Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
         try {
-            $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
             Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
         }
         catch {
@@ -161,8 +161,8 @@ if ($AutoDownloadASDK -eq "true")
             Write-Log @writeLogParams -Message "$folder done..."
         }
         Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
-        Dismount-VHD -Path $vhdxFullPath       
-    }
+        Dismount-DiskImage -Path $vhdxFullPath       
+    } 
     
     Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
     Set-Location C:\CloudDeployment\Setup
@@ -250,6 +250,7 @@ else
     }
     
 }
-Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
 
 Rename-LocalUser -Name $username -NewName Administrator
+
+Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart

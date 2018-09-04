@@ -219,7 +219,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
         Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
         try {
-            $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
             Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
         }
         catch {
@@ -231,11 +231,13 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         foreach ($folder in $foldersToCopy)
         {
             Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"
-            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination $destPath -Recurse -Force
+            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
             Write-Log @writeLogParams -Message "$folder done..."
         }
-        Dismount-VHD -Path $vhdxFullPath       
-    }
+        Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
+        Dismount-DiskImage -Path $vhdxFullPath       
+    } 
+    
 
 }
 

@@ -6,7 +6,7 @@ Param (
     [switch]
     $EnableDownloadASDK,
 
-    [bool]
+    [string]
     $AutoDownloadASDK
     )
 
@@ -114,7 +114,7 @@ if (!($AsdkFileList))
 
 $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
 
-if ($AutoDownloadASDK -eq $true)
+if ($AutoDownloadASDK -eq "true")
 {
     #Download ASDK files (BINs and EXE)
     Write-Log @writeLogParams -Message "Finding available ASDK versions"

@@ -121,14 +121,9 @@ if ($AutoDownloadASDK -eq $true)
 
     $asdkDownloadPath = "d:\"
     $asdkExtractFolder = "Azure Stack Development Kit"
-    if ($null -eq $version -or $Version -eq "")
-    {
-        $asdkFiles = ASDKDownloader -Interactive -Destination $asdkDownloadPath
-    }
-    else
-    {
-        $asdkFiles = ASDKDownloader -Version $Version -Destination $asdkDownloadPath
-    }
+
+    $asdkFiles = ASDKDownloader -Version $latestASDK -Destination $asdkDownloadPath
+
     Write-Log @writeLogParams -Message "$asdkFiles"
       
     #Extracting Azure Stack Development kit files

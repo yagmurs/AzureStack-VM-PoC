@@ -177,7 +177,6 @@ if ($DownloadASDK)
 
     Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     workaround2
-}
 
 if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
 {

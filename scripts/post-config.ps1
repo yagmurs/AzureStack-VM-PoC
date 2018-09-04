@@ -164,18 +164,6 @@ if ($AutoDownloadASDK -eq "true")
         Dismount-DiskImage -ImagePath $vhdxFullPath       
     } 
     
-    Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
-    Set-Location C:\CloudDeployment\Setup
-    .\BootstrapAzureStackDeployment.ps1
-
-    Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
-
-    Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
-    workaround1
-
-    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
-    workaround2
-
     Write-Log @writeLogParams -Message "Creating shortcut AAD_Install-ASDK.lnk"
     $WshShell = New-Object -comObject WScript.Shell
     $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
@@ -248,7 +236,6 @@ else
         $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDKv2.ps1"
         $Shortcut.Save()
     }
-    
 }
 
 Rename-LocalUser -Name $username -NewName Administrator

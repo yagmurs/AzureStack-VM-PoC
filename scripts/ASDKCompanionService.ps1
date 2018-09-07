@@ -1,12 +1,15 @@
 #region function Definition
 function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
 {
+    # Register the HNetCfg library (once)
+    regsvr32 /s hnetcfg.dll
+
     # Create a NetSharingManager object
     $m = New-Object -ComObject HNetCfg.HNetShare
 
     # Find connection
-    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+    $publicAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
 
 
     # Get sharing configuration
@@ -38,8 +41,8 @@ function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
     $m = New-Object -ComObject HNetCfg.HNetShare
 
     # Find connection
-    $publicAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
-    $privateAdapter = $m.EnumEveryConnection |? { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+    $publicAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection | Where-Object{ $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
 
 
     # Get sharing configuration
@@ -63,6 +66,48 @@ function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
     {
         Add-Content -Path $LogFilePath -Value "$Message - $t"
     }
+}
+
+function createDesktopShortcuts {
+    #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
+    $Shell = New-Object -ComObject ("WScript.Shell")
+            
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "https://adminportal.local.azurestack.external";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcut $fileName created."
+    }
+
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "https://portal.local.azurestack.external";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+    }
+
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "https://portal.azure.com";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+    }
+
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "http://azs-xrp01:19007";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+    }
+
 }
 #endregion
 
@@ -194,6 +239,7 @@ while ($true)
         ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true) -and 
         ([System.Environment]::GetEnvironmentVariable('NATEnabled', [System.EnvironmentVariableTarget]::Machine) -eq $true))
     {
+        createDesktopShortcuts
         if ($ICS -eq $true)
         {
             $o = Enable-ICS -PublicAdapterName $publicAdapterName -PrivateAdapterName $privateAdapterName
@@ -208,6 +254,7 @@ while ($true)
             Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
             break
         }
+        
     }
     Start-Sleep -Seconds $defaultPollIntervalInSeconds
     $loopCount++

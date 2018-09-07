@@ -219,7 +219,7 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
         Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
         try {
-            $driveLetter = Mount-VHD -Path $vhdxFullPath -Passthru | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
             Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
         }
         catch {
@@ -231,33 +231,27 @@ if ((Test-Path -Path ($foldersToCopy | ForEach-Object {Join-Path -Path $destPath
         foreach ($folder in $foldersToCopy)
         {
             Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"
-            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination $destPath -Recurse -Force
+            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
             Write-Log @writeLogParams -Message "$folder done..."
         }
-        Dismount-VHD -Path $vhdxFullPath       
-    }
+        Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
+        Dismount-DiskImage -ImagePath $vhdxFullPath       
+    } 
+    
 
 }
 
 Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
 Set-Location C:\CloudDeployment\Setup
 .\BootstrapAzureStackDeployment.ps1
+
 Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 
 Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
-$baremetalFilePath = "C:\CloudDeployment\Roles\PhysicalMachines\Tests\BareMetal.Tests.ps1"
-$baremetalFile = Get-Content -Path $baremetalFilePath
-$baremetalFile = $baremetalFile.Replace('$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'')','$isVirtualizedDeployment = ($Parameters.OEMModel -eq ''Hyper-V'') -or $isOneNode') 
-Set-Content -Value $baremetalFile -Path $baremetalFilePath -Force 
+workaround1
 
-if ($version -ge 1802)
-{
-    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
-    $HelpersFilePath = "C:\CloudDeployment\Common\Helpers.psm1" 
-    $HelpersFile = Get-Content -Path $HelpersFilePath
-    $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
-    Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force 
-}
+Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+workaround2
 
 #Download Azure Stack Development Kit Companion Service script
 DownloadWithRetry -Uri "$gitbranch/scripts/ASDKCompanionService.ps1" -DownloadLocation "$defaultLocalPath\ASDKCompanionService.ps1"
@@ -272,21 +266,6 @@ $st.StartJob()
 #Download Azure Stack Register script
 DownloadWithRetry -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -DownloadLocation "$defaultLocalPath\Register-AzureStackLAB.ps1"
 #Invoke-WebRequest -Uri "$gitbranch/scripts/Register-AzureStackLAB.ps1" -OutFile "$defaultLocalPath\Register-AzureStackLAB.ps1"
-
-#Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
-$Shell = New-Object -ComObject ("WScript.Shell")
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url")
-$Favorite.TargetPath = "https://adminportal.local.azurestack.external";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url")
-$Favorite.TargetPath = "https://portal.local.azurestack.external";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url")
-$Favorite.TargetPath = "https://portal.azure.com";
-$Favorite.Save()
-$Favorite = $Shell.CreateShortcut($env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url")
-$Favorite.TargetPath = "http://azs-xrp01:19007";
-$Favorite.Save()
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"

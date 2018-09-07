@@ -34,7 +34,7 @@ This template creates a new Azure VM, and installs, configures all prerequisites
  - Tested with ASDK 1808
  - findLatestASDK function updated to detect additional ASDK releases to download. ex. 1807 re-released twice 1807-1 and 1807-2
  - non-onmicrosoft.com domains and account with MFA support (pop-up Microsoft account logon UI after download and extract)
- - Removal of redundant local admin password entry, local admin password validation in-place.
+ - Removal of redundant local admin password prompt.
  - Support for ADFS as Identity Provider in addition to Azure Cloud (AAD). Additional desktop shortcuts added for each IDP.
  - New ARM template option to download latest ASDK and extract with the VM deployement, disabled by default. 😊 Which makes the deployment time a bit longer (30-40 mins.)
 

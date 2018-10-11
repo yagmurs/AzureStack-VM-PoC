@@ -19,6 +19,9 @@ param (
     [switch]
     $DownloadASDK,
 
+    [switch]
+    $SkipWorkaround,
+
     [string]
     $version
 )
@@ -165,7 +168,9 @@ if ($DownloadASDK)
         Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
         Dismount-VHD -Path $vhdxFullPath       
     }
-    
+
+if ($SkipWorkaround -eq $false)
+{    
     Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
     Set-Location C:\CloudDeployment\Setup
     .\BootstrapAzureStackDeployment.ps1
@@ -177,6 +182,7 @@ if ($DownloadASDK)
 
     Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     workaround2
+}
 
 if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
 {

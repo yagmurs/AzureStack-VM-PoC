@@ -283,11 +283,11 @@ if ($AzureImage)
 
     DownloadWithRetry -Uri "$gitbranch/scripts/roles.xml" -DownloadLocation "$defaultLocalPath\roles.xml"
 
-    Rename-LocalUser -Name $username -NewName Administrator
-
     if (Test-Path "$defaultLocalPath\roles.xml")
     {
-        Import-Clixml "$defaultLocalPath\roles.xml" | Where-Object installed | Add-WindowsFeature -Restart
+        Import-Clixml "$defaultLocalPath\roles.xml" | Where-Object installed | Add-WindowsFeature
+        Rename-LocalUser -Name $username -NewName Administrator
+        Restart-Computer
     }
     else
     {

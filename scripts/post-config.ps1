@@ -54,6 +54,7 @@ $gitbranchcode = $gitbranchconfig.branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 
 DownloadWithRetry -Uri "$gitbranch/scripts/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
+DownloadWithRetry -Uri "$gitbranch/scripts/roles.xml" -DownloadLocation "$defaultLocalPath\roles.xml"
 
 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
 {
@@ -240,4 +241,13 @@ else
 
 Rename-LocalUser -Name $username -NewName Administrator
 
-Add-WindowsFeature Hyper-V, Failover-Clustering, Web-Server -IncludeManagementTools -Restart
+if (Test-Path "$defaultLocalPath\roles.xml")
+{
+    Import-Clixml "$defaultLocalPath\roles.xml" | Where-Object installed | Add-WindowsFeature -Restart
+}
+else
+{
+    throw "required module $defaultLocalPath\roles.xml not found"   
+}
+
+

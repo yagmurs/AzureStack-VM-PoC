@@ -150,6 +150,14 @@ if ($AzureImage)
     #Download ASDK Downloader
     DownloadWithRetry -Uri "https://aka.ms/azurestackdevkitdownloader" -DownloadLocation "D:\AzureStackDownloader.exe"
 
+    if (!($AsdkFileList))
+    {
+        $AsdkFileList = @("AzureStackDevelopmentKit.exe")
+        1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
+    }
+
+    $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
+
     if ($AutoDownloadASDK -eq "true")
     {
         #Download ASDK files (BINs and EXE)
@@ -163,8 +171,7 @@ if ($AzureImage)
         Write-Log @writeLogParams -Message "$asdkFiles"
         
         #Extracting Azure Stack Development kit files
-        
-        
+                
         $f = Join-Path -Path $asdkDownloadPath -ChildPath $asdkFiles[0].Split("/")[-1]
         $d = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
 

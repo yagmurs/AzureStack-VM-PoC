@@ -38,6 +38,16 @@ This template creates a new Azure VM, and installs, configures all prerequisites
  - Support for ADFS as Identity Provider in addition to Azure Cloud (AAD). Additional desktop shortcuts added for each IDP.
  - New ARM template option to download latest ASDK and extract with the VM deployement, disabled by default. 😊 Which makes the deployment time a bit longer (30-40 mins.)
 
+*** updates on 19.12.2018
+- Tested with ASDK 1901
+- New switches to differantiate AzureImage and ADSKImage
+- Companion service moved into Install-ASDK
+- Desktop shortcuts creation upon successful installation
+- New scheduled task to create desktop shortcuts
+- BGPNAT functionality detection based on versions
+- Install all roles available in ASDKImage to AzureImage using roles.xml
+- Version number extraction from cloudbuilder.vhdx
+
 
 For more details, please read the following article for details
 https://blogs.technet.microsoft.com/yagmurs/deploying-azure-stack-development-kit-asdk-straight-on-azure-vm

@@ -114,7 +114,14 @@ else
 
         if (!(Test-Path -Path $vhdxFullPath))
         {
-            $asdkFiles = ASDKDownloader -Interactive -Destination $asdkDownloadPath
+            if ($null -eq $version -or $Version -eq "")
+            {
+                $asdkFiles = ASDKDownloader -Interactive -Destination $asdkDownloadPath
+            }
+            else
+            {
+                $asdkFiles = ASDKDownloader -Version $Version -Destination $asdkDownloadPath
+            }
             Write-Log @writeLogParams -Message "$asdkFiles"
 
             #Extracting Azure Stack Development kit files

@@ -353,7 +353,8 @@ $taskstoCompleteUponSuccess = {
                     throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
                 }
                 createDesktopShortcuts
-                Unregister-ScheduledJob -Name "Task to complete upon success" -Force
+                Unregister-ScheduledJob -Name "Tasks to complete upon success" -Force
+                Get-ChildItem -Path "C:\Users\Public\Desktop" -Filter "*.lnk" | Remove-Item -Force
                 break
             }
             catch 
@@ -370,7 +371,7 @@ $taskstoCompleteUponSuccess = {
 
 $trigger = New-JobTrigger -AtLogOn
 $option = New-ScheduledJobOption
-Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name "Task to complete upon success" -Trigger $trigger -ScheduledJobOption $option
+Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name "Tasks to complete upon success" -Trigger $trigger -ScheduledJobOption $option
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"

@@ -174,7 +174,10 @@ if ($SkipWorkaround -eq $false)
     Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     workaround2
 }
-if ($version -lt 1812)
+$pocParameters = Get-Help C:\CloudDeployment\Setup\InstallAzureStackPOC.ps1 -Parameter Nat* -ErrorAction SilentlyContinue
+
+#if ($version -lt 1812)
+if ($pocParameters.Count -gt 0)
 {
     $ASDKCompanionService = {
         $script:defaultLocalPath = "C:\AzureStackOnAzureVM"
@@ -392,7 +395,8 @@ if ($DeploymentType -eq "AAD")
         TimeServer = $timeServer
         DNSForwarder = "8.8.8.8"
     }
-    if ($version -lt 1812)
+    #if ($version -lt 1812)
+    if ($pocParameters.Count -gt 0)
     {
         $global:InstallAzSPOCParams.Add("NATIPv4Subnet","192.168.137.0/28")
         $global:InstallAzSPOCParams.Add("NATIPv4Address","192.168.137.11")
@@ -408,7 +412,8 @@ if ($DeploymentType -eq "ADFS")
         DNSForwarder = "8.8.8.8"
         UseADFS = $true
     }
-    if ($version -lt 1812)
+    #if ($version -lt 1812)
+    if ($pocParameters.Count -gt 0)
     {
         $global:InstallAzSPOCParams.Add("NATIPv4Subnet","192.168.137.0/28")
         $global:InstallAzSPOCParams.Add("NATIPv4Address","192.168.137.11")

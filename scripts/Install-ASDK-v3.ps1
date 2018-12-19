@@ -198,6 +198,14 @@ if ($version -lt 1812)
         [int]$defaultPollIntervalInSeconds = 60
         $script:ICS = $true
         $script:serviceVersion = "1.1"
+        if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
+        {
+            Import-Module "$defaultLocalPath\ASDKHelperModule.psm1"
+        }
+        else
+        {
+            throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
+        }
         Write-Log @writeLogParams -Message "Starting the service `($serviceVersion`)"
 
         $loopCount = 0
@@ -340,8 +348,6 @@ $taskstoCompleteUponSuccess = {
         [xml]$summary = Get-Content -Path C:\CloudDeployment\Logs\summary.*.log.xml -ErrorAction SilentlyContinue
         if ($summary.action.Status -eq "success")
         {
-
-            
             try
             {
                 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")

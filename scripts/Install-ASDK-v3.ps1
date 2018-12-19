@@ -128,7 +128,8 @@ else
     
             Write-Log @writeLogParams -Message "Extracting Azure Stack Development kit files;"
             Write-Log @writeLogParams -Message "to $d"
-
+            
+            $f = Join-Path -Path $asdkDownloadPath -ChildPath $asdkFiles[0].Split("/")[-1]
             ExtractASDK -File $f -Destination $d
         }
 

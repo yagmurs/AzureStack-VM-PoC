@@ -73,7 +73,7 @@ else
 #Download Install-ASDK.ps1 (installer)
 DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
 DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDKv2.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDKv2.ps1"
-DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDKv3.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDKv3.ps1"
+DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK-v3.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK-v3.ps1"
 
 #Download and extract Mobaxterm
 DownloadWithRetry -Uri "https://aka.ms/mobaxtermLatest" -DownloadLocation "$defaultLocalPath\Mobaxterm.zip"

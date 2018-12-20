@@ -23,7 +23,10 @@ param (
     $SkipWorkaround,
 
     [string]
-    $version
+    $version,
+
+    [pscredential]
+    $InfraAzureDirectoryTenantAdminCredential
 )
 
 #region Variables
@@ -401,6 +404,10 @@ if ($DeploymentType -eq "AAD")
         $global:InstallAzSPOCParams.Add("NATIPv4Subnet","192.168.137.0/28")
         $global:InstallAzSPOCParams.Add("NATIPv4Address","192.168.137.11")
         $global:InstallAzSPOCParams.Add("NATIPv4DefaultGateway","192.168.137.1")
+    }
+    if ($InfraAzureDirectoryTenantAdminCredential)
+    {
+        $global:InstallAzSPOCParams.Add("InfraAzureDirectoryTenantAdminCredential", $InfraAzureDirectoryTenantAdminCredential)
     }
 }
 

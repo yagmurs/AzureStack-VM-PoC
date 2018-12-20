@@ -58,5 +58,7 @@ or use http://aka.ms/DeployAzureStackonAzureVM
 - Version number extraction from cloudbuilder.vhdx
 - New EXAMPLES.md file with lots of unattendant installation examples
 - Updated cleanup and deploy.ps1 content with examples to automate ARM template deployment
+- PowerShell remoting enabled on NSG (TCP 5985)
+- PowerShell remoting enabled on Windows firewall public profile (TCP 5985)
 
 Feel free to post questions and enjoy!

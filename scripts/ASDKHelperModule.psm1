@@ -199,6 +199,15 @@ function workaround2
     Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force
 }
 
+function workaround3
+{
+    Write-Verbose "Applying workaround to tackle installation from PS remoting" -Verbose
+    $DeploySingleNodeCommonFilePath = "C:\CloudDeployment\Setup\Common\DeploySingleNodeCommon.ps1"
+    $DeploySingleNodeCommonFile = Get-Content -Path $DeploySingleNodeCommonFilePath
+    $DeploySingleNodeCommonFile = $DeploySingleNodeCommonFile.Replace('$credentialSuccess = Invoke-Command -ComputerName 'LocalHost' -Credential $builtInAdminCredential -ErrorAction 'SilentlyContinue' { $true }','$credentialSuccess = $true') 
+    Set-Content -Value $DeploySingleNodeCommonFile -Path $DeploySingleNodeCommonFilePath -Force
+}
+
 function createDesktopShortcuts
 {
     #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal

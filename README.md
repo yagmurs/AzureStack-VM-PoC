@@ -1,4 +1,4 @@
-## Azure Stack on Azure VM
+# Azure Stack on Azure VM
 Creates a new VM and installs prerequisites to install AzureStack Development kit (ASDK) to run PoC
 
 ### Description
@@ -17,7 +17,7 @@ This template creates a new Azure VM, and installs, configures all prerequisites
 or use http://aka.ms/DeployAzureStackonAzureVM
 
 
-#### High level steps to follow
+### High level steps to follow
   - Deploy the template ( check examples on cleanup and deploy.ps1)
   - Logon to Azure VM (default username is administrator)
   - Run Install-ASDK on the desktop (additional automated setup options are available on EXAMPLES.md) 
@@ -25,7 +25,7 @@ or use http://aka.ms/DeployAzureStackonAzureVM
   - Setup will download selected version of ASDK and extract files automatically
   - ASDK setup will be feeded with required default parameters and parameters collected above
 
-#### Updates
+### Updates
 
 **updates on 06.01.2018**
  - New options to select ASDK version to install

@@ -8,7 +8,7 @@ Creates a new VM and installs prerequisites to install AzureStack Development ki
     <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
 </a>
 
-This template creates a new Azure VM, and installs, configures all prerequisites that is required to install Azure Stack Development Kit to ease the process to evaluate all Azure Stack functionalities. 
+This template creates a new Azure VM, and installs, configures all prerequisites that is required to install Azure Stack Development Kit to simplify evaluating all Azure Stack functionalities. 
 
  --High level steps to follow--
   - Deploy the template

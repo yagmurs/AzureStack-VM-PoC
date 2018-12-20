@@ -331,7 +331,7 @@ function Start-SleepWithProgress($seconds)
 function Copy-ASDKContent 
 {
     param (
-        $vhdxFullPath,
+        $vhdxFullPath
     )
     $foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
 

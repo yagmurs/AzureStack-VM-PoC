@@ -1,7 +1,8 @@
 
-# Unattendant installation examples once the VM deployed succesfully
+# Unattendant installation examples
+Following examples may be used once VM deployed succesfully.
 
-To Automate ARM template deployment using PowerShell, check "/scripts/cleanup and deploy.ps1"
+To Automate ARM template deployment using PowerShell, check **/scripts/cleanup and deploy.ps1**
 
 ## - Deploy downloaded version of ASDK (AAD)
 

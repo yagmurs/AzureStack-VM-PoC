@@ -361,9 +361,9 @@ $taskstoCompleteUponSuccess = {
                 {
                     throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
                 }
+                Get-ChildItem -Path "C:\Users\Public\Desktop" -Filter "*.lnk" | Remove-Item -Force
                 createDesktopShortcuts
                 Unregister-ScheduledJob -Name "Tasks to complete upon success" -Force
-                Get-ChildItem -Path "C:\Users\Public\Desktop" -Filter "*.lnk" | Remove-Item -Force
                 break
             }
             catch 

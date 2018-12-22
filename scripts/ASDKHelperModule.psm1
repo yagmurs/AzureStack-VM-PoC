@@ -198,3 +198,154 @@ function workaround2
     $HelpersFile = $HelpersFile.Replace('C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease','C:\tools\NuGet.exe install $NugetName -Source $NugetStorePath -OutputDirectory $DestinationPath -packagesavemode "nuspec" -Prerelease -ExcludeVersion') 
     Set-Content -Value $HelpersFile -Path $HelpersFilePath -Force
 }
+
+function workaround3
+{
+    Write-Verbose "Applying workaround to tackle installation from PS remoting" -Verbose
+    $DeploySingleNodeCommonFilePath = "C:\CloudDeployment\Setup\Common\DeploySingleNodeCommon.ps1"
+    $DeploySingleNodeCommonFile = Get-Content -Path $DeploySingleNodeCommonFilePath
+    $DeploySingleNodeCommonFile = $DeploySingleNodeCommonFile.Replace('$credentialSuccess = Invoke-Command -ComputerName ''LocalHost'' -Credential $builtInAdminCredential -ErrorAction ''SilentlyContinue'' { $true }','$credentialSuccess = $true') 
+    Set-Content -Value $DeploySingleNodeCommonFile -Path $DeploySingleNodeCommonFilePath -Force
+}
+
+function createDesktopShortcuts
+{
+    #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal
+    $Shell = New-Object -ComObject ("WScript.Shell")
+            
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Stack Admin Portal.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "https://adminportal.local.azurestack.external";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcut $fileName created."
+    }
+
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Stack Tenant Portal.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "https://portal.local.azurestack.external";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+    }
+
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Azure Portal.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "https://portal.azure.com";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+    }
+
+    $fileName = $env:ALLUSERSPROFILE + "\Desktop\Service Fabric Explorer.url"
+    if (!(Test-Path -Path $fileName))
+    {
+        $Favorite = $Shell.CreateShortcut($fileName)
+        $Favorite.TargetPath = "http://azs-xrp01:19007";
+        $Favorite.Save()
+        Write-Log @writeLogParams -Message "Desktop shorcuts $fileName created."
+    }
+
+}
+
+
+function Enable-ICS ($PublicAdapterName, $PrivateAdapterName)
+{
+    # Register the HNetCfg library (once)
+    regsvr32 /s hnetcfg.dll
+
+    # Create a NetSharingManager object
+    $m = New-Object -ComObject HNetCfg.HNetShare
+
+    # Find connection
+    $publicAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+
+
+    # Get sharing configuration
+    $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
+    $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
+        
+    Start-Sleep -Seconds 2
+
+    # Disable sharing
+    $publicAdapter.DisableSharing()
+    $privateAdapter.DisableSharing()
+
+    # Enable sharing (0 - public, 1 - private)
+
+    # Enable sharing public on Network_1
+    $publicAdapter.EnableSharing(0)
+
+    # Enable sharing private on Network_2
+    $privateAdapter.EnableSharing(1)
+
+}
+    
+function Disable-ICS ($PublicAdapterName, $PrivateAdapterName)
+{
+    # Register the HNetCfg library (once)
+    regsvr32 /s hnetcfg.dll
+
+    # Create a NetSharingManager object
+    $m = New-Object -ComObject HNetCfg.HNetShare
+
+    # Find connection
+    $publicAdapter = $m.EnumEveryConnection | Where-Object { $m.NetConnectionProps.Invoke($_).Name -eq $publicAdapterName }
+    $privateAdapter = $m.EnumEveryConnection | Where-Object{ $m.NetConnectionProps.Invoke($_).Name -eq $privateAdapterName }
+
+
+    # Get sharing configuration
+    $publicAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($publicAdapter)
+    $privateAdapter = $m.INetSharingConfigurationForINetConnection.Invoke($privateAdapter)
+        
+    # Disable sharing
+    $publicAdapter.DisableSharing()
+    $privateAdapter.DisableSharing()
+}
+
+function Start-SleepWithProgress($seconds)
+{
+
+    $doneDT = (Get-Date).AddSeconds($seconds)
+
+    while($doneDT -gt (Get-Date)) {
+
+        $secondsLeft = $doneDT.Subtract((Get-Date)).TotalSeconds
+
+        $percent = ($seconds - $secondsLeft) / $seconds * 100
+
+        Write-Progress -Activity "Sleeping" -Status "Sleeping..." -SecondsRemaining $secondsLeft -PercentComplete $percent
+
+        [System.Threading.Thread]::Sleep(500)
+
+    }
+
+    Write-Progress -Activity "Sleeping" -Status "Sleeping..." -SecondsRemaining 0 -Completed
+
+}
+
+function Copy-ASDKContent 
+{
+    param (
+        $vhdxFullPath
+    )
+    $foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
+
+        try {
+            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+        }
+        catch {
+            throw "an error occured while mounting cloudbuilder.vhdx file"
+        }
+
+        foreach ($folder in $foldersToCopy)
+        {
+            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
+        }
+        Dismount-DiskImage -ImagePath $vhdxFullPath
+        
+}

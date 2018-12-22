@@ -225,7 +225,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK', ' ', '-AutoDownloadASDK', ' ', parameters('autoDownloadASDK'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK', ' ', '-AzureImage', ' ', '-AutoDownloadASDK', ' ', parameters('autoDownloadASDK'))]"
                         }
                     }
                 },
@@ -332,6 +332,19 @@
                             "sourceAddressPrefix": "*",
                             "protocol": "Tcp",
                             "destinationPortRange": "3389",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "allow-psremoting",
+                        "properties": {
+                            "priority": 1010,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "5985",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourcePortRange": "*",

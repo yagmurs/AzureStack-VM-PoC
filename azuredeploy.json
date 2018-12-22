@@ -2,6 +2,17 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "branch": {
+            "type": "string",
+            "allowedValues": [
+                "master",
+                "development"
+            ],
+            "defaultValue": "development",
+            "metadata": {
+                "name": "development"
+            }
+        },
         "virtualMachineName": {
             "type": "string",
             "defaultValue": "AzS-HOST1",
@@ -161,7 +172,7 @@
                     "computerName": "[parameters('virtualMachineName')]",
                     "adminUsername": "[variables('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
-                    "branch": "development",
+                    "branch":  "[parameters('branch')]",
                     "windowsConfiguration": {
                         "provisionVmAgent": "true"
                     }

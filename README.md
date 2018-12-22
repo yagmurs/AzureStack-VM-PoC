@@ -10,12 +10,10 @@ This template creates a new Azure VM, and installs, configures all prerequisites
 
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fdevelopment%2Fazuredeploy.json)
 
-
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fdevelopment%2Fazuredeploy.json" target="_blank">
-    <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
-</a>
-
 or use http://aka.ms/AzureStackonAzureVMdev
+
+or Deploy to Azure (deploy.azure.com)
+[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 
 ### High level steps to follow
   - Deploy the template ( check examples on cleanup and deploy.ps1)
@@ -61,5 +59,8 @@ or use http://aka.ms/AzureStackonAzureVMdev
 - Register-AzureStackLab.ps1 updated with new options to register Azure Stack.
 - PowerShell remoting enabled on NSG (TCP 5985)
 - PowerShell remoting enabled on Windows firewall public profile (TCP 5985)
+- Auto shutdown API version and parameters updated
+- New ARM template parameters sitelocation and branch added to being compatible with deploy.azure.com
+- Additional Deploy to Azure button added for deploy.azure.com
 
 Feel free to post questions and enjoy!

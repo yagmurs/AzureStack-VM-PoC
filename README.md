@@ -25,7 +25,7 @@ or use http://aka.ms/DeployAzureStackonAzureVM
   - Setup will download selected version of ASDK and extract files automatically
   - ASDK setup will be feeded with required default parameters and parameters collected above
 
-### Updates
+### Updates / Change log
 
 **updates on 06.01.2018**
  - New options to select ASDK version to install

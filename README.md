@@ -12,7 +12,7 @@ This template creates a new Azure VM, and installs, configures all prerequisites
     <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
 </a>
 
-or use http://aka.ms/DeployAzureStackonAzureVM
+or use http://aka.ms/AzureStackonAzureVMdev
 
 ### High level steps to follow
   - Deploy the template ( check examples on cleanup and deploy.ps1)

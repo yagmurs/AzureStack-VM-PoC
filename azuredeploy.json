@@ -2,12 +2,6 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "branch": {
-            "type": "string"
-        },
-        "siteLocation": {
-          "type": "string"
-        },
         "virtualMachineName": {
             "type": "string",
             "defaultValue": "AzS-HOST1",
@@ -138,6 +132,24 @@
             "metadata": {
                 "name": false
             }
+        },        
+        "branch": {
+            "type": "string",
+            "defaultValue": "development",
+            "allowedValues": [
+                "master",
+                "development"
+            ],
+            "metadata": {
+                "name": "development"
+            }
+        },
+        "siteLocation": {
+          "type": "string",
+          "defaultValue": "[resourceGroup().location]",
+          "metadata": {
+              "name": "[resourceGroup().location]"
+          }
         }
     },
     "variables": {

@@ -3,15 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "branch": {
-            "type": "string",
-            "allowedValues": [
-                "master",
-                "development"
-            ],
-            "defaultValue": "development",
-            "metadata": {
-                "name": "development"
-            }
+            "type": "string"
+        },
+        "siteLocation": {
+          "type": "string"
         },
         "virtualMachineName": {
             "type": "string",
@@ -149,7 +144,7 @@
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
         "scriptFileName": "post-config.ps1",
-        "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts/",
+        "scriptPath": "[concat('https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/', parameters('branch'), '/scripts/')]",
         "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
         "adminUsername": "__administrator",
         "osDiskSizeinGB": 256,
@@ -163,7 +158,7 @@
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2016-04-30-preview",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('sitelocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -172,7 +167,6 @@
                     "computerName": "[parameters('virtualMachineName')]",
                     "adminUsername": "[variables('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
-                    "branch":  "[parameters('branch')]",
                     "windowsConfiguration": {
                         "provisionVmAgent": "true"
                     }

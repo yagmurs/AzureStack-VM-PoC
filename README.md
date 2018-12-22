@@ -48,7 +48,7 @@ or use http://aka.ms/DeployAzureStackonAzureVM
  - New ARM template option to download latest ASDK and extract with the VM deployement, disabled by default. 😊 Which makes the deployment time a bit longer (30-40 mins.)
 
 **updates on 19.12.2018**
-- Tested with ASDK 1901
+- Tested with ASDK 1.1811.0.101
 - New switches to differantiate AzureImage and ADSKImage
 - Companion service moved into Install-ASDK
 - Desktop shortcuts creation upon successful installation

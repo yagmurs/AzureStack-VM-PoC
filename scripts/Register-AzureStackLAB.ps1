@@ -41,8 +41,8 @@ $AzureContext = Get-AzureRmContext
 $CloudAdminCred = Get-Credential -UserName AZURESTACK\CloudAdmin -Message "Enter the credentials to access the privileged endpoint."
 $RegistrationName = "yagmurs-$(New-Guid)"
 Set-AzsRegistration `
--PrivilegedEndpointCredential $CloudAdminCred `
--PrivilegedEndpoint AzS-ERCS01 `
--BillingModel Development `
--RegistrationName $RegistrationName `
--UsageReportingEnabled:$true
+        -PrivilegedEndpointCredential $CloudAdminCred `
+        -PrivilegedEndpoint AzS-ERCS01 `
+        -BillingModel Development `
+        -RegistrationName $RegistrationName `
+        -UsageReportingEnabled:$true

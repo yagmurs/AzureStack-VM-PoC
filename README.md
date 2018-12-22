@@ -12,7 +12,7 @@ This template creates a new Azure VM, and installs, configures all prerequisites
 
 or use http://aka.ms/AzureStackonAzureVMdev
 
-or Deploy to Azure (deploy.azure.com)
+or **Deploy to Azure** (**deploy.azure.com**)
 
 [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 

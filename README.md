@@ -48,7 +48,7 @@ or **Deploy to Azure** (**deploy.azure.com**)
 
 **updates on 19.12.2018**
 - Tested with ASDK 1.1811.0.101
-- New switches to differantiate AzureImage and ADSKImage
+- New parameters to differantiate AzureImage and ADSKImage
 - Companion service moved into Install-ASDK
 - Desktop shortcuts creation upon successful installation
 - New scheduled task to create desktop shortcuts
@@ -63,5 +63,6 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - Auto shutdown API version and parameters updated
 - New ARM template parameters sitelocation and branch added to being compatible with deploy.azure.com
 - Additional Deploy to Azure button added for deploy.azure.com
+- InfraAzureDirectoryTenantAdminCredential paramater added to Install-ASDK.ps1 to be able to accommodate automated ASDK setup
 
 Feel free to post questions and enjoy!

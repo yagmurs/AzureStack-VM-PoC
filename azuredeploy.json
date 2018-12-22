@@ -161,6 +161,7 @@
                     "computerName": "[parameters('virtualMachineName')]",
                     "adminUsername": "[variables('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
+                    "branch": "development",
                     "windowsConfiguration": {
                         "provisionVmAgent": "true"
                     }

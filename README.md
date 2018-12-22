@@ -20,7 +20,7 @@ or use http://aka.ms/DeployAzureStackonAzureVM
 ### High level steps to follow
   - Deploy the template ( check examples on cleanup and deploy.ps1)
   - Logon to Azure VM (default username is administrator)
-  - Run Install-ASDK on the desktop (additional automated setup options are available on EXAMPLES.md) 
+  - Run Install-ASDK on the desktop (additional automated setup options are available on EXAMPLES.md including ARM template deployment examples) 
   - Follow on-screen instructions
   - Setup will download selected version of ASDK and extract files automatically
   - ASDK setup will be feeded with required default parameters and parameters collected above
@@ -56,8 +56,9 @@ or use http://aka.ms/DeployAzureStackonAzureVM
 - BGPNAT functionality detection based on versions
 - Install all roles available in ASDKImage to AzureImage using roles.xml
 - Version number extraction from cloudbuilder.vhdx
-- New EXAMPLES.md file with lots of unattendant installation examples
-- Updated cleanup and deploy.ps1 content with examples to automate ARM template deployment
+- Updated cleanup and deploy.ps1 content with examples to automate ARM 
+- **New EXAMPLES.md file with several automated ASDK installation examples and automated ARM template deployment**
+- Register-AzureStackLab.ps1 updated with new options to register Azure Stack.
 - PowerShell remoting enabled on NSG (TCP 5985)
 - PowerShell remoting enabled on Windows firewall public profile (TCP 5985)
 

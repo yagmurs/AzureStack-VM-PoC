@@ -212,7 +212,7 @@ Pause
 Get-AzureRmResourceGroup -Name $resourceGroupName | Remove-AzureRmResourceGroup -AsJob #-Force
 ```
 
-## Deploy ARM template and auto download, extract latest version of ASDK
+
 
 Once deployed run/check desktop shorcut options. You can select AAD or ADFS installations.
 

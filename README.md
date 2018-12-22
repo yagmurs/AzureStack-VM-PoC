@@ -16,6 +16,7 @@ This template creates a new Azure VM, and installs, configures all prerequisites
 
 or use http://aka.ms/DeployAzureStackonAzureVM
 
+[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 
 ### High level steps to follow
   - Deploy the template ( check examples on cleanup and deploy.ps1)

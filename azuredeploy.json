@@ -132,17 +132,34 @@
             "metadata": {
                 "name": false
             }
+        },        
+        "branch": {
+            "type": "string",
+            "defaultValue": "master",
+            "allowedValues": [
+                "master",
+                "development"
+            ],
+            "metadata": {
+                "name": "master"
+            }
+        },
+        "siteLocation": {
+          "type": "string",
+          "defaultValue": "[resourceGroup().location]",
+          "metadata": {
+              "name": "[resourceGroup().location]"
+          }
         }
     },
     "variables": {
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
         "scriptFileName": "post-config.ps1",
-        "scriptPath": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts/",
+        "scriptPath": "[concat('https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/', parameters('branch'), '/scripts/')]",
         "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
         "adminUsername": "__administrator",
         "osDiskSizeinGB": 256,
-        "location": "[resourceGroup().location]",
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-NSG')]",
         "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]"
@@ -153,7 +170,7 @@
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2016-04-30-preview",
-            "location": "[variables('location')]",
+            "location": "[parameters('sitelocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -212,7 +229,7 @@
                     "type": "extensions",
                     "name": "CustomScriptExtension",
                     "apiVersion": "2016-04-30-preview",
-                    "location": "[resourceGroup().location]",
+                    "location": "[parameters('sitelocation')]",
                     "dependsOn": [
                         "[parameters('virtualMachineName')]"
                     ],
@@ -230,10 +247,11 @@
                     }
                 },
                 {
-                    "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
                     "type": "Microsoft.DevTestLab/schedules",
-                    "apiVersion": "2016-05-15",
-                    "location": "[variables('location')]",
+                    "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
+                    "apiVersion": "2017-04-26-preview",
+                    "location": "[parameters('sitelocation')]",
+                    "tags": {},
                     "properties": {
                         "status": "[parameters('autoShutdownStatus')]",
                         "taskType": "ComputeVmShutdownTask",
@@ -244,6 +262,7 @@
                         "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
                         "notificationSettings": {
                             "status": "[parameters('autoShutdownNotificationStatus')]",
+                            "notificationLocale": "en",
                             "timeInMinutes": "30"
                         }
                     },
@@ -257,7 +276,7 @@
             "name": "[parameters('virtualNetworkName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-12-01",
-            "location": "[variables('location')]",
+            "location": "[parameters('sitelocation')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -278,7 +297,7 @@
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2016-09-01",
-            "location": "[variables('location')]",
+            "location": "[parameters('sitelocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
@@ -308,13 +327,13 @@
             "name": "[variables('publicIpAddressName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-06-01",
-            "location": "[variables('location')]",
+            "location": "[parameters('sitelocation')]",
             "properties": {
                 "publicIPAllocationMethod": "[parameters('publicIpAddressType')]",
                 "publicIPAddressVersion": "IPv4",
                 "dnsSettings":{
                     "domainNameLabel": "[parameters('publicDnsName')]",
-                    "fqdn": "[concat(parameters('publicDnsName'), '.',variables('location'), '.cloudapp.azure.com')]"
+                    "fqdn": "[concat(parameters('publicDnsName'), '.', parameters('sitelocation'), '.cloudapp.azure.com')]"
                 }
             }
         },
@@ -322,7 +341,7 @@
             "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-09-01",
-            "location": "[variables('location')]",
+            "location": "[parameters('sitelocation')]",
             "properties": {
                 "securityRules": [
                     {

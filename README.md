@@ -6,16 +6,15 @@ This template creates a new Azure VM, and installs, configures all prerequisites
 
 ### Deploy ARM template 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fmaster%2Fazuredeploy.json" target="_blank">
-    <img src="https://azuredeploy.net/deploybutton.png"/>
-</a>
+[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fmaster%2Fazuredeploy.json)
 
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fmaster%2Fazuredeploy.json" target="_blank">
-    <img src="https://raw.githubusercontent.com/shenglol/arm-visualizer/master/src/visualizebutton.png"/>
-</a>
+[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fyagmurs%2FAzureStack-VM-PoC%2Fmaster%2Fazuredeploy.json)
 
-or use http://aka.ms/DeployAzureStackonAzureVM
+or use http://aka.ms/AzureStackonAzureVM
 
+or **Deploy to Azure** (**deploy.azure.com**)
+
+[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 
 ### High level steps to follow
   - Deploy the template ( check examples on cleanup and deploy.ps1)
@@ -49,7 +48,7 @@ or use http://aka.ms/DeployAzureStackonAzureVM
 
 **updates on 19.12.2018**
 - Tested with ASDK 1.1811.0.101
-- New switches to differantiate AzureImage and ADSKImage
+- New parameters to differantiate AzureImage and ADSKImage
 - Companion service moved into Install-ASDK
 - Desktop shortcuts creation upon successful installation
 - New scheduled task to create desktop shortcuts
@@ -61,5 +60,9 @@ or use http://aka.ms/DeployAzureStackonAzureVM
 - Register-AzureStackLab.ps1 updated with new options to register Azure Stack.
 - PowerShell remoting enabled on NSG (TCP 5985)
 - PowerShell remoting enabled on Windows firewall public profile (TCP 5985)
+- Auto shutdown API version and parameters updated
+- New ARM template parameters sitelocation and branch added to being compatible with deploy.azure.com
+- Additional Deploy to Azure button added for deploy.azure.com
+- InfraAzureDirectoryTenantAdminCredential paramater added to Install-ASDK.ps1 to be able to accommodate automated ASDK setup
 
 Feel free to post questions and enjoy!

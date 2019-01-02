@@ -204,6 +204,7 @@ if ($pocParameters.Count -gt 0)
         [int]$defaultPollIntervalInSeconds = 60
         $script:ICS = $true
         $script:serviceVersion = "1.1"
+        $taskName1 = "ASDK Installer Companion Service"
         if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
         {
             Import-Module "$defaultLocalPath\ASDKHelperModule.psm1"
@@ -322,7 +323,7 @@ if ($pocParameters.Count -gt 0)
                 else
                 {
                     Write-Log @writeLogParams -Message "All fixes applied, Unregistering the service"
-                    Unregister-ScheduledJob -Name "ASDK Installer Companion Service"
+                    Unregister-ScheduledJob -Name $taskName1
                     break
                 }
                 
@@ -332,13 +333,14 @@ if ($pocParameters.Count -gt 0)
         }
     }
     Write-Log @writeLogParams -Message "Registering ASDK Companion service"
+    $taskName1 = "ASDK Installer Companion Service"
     $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
     $options = New-ScheduledJobOption -RequireNetwork
-    if (Get-ScheduledJob -name "ASDK Installer Companion Service" -ErrorAction SilentlyContinue)
+    if (Get-ScheduledJob -name $taskName1 -ErrorAction SilentlyContinue)
     {
-        Get-ScheduledJob -name "ASDK Installer Companion Service" | Unregister-ScheduledJob -Force
+        Get-ScheduledJob -name $taskName1 | Unregister-ScheduledJob -Force
     }
-    $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -ScriptBlock $ASDKCompanionService -Name "ASDK Installer Companion Service" -Credential $localAdminCred
+    $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -ScriptBlock $ASDKCompanionService -Name $taskName1 -Credential $localAdminCred
     $st.StartJob()
 }
 
@@ -354,6 +356,7 @@ $taskstoCompleteUponSuccess = {
         [xml]$summary = Get-Content -Path C:\CloudDeployment\Logs\summary.*.log.xml -ErrorAction SilentlyContinue
         if ($summary.action.Status -eq "success")
         {
+            $taskName2 = "Tasks to complete upon success"
             try
             {
                 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
@@ -366,7 +369,7 @@ $taskstoCompleteUponSuccess = {
                 }
                 Get-ChildItem -Path "C:\Users\Public\Desktop" -Filter "*.lnk" | Remove-Item -Force
                 createDesktopShortcuts
-                Unregister-ScheduledJob -Name "Tasks to complete upon success" -Force
+                Unregister-ScheduledJob -Name $taskName2 -Force
                 break
             }
             catch 
@@ -381,13 +384,14 @@ $taskstoCompleteUponSuccess = {
     }
 }
 
+$taskName2 = "Tasks to complete upon success"
 $trigger = New-JobTrigger -AtLogOn
 $option = New-ScheduledJobOption
-if (Get-ScheduledJob -name "Tasks to complete upon success" -ErrorAction SilentlyContinue)
+if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 {
-    Get-ScheduledJob -name "Tasks to complete upon success" | Unregister-ScheduledJob -Force
+    Get-ScheduledJob -name $taskName2 | Unregister-ScheduledJob -Force
 }
-Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name "Tasks to complete upon success" -Trigger $trigger -ScheduledJobOption $option
+Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"

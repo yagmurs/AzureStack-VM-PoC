@@ -66,9 +66,9 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - InfraAzureDirectoryTenantAdminCredential paramater added to Install-ASDK.ps1 to be able to accommodate automated ASDK setup
 
 **updates on 02.01.2019**
-- IE Allow file download option enabled
-- IE ESC disabled on all image types
-- Scheduler for Desktop shortcuts updated
+- IE Allow file download option enabled for Local Machine registry (postconfig.ps1)
+- IE ESC disabled on all image types (postconfig.ps1)
+- Scheduler for Desktop shortcuts updated (Install-ASDK.ps1)
 - Tested for ASDK 1.1811.0.101 with original ASDK VHD for LOD environment 
 
 Feel free to post questions and enjoy!

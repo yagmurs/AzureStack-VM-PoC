@@ -69,5 +69,6 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - IE Allow file download option enabled
 - IE ESC disabled on all image types
 - Scheduler for Desktop shortcuts updated
+- Tested for ASDK 1.1811.0.101 with original ASDK VHD for lod environment 
 
 Feel free to post questions and enjoy!

@@ -383,6 +383,10 @@ $taskstoCompleteUponSuccess = {
 
 $trigger = New-JobTrigger -AtLogOn
 $option = New-ScheduledJobOption
+if (Get-ScheduledJob -name "Tasks to complete upon success" -ErrorAction SilentlyContinue)
+{
+    Get-ScheduledJob -name "Tasks to complete upon success" | Unregister-ScheduledJob -Force
+}
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name "Tasks to complete upon success" -Trigger $trigger -ScheduledJobOption $option
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random

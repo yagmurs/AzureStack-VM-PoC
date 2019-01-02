@@ -82,6 +82,9 @@ Get-NetFirewallRule -Name WINRM-HTTP-In-TCP-PUBLIC | Get-NetFirewallAddressFilte
 Write-Log @writeLogParams -Message $firewallRuleResult
 Remove-Variable -Name firewallRuleResult -Force -ErrorAction SilentlyContinue
 
+#Disables Internet Explorer Enhanced Security Configuration
+Disable-InternetExplorerESC
+
 if ($ASDKImage)
 {
     $WshShell = New-Object -comObject WScript.Shell
@@ -125,9 +128,6 @@ if ($ASDKImage)
 
 if ($AzureImage)
 {
-    #Disables Internet Explorer Enhanced Security Configuration
-    Disable-InternetExplorerESC
-
     #Enable Internet Explorer File download
     New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -Force
     New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -Force

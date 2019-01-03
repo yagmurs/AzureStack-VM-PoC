@@ -69,6 +69,8 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - IE Allow file download option enabled for Local Machine registry (postconfig.ps1)
 - IE ESC disabled on all image types (postconfig.ps1)
 - Scheduler for Desktop shortcuts updated (Install-ASDK.ps1)
-- Tested for ASDK 1.1811.0.101 with original ASDK VHD for LOD environment 
+- Tested for ASDK 1.1811.0.101 with original ASDK VHD for LOD environment
+- Timeserver is now use FQDN instead of IP address
+--- Required roles installed by default for ASDKImage to prevent restart requirement during the installation
 
 Feel free to post questions and enjoy!

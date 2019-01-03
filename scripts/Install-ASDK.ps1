@@ -393,11 +393,19 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
+$timeServiceProvider = @("pool.ntp.org", "time.windows.com") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
-$timeServer = $timeServiceProvider
-#$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
-Write-Log @writeLogParams -Message "Time server is now $timeServer"
+
+if ($pocParameters.Count -gt 0) {
+    Write-Log @writeLogParams -Message "timeserver is IP address"
+    $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+}
+else {
+    Write-Log @writeLogParams -Message "timeserver is FQDN"
+    $timeServer = $timeServiceProvider
+}
+
+Write-Log @writeLogParams -Message "timeserver: $timeServer"
 
 if ($DeploymentType -eq "AAD")
 {

@@ -395,7 +395,8 @@ Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 
 
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
-$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+$timeServer = $timeServiceProvider
+#$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
 Write-Log @writeLogParams -Message "Time server is now $timeServer"
 
 if ($DeploymentType -eq "AAD")

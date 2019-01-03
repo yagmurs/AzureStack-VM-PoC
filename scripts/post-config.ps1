@@ -130,7 +130,8 @@ if ($ASDKImage)
 
     #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     #workaround2
-    #Restart-Computer -Force
+    Add-WindowsFeature -Name RemoteAccess, DirectAccess-VPN, Routing, NPAS, FS-VSS-Agent -IncludeManagementTools
+    Restart-Computer -Force
 }
 
 if ($AzureImage)

@@ -128,10 +128,10 @@ if ($ASDKImage)
     Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
     workaround1
 
-    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
-    workaround2
-    #Add-WindowsFeature -Name RemoteAccess, DirectAccess-VPN, Routing, NPAS, FS-VSS-Agent -IncludeManagementTools
-    #Restart-Computer -Force
+    #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+    #workaround2
+    Add-WindowsFeature -Name RemoteAccess, DirectAccess-VPN, Routing, NPAS, FS-VSS-Agent -IncludeManagementTools
+    Restart-Computer -Force
 }
 
 if ($AzureImage)

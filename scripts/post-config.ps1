@@ -141,6 +141,8 @@ if ($ASDKImage)
         $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
         if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0)
         {
+            Write-Log @writeLogParams -Message "Following roles will be installed"
+            Write-Log @writeLogParams -Message "$featuresToInstall"
             Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
         }
     }
@@ -150,6 +152,8 @@ if ($ASDKImage)
         $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
         if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0)
         {
+            Write-Log @writeLogParams -Message "Following roles will be uninstalled"
+            Write-Log @writeLogParams -Message "$featuresToRemove"
             Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
         }
     }

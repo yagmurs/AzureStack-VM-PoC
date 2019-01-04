@@ -130,7 +130,29 @@ if ($ASDKImage)
 
     #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     #workaround2
-    Add-WindowsFeature -Name RemoteAccess, DirectAccess-VPN, Routing, NPAS, FS-VSS-Agent -IncludeManagementTools
+
+    #Download OneNodeRole.xml
+    DownloadWithRetry -Uri "$gitbranch/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
+    [xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
+    $WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
+    $dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
+    if ($null -ne $WindowsFeature.Feature.Name)
+    {
+        $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
+        if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0)
+        {
+            Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
+        }
+    }
+
+    if ($null -ne $WindowsFeature.RemoveFeature.Name)
+    {
+        $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
+        if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0)
+        {
+            Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
+        }
+    }
     Restart-Computer -Force
 }
 

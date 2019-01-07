@@ -1,7 +1,7 @@
 Param (
     [Parameter(Mandatory=$true)]
     [string]
-    $Username,
+    $Username = "__administrator",
 
     [switch]
     $EnableDownloadASDK,
@@ -93,6 +93,7 @@ New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion
 
 if ($ASDKImage)
 {
+    Rename-LocalUser -Name Administrator -NewName $username
     $WshShell = New-Object -comObject WScript.Shell
     $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
     $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
@@ -130,34 +131,6 @@ if ($ASDKImage)
 
     #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     #workaround2
-
-    #Download OneNodeRole.xml
-    DownloadWithRetry -Uri "$gitbranch/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
-    [xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
-    $WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
-    $dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
-    if ($null -ne $WindowsFeature.Feature.Name)
-    {
-        $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
-        if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0)
-        {
-            Write-Log @writeLogParams -Message "Following roles will be installed"
-            Write-Log @writeLogParams -Message "$featuresToInstall"
-            Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
-        }
-    }
-
-    if ($null -ne $WindowsFeature.RemoveFeature.Name)
-    {
-        $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
-        if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0)
-        {
-            Write-Log @writeLogParams -Message "Following roles will be uninstalled"
-            Write-Log @writeLogParams -Message "$featuresToRemove"
-            Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
-        }
-    }
-    Restart-Computer -Force
 }
 
 if ($AzureImage)
@@ -311,18 +284,34 @@ if ($AzureImage)
             $Shortcut.Save()
         }
     }
+}
 
-    DownloadWithRetry -Uri "$gitbranch/scripts/roles.xml" -DownloadLocation "$defaultLocalPath\roles.xml"
-
-    if (Test-Path "$defaultLocalPath\roles.xml")
+#Download OneNodeRole.xml
+DownloadWithRetry -Uri "$gitbranch/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
+[xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
+$WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
+$dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
+if ($null -ne $WindowsFeature.Feature.Name)
+{
+    $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
+    if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0)
     {
-        Import-Clixml "$defaultLocalPath\roles.xml" | Where-Object installed | Add-WindowsFeature
-        Rename-LocalUser -Name $username -NewName Administrator
-        Restart-Computer
-    }
-    else
-    {
-        throw "required module $defaultLocalPath\roles.xml not found"   
+        Write-Log @writeLogParams -Message "Following roles will be installed"
+        Write-Log @writeLogParams -Message "$featuresToInstall"
+        Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
     }
 }
+
+if ($null -ne $WindowsFeature.RemoveFeature.Name)
+{
+    $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
+    if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0)
+    {
+        Write-Log @writeLogParams -Message "Following roles will be uninstalled"
+        Write-Log @writeLogParams -Message "$featuresToRemove"
+        Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
+    }
+}
+Rename-LocalUser -Name $username -NewName Administrator
+Restart-Computer -Force
 

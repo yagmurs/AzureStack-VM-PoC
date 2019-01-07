@@ -312,6 +312,8 @@ if ($null -ne $WindowsFeature.RemoveFeature.Name)
         Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
     }
 }
+
+Add-WindowsFeature -Name Hyper-V-Tools
 Rename-LocalUser -Name $username -NewName Administrator
 Restart-Computer -Force
 

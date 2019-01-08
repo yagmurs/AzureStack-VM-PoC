@@ -47,7 +47,7 @@ Param(
 
     # Local Administrator Password
     [Parameter(Mandatory=$true)]
-    [securestring]
+    [string]
     $AdminPassword,
 
     # Azure Active Diretory Tenant name
@@ -120,8 +120,10 @@ Write-Verbose "repoRoot: $repoRoot"
 Write-Verbose $MyInvocation.MyCommand.Definition
 ii $repoRoot\scripts
 
+$AdminPassword = $($AdminPassword | ConvertTo-SecureString -AsPlainText -Force)
+
 $InstallAzSPOCParams = @{
-    AdminPassword = $AdminPassword
+    AdminPassword = $($AdminPassword | ConvertTo-SecureString -AsPlainText -Force)
     InfraAzureDirectoryTenantName = $InfraAzureDirectoryTenantName
     TimeServer = $TimeServer
     DNSForwarder = $DNSForwarder
@@ -129,6 +131,7 @@ $InstallAzSPOCParams = @{
 
 if ($InfraAzureDirectoryTenantName -and $InfraAzureDirectoryTenantAdmin -and $InfraAzureDirectoryTenantAdminPassword)
 {
+    $InfraAzureDirectoryTenantAdminPassword = $($InfraAzureDirectoryTenantAdminPassword | ConvertTo-SecureString -AsPlainText -Force)
     $InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ($InfraAzureDirectoryTenantAdmin, $InfraAzureDirectoryTenantAdminPassword)
     $InstallAzSPOCParams.add("InfraAzureDirectoryTenantAdminCredential", $InfraAzureDirectoryTenantAdminCredential)
 }

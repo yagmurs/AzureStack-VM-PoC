@@ -72,7 +72,7 @@ Param(
 
     # Parameter help description
     [Parameter()]
-    [securestring]
+    [string]
     $InfraAzureDirectoryTenantAdminPassword
 )
 

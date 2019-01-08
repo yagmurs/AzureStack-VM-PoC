@@ -284,6 +284,9 @@ if ($AzureImage)
             $Shortcut.Save()
         }
     }
+
+    # Enable differencing roles from ASDKImage except .NET framework 3.5
+    Enable-WindowsOptionalFeature -Online -NoRestart -FeatureName @("ActiveDirectory-PowerShell","DfsMgmt","DirectoryServices-AdministrativeCenter","DirectoryServices-DomainController","DirectoryServices-DomainController-Tools","DNS-Server-Full-Role","DNS-Server-Tools","DSC-Service","FailoverCluster-AutomationServer","FailoverCluster-CmdInterface","FSRM-Management","IIS-ASPNET45","IIS-HttpTracing","IIS-ISAPIExtensions","IIS-ISAPIFilter","IIS-NetFxExtensibility45","IIS-RequestMonitor","ManagementOdata","NetFx4Extended-ASPNET45","NFS-Administration","RSAT-ADDS-Tools-Feature","RSAT-AD-Tools-Feature","Server-Manager-RSAT-File-Services","UpdateServices-API","UpdateServices-RSAT","UpdateServices-UI","WAS-ConfigurationAPI","WAS-ProcessModel","WAS-WindowsActivationService","WCF-HTTP-Activation45","Microsoft-Hyper-V-Management-Clients")
 }
 
 #Download OneNodeRole.xml
@@ -313,7 +316,6 @@ if ($null -ne $WindowsFeature.RemoveFeature.Name)
     }
 }
 
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-Management-Clients -All -NoRestart 
 Rename-LocalUser -Name $username -NewName Administrator
 Restart-Computer -Force
 

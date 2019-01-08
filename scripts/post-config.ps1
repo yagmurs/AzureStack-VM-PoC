@@ -313,7 +313,7 @@ if ($null -ne $WindowsFeature.RemoveFeature.Name)
     }
 }
 
-Add-WindowsFeature -Name Hyper-V-Tools
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-Management-Clients
 Rename-LocalUser -Name $username -NewName Administrator
 Restart-Computer -Force
 

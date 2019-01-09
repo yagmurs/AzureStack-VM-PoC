@@ -65,7 +65,7 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - Additional Deploy to Azure button added for deploy.azure.com
 - InfraAzureDirectoryTenantAdminCredential paramater added to Install-ASDK.ps1 to be able to accommodate automated ASDK setup
 
-**updates on 09.01.2019**
+**updates on 10.01.2019**
 - IE Allow file download option enabled for Local Machine registry (postconfig.ps1)
 - IE ESC disabled on all image types (postconfig.ps1)
 - Scheduler for Desktop shortcuts updated (Install-ASDK.ps1)

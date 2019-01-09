@@ -1,7 +1,7 @@
 Param (
     [Parameter(Mandatory=$true)]
     [string]
-    $Username,
+    $Username = "__administrator",
 
     [switch]
     $EnableDownloadASDK,
@@ -82,8 +82,18 @@ Get-NetFirewallRule -Name WINRM-HTTP-In-TCP-PUBLIC | Get-NetFirewallAddressFilte
 Write-Log @writeLogParams -Message $firewallRuleResult
 Remove-Variable -Name firewallRuleResult -Force -ErrorAction SilentlyContinue
 
+#Disables Internet Explorer Enhanced Security Configuration
+Disable-InternetExplorerESC
+
+#Enable Internet Explorer File download
+New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Force
+New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Force
+New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -PropertyType DWORD -Force
+New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -PropertyType DWORD -Force
+
 if ($ASDKImage)
 {
+    Rename-LocalUser -Name Administrator -NewName $username
     $WshShell = New-Object -comObject WScript.Shell
     $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
     $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
@@ -125,13 +135,6 @@ if ($ASDKImage)
 
 if ($AzureImage)
 {
-    #Disables Internet Explorer Enhanced Security Configuration
-    Disable-InternetExplorerESC
-
-    #Enable Internet Explorer File download
-    New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -Force
-    New-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -Force
-
     New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
     New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
     Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Name 1 -Value "wsman/*" -Type STRING -Force
@@ -282,17 +285,37 @@ if ($AzureImage)
         }
     }
 
-    DownloadWithRetry -Uri "$gitbranch/scripts/roles.xml" -DownloadLocation "$defaultLocalPath\roles.xml"
+    # Enable differencing roles from ASDKImage except .NET framework 3.5
+    Enable-WindowsOptionalFeature -Online -All -NoRestart -FeatureName @("ActiveDirectory-PowerShell","DfsMgmt","DirectoryServices-AdministrativeCenter","DirectoryServices-DomainController","DirectoryServices-DomainController-Tools","DNS-Server-Full-Role","DNS-Server-Tools","DSC-Service","FailoverCluster-AutomationServer","FailoverCluster-CmdInterface","FSRM-Management","IIS-ASPNET45","IIS-HttpTracing","IIS-ISAPIExtensions","IIS-ISAPIFilter","IIS-NetFxExtensibility45","IIS-RequestMonitor","ManagementOdata","NetFx4Extended-ASPNET45","NFS-Administration","RSAT-ADDS-Tools-Feature","RSAT-AD-Tools-Feature","Server-Manager-RSAT-File-Services","UpdateServices-API","UpdateServices-RSAT","UpdateServices-UI","WAS-ConfigurationAPI","WAS-ProcessModel","WAS-WindowsActivationService","WCF-HTTP-Activation45","Microsoft-Hyper-V-Management-Clients")
+}
 
-    if (Test-Path "$defaultLocalPath\roles.xml")
+#Download OneNodeRole.xml
+DownloadWithRetry -Uri "$gitbranch/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
+[xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
+$WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
+$dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
+if ($null -ne $WindowsFeature.Feature.Name)
+{
+    $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
+    if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0)
     {
-        Import-Clixml "$defaultLocalPath\roles.xml" | Where-Object installed | Add-WindowsFeature
-        Rename-LocalUser -Name $username -NewName Administrator
-        Restart-Computer
-    }
-    else
-    {
-        throw "required module $defaultLocalPath\roles.xml not found"   
+        Write-Log @writeLogParams -Message "Following roles will be installed"
+        Write-Log @writeLogParams -Message "$featuresToInstall"
+        Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
     }
 }
+
+if ($null -ne $WindowsFeature.RemoveFeature.Name)
+{
+    $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
+    if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0)
+    {
+        Write-Log @writeLogParams -Message "Following roles will be uninstalled"
+        Write-Log @writeLogParams -Message "$featuresToRemove"
+        Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
+    }
+}
+
+Rename-LocalUser -Name $username -NewName Administrator
+Restart-Computer -Force
 

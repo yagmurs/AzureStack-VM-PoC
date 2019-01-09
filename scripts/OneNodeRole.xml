@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Role Id="BareMetal" PSClass="Classes\BareMetal\BareMetal.psm1" xmlns:pp="http://schemas.microsoft.com/ece/2015/preprocessor">
+  <PublicInfo>
+    <Logs Enabled ="True">
+      <FileLog Location="$env:SystemDrive\CloudDeployment\Logs\" />
+      <FileLog Location="$env:windir\Panther\" />
+      <FileLog Location="$env:SystemDrive\Windows\Logs\WindowsUpdate\*.etl" />
+      <FileLog Location="D:\AzureStack\MiniDump\*.dmp" />
+      <FileLog Location="$env:SystemRoot\*.dmp" />
+      <FileLog Location="$env:SystemDrive\MASLogs\" />
+       <FileLog Location="D:\AzureStack\CrashDumps\*.dmp" />
+      <FileLog Location="$env:SystemDrive\Windows\ServiceProfiles\NetworkService\AppData\Local\CrashDumps\*.dmp" />
+      <FileLog Location="$env:SystemDrive\Windows\System32\Config\SystemProfile\AppData\Local\CrashDumps\*.dmp" />
+      <FileLog Location="$env:SystemDrive\Windows\SetupComplete.log" />
+      <FileLog Location="$env:SystemDrive\Windows\Temp\WaitResultLogs\" />
+      <FileLog Location="$env:SystemDrive\AzureStack\Logs\IPInformation.txt" />
+      <FileLog Location="$env:windir\tracing\" />
+      <FileLog Location="$env:SystemDrive\Monitoring\Data\Configuration\MonAgentHost*.log" />
+      <FileLog Location="$env:SystemDrive\Monitoring\Data\Tables\V2Faults*.tsf" />
+      <FileLog Location="$env:SystemDrive\vstoretrace\*.etl" />
+      <FileLog Location="$env:SystemDrive\Windows\System32\Configuration\ConfigurationStatus\*.mof" />
+      <FileLog Location="$env:SystemDrive\Windows\System32\Configuration\ConfigurationStatus\*.json" />
+      <FileLog Location="$env:SystemDrive\Windows\debug\netlogon*" />
+      <FileLog Location="$env:ProgramData\Microsoft\Windows Defender\Support\MpSupportFiles.cab" />
+      <ShareLog Location="[DiagnosticsShare]\BareMetal\*" />
+      <WindowsEventLog Pattern="System" />
+      <WindowsEventLog Pattern="Application" />
+      <WindowsEventLog Pattern="*TraceCollector*" />
+      <WindowsEventLog Pattern="*Microsoft-Windows-DSC*" />
+      <WindowsEventLog Pattern="Microsoft-Windows-GroupPolicy/Operational" />
+      <WindowsEventLog Pattern="Microsoft-Windows-NTLM/Operational" />
+    </Logs>
+    <NugetStore Path="$env:SystemDrive\CloudDeployment\NuGetStore" />
+    <SecurityInfo>
+      <DomainGroups>
+        <Group Id="BMCAdminGroup" Name="AzS-Bmc-AdmnSG" Scope="DomainLocal" Category="Security" />
+      </DomainGroups>
+      <ServiceAccounts>
+        <Account Name="AzS-Host-TCSA" ManagedPasswordIntervalInDays="1" PrincipalsAllowedToRetrieveManagedPassword="AzS-Sto-SG">
+          <Membership>
+            <MemberOf GroupName="AzS-FsAcl-InfraSG" />
+          </Membership>
+        </Account>
+      </ServiceAccounts>
+    </SecurityInfo>
+    <SKU>Full</SKU>
+    <Model>[Model]</Model>
+    <DeploymentGuid>[Deployment_Guid]</DeploymentGuid>
+    <BootImage Path="" Index="" VHDName="" />
+    <InstallImage Path="" Index="" VHDName="" />
+    <VhdImageTargetDir Path="[CloudMediaPath]\Images\en-us" />
+    <WindowsUpdateStagingFolder Path="[CloudMediaPath]\WindowsUpdates" />
+    <DefenderUpdates Path="[CloudMediaPath]\Updates\DefenderUpdates\x64" />
+    <CodeIntegrityPolicy Audit="True" StagingFolder="[CloudMediaPath]\Security\CodeIntegrity" FileName="MASPolicy.bin" FileNameForHost="MASPolicyForHost.bin" />
+    <SkipDriverInjection>False</SkipDriverInjection>
+    <Drivers Path="[CloudMediaPath]\Drivers" />
+    <pp:Import Path=".\HardwareInventoryInformaton.xml" />
+    <DumpMinimumPhysicalDiskBytes>18446744073709551615</DumpMinimumPhysicalDiskBytes> <!-- [UInt64]::MaxValue. Effectively disabled on ASDK. If re-enabling, checks for boot disk should change to IsBoot rather than BootFromDisk. -->
+    <JEA>
+      <Endpoints>
+        <Endpoint Name="BareMetalShutdownEndpoint" RunAsAccountID="DomainAdminSA" RunAsGmsa="True">
+          <TargetRoles>
+            <TargetRole Id="BareMetal" />
+            <TargetRole Id="Storage" />
+          </TargetRoles>
+          <SessionConfiguration Name="BareMetalShutdownEndpoint">
+            <SecurityGroup Name="[PREFIX]-OpsAdmin">
+              <Whitelist Value="BareMetalShutdownEndpointWhitelist" />
+            </SecurityGroup>
+            <EnableTranscript Value="False" />
+          </SessionConfiguration>
+          <Whitelist Name="BareMetalShutdownEndpointWhitelist">
+            <VisibleFunctions>
+              <Function Name="Stop-LocalPhysicalComputer" />
+            </VisibleFunctions>
+          </Whitelist>
+        </Endpoint>
+        <Endpoint Name="StorageSubsystemEndpoint" RunAsAccountID="DomainAdminSA" RunAsGmsa="True">
+          <TargetRoles>
+            <TargetRole Id="BareMetal" />
+            <TargetRole Id="Storage" />
+          </TargetRoles>
+          <SessionConfiguration Name="StorageSubsystemEndpoint">
+            <SecurityGroup Name="[PREFIX]-OpsAdmin">
+              <Whitelist Value="StorageSubsystemEndpointWhitelist" />
+            </SecurityGroup>
+            <EnableTranscript Value="False" />
+          </SessionConfiguration>
+          <Whitelist Name="StorageSubsystemEndpointWhitelist">
+            <VisibleFunctions>
+              <Function Name="Get-VolumesFromStorageSubsystem" />
+            </VisibleFunctions>
+          </Whitelist>
+        </Endpoint>
+      </Endpoints>
+    </JEA>
+    <DeploymentContent>
+      <!-- Deployment content is injected into the bare metal image. -->
+      <NugetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.TraceCollector" SourcePath="lib\net46" DestinationPath="TraceCollector" />
+      <NugetArtifact Name="Microsoft.AzureStack.Common.Infrastructure.TraceCollectorConfiguration" SourcePath="content\TraceCollector\DVM" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.TraceCollector" SourcePath="content\PerfCollector\BareMetal" DestinationPath="TraceCollector\PerfCounterConfiguration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Common.Tools.Diagnostics" SourcePath="lib\net46" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.ACSDSC" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.DSC" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.NCDSC" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Compute.HostInstaller" SourcePath="content\TraceCollector" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Health.MAConfig" SourcePath="Monitoring" DestinationPath="Monitoring" />
+      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Storage.SCPSModule" SourcePath="content" DestinationPath="Windows\System32\WindowsPowerShell\v1.0\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.MonitoringAgent" SourcePath="Monitoring" DestinationPath="Monitoring" />
+      <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\TraceCollector\Blob" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\Deployment" DestinationPath="ACS\Deployment" />
+      <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\BlobService" DestinationPath="ACS\BlobService" />
+      <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\MonitoringAgent\MAConfig" DestinationPath="Monitoring\agent\initconfig\2.0\Standard" />
+      <NugetArtifact Name="Microsoft.AzureStack.Solution.Deploy.Security" SourcePath="content\PrivilegedEndpoint\JEAModules" DestinationPath="Program Files\WindowsPowerShell\Modules"/>
+      <NugetArtifact Name="Microsoft.AzureStack.Solution.Deploy.Security" SourcePath="content\PrivilegedEndpoint\REPCerts" DestinationPath="Program Files\WindowsPowerShell\Modules\Microsoft.AzureStack.PrivilegedEndpointSecurity"/>
+      <NugetArtifact Name="Microsoft.AzureStack.Solution.Deploy.Security" SourcePath="content\GP\Modules" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Backup.IBCAdapterClient" SourcePath="" DestinationPath="NugetStore" NugetInstall="true" />
+      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Backup.IBCAdapterClient" SourcePath="content\TraceCollector" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Health" SourcePath="Deployment\BareMetalTraceCollector" DestinationPath="TraceCollector\Configuration" />
+      <NuGetArtifact Name="Microsoft.AzureStack.Solution.Deploy.CloudDeployment" SourcePath="content\AzureStackDiagnostics" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NuGetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.StorageDiagnostic" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.ExternalDNSDSC" SourcePath="content\TraceCollector\DNSClient" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.ExternalDNSDSC" SourcePath="content\TraceCollector\VMSIF" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.ExternalDNSDSC" SourcePath="content\TraceCollector\VFPHostProxy\BareMetal" DestinationPath="TraceCollector\Configuration" />
+    </DeploymentContent>
+    <WindowsFeature>
+      <Feature Name="BitLocker" />
+      <Feature Name="DataCenterBridging" />
+      <Feature Name="FailoverCluster-AdminPak" />
+      <Feature Name="FailoverCluster-FullServer" />
+      <Feature Name="FailoverCluster-Mgmt" />
+      <Feature Name="FailoverCluster-PowerShell" />
+      <Feature Name="FileServerVSSAgent" />
+      <Feature Name="Microsoft-Hyper-V-Management-PowerShell" />
+      <Feature Name="Microsoft-Hyper-V-Offline" />
+      <Feature Name="Microsoft-Hyper-V-Online" />
+      <Feature Name="RSAT-Hyper-V-Tools-Feature" />
+      <Feature Name="Server-Gui-Shell" />
+      <Feature Name="ServerManager-Core-RSAT" />
+      <Feature Name="ServerManager-Core-RSAT-Feature-Tools" />
+      <Feature Name="ServerManager-Core-RSAT-Role-Tools" />
+      <Feature Name="DamgmtTools" />
+      <Feature Name="NPAS-Role" />
+      <Feature Name="NPSMMC" />
+      <Feature Name="RasRoutingProtocols" />
+      <Feature Name="RemoteAccess" />
+      <Feature Name="RemoteAccessMgmtTools" />
+      <Feature Name="RemoteAccessPowerShell" />
+      <Feature Name="RemoteAccessServer" />
+      <RemoveFeature Name="ADCertificateServicesRole" />
+      <RemoveFeature Name="BITS" />
+      <RemoveFeature Name="BITSExtensions-Upload" />
+      <RemoveFeature Name="CertificateEnrollmentPolicyServer" />
+      <RemoveFeature Name="CertificateEnrollmentServer" />
+      <RemoveFeature Name="CertificateServices" />
+      <RemoveFeature Name="ClientForNFS-Infrastructure" />
+      <RemoveFeature Name="DFSN-Server" />
+      <RemoveFeature Name="DFSR-Infrastructure-ServerEdition" />
+      <RemoveFeature Name="DHCPServer" />
+      <RemoveFeature Name="DHCPServer-Tools" />
+      <RemoveFeature Name="FabricShieldedTools" />
+      <RemoveFeature Name="FRS-Infrastructure" />
+      <RemoveFeature Name="HardenedFabricEncryptionTask" />
+      <RemoveFeature Name="IdentityServer-SecurityTokenService" />
+      <RemoveFeature Name="IPAMClientFeature" />
+      <RemoveFeature Name="IPAMServerFeature" />
+      <RemoveFeature Name="iSCSITargetServer" />
+      <RemoveFeature Name="iSCSITargetServer-PowerShell" />
+      <RemoveFeature Name="iSCSITargetStorageProviders" />
+      <RemoveFeature Name="iSNS_Service" />
+      <RemoveFeature Name="Licensing" />
+      <RemoveFeature Name="LightweightServer" />
+      <RemoveFeature Name="MicrosoftWindowsPowerShellV2" />
+      <RemoveFeature Name="MSMQ" />
+      <RemoveFeature Name="MSMQ-ADIntegration" />
+      <RemoveFeature Name="MSMQ-DCOMProxy" />
+      <RemoveFeature Name="MSMQ-HTTP" />
+      <RemoveFeature Name="MSMQ-Multicast" />
+      <RemoveFeature Name="MSMQ-RoutingServer" />
+      <RemoveFeature Name="MSMQ-Server" />
+      <RemoveFeature Name="MSMQ-Services" />
+      <RemoveFeature Name="MSMQ-Triggers" />
+      <RemoveFeature Name="MSRDC-Infrastructure" />
+      <RemoveFeature Name="MultipathIo" />
+      <RemoveFeature Name="MultiPoint-Connector" />
+      <RemoveFeature Name="MultiPoint-Connector-Services" />
+      <RemoveFeature Name="MultiPoint-Role" />
+      <RemoveFeature Name="MultiPoint-Tools" />
+      <RemoveFeature Name="NetworkController" />
+      <RemoveFeature Name="NetworkControllerTools" />
+      <RemoveFeature Name="NetworkDeviceEnrollmentServices" />
+      <RemoveFeature Name="NetworkLoadBalancingFullServer" />
+      <RemoveFeature Name="OnlineRevocationServices" />
+      <RemoveFeature Name="P2P-PnrpOnly" />
+      <RemoveFeature Name="PeerDist" />
+      <RemoveFeature Name="Printing-Client" />
+      <RemoveFeature Name="Printing-Client-Gui" />
+      <RemoveFeature Name="Printing-LPDPrintService" />
+      <RemoveFeature Name="Printing-PrintToPDFServices-Features" />
+      <RemoveFeature Name="Printing-Server-Foundation-Features" />
+      <RemoveFeature Name="Printing-Server-Role" />
+      <RemoveFeature Name="Printing-XPSServices-Features" /> 
+      <RemoveFeature Name="QWAVE" />
+      <RemoveFeature Name="RightsManagementServices" />
+      <RemoveFeature Name="RightsManagementServices-AdminTools" />
+      <RemoveFeature Name="RightsManagementServices-Role" />
+      <RemoveFeature Name="RMS-Federation" />
+      <RemoveFeature Name="RPC-HTTP_Proxy" />
+      <RemoveFeature Name="SBMgr-UI" />
+      <RemoveFeature Name="ServerForNFS-Infrastructure" />
+      <RemoveFeature Name="ServerMediaFoundation" />
+      <RemoveFeature Name="ServicesForNFS-ServerAndClient" />
+      <RemoveFeature Name="SessionDirectory" />
+      <RemoveFeature Name="SMBHashGeneration" />
+      <RemoveFeature Name="Smtpsvc-Admin-Update-Name" />
+      <RemoveFeature Name="Smtpsvc-Service-Update-Name" />
+      <RemoveFeature Name="SoftwareLoadBalancer" />
+      <RemoveFeature Name="Storage-Replica" />
+      <RemoveFeature Name="Storage-Replica-AdminPack" />
+      <RemoveFeature Name="TelnetClient" />
+      <RemoveFeature Name="VmHostAgent" />
+      <RemoveFeature Name="WebAccess" />
+      <RemoveFeature Name="Web-Application-Proxy" />
+      <RemoveFeature Name="WebEnrollmentServices" />
+      <RemoveFeature Name="WindowsPowerShellWebAccess" />
+      <RemoveFeature Name="WINSRuntime" />
+      <RemoveFeature Name="WorkFolders-Server" />
+      <RemoveFeature Name="WSS-Product-Package" />
+    </WindowsFeature>
+  </PublicInfo>
+  <PrivateInfo>
+    <!-- Do not change the Deployment Guid. For re-deploying update 'IdempotentRun' property to "False"-->
+    <ExecutionContext IdempotentRun="True" />
+    <BmdWaitTimeoutMinutes>90</BmdWaitTimeoutMinutes>
+    <BMCWinPETimeOutInMinutes>30</BMCWinPETimeOutInMinutes>
+    <TimeServiceStartTimeoutInMinutes>3</TimeServiceStartTimeoutInMinutes>
+    <UseWimBoot>False</UseWimBoot>
+    <IgnoreOldOSCheckResult>False</IgnoreOldOSCheckResult>
+    <LibraryShareImageFolder Path="{Infrastructure_2}\CloudMedia\Images\en-us" />
+    <StartupTimeoutInMinutes>10</StartupTimeoutInMinutes>
+    <ShutdownTimeoutInMinutes>10</ShutdownTimeoutInMinutes>
+    <Accounts>
+      <LocalAdminAccountID>MgmtLocalAdmin</LocalAdminAccountID>
+      <LocalCloudAdminAccountID>LocalCloudAdmin</LocalCloudAdminAccountID>
+      <RunAsAccountID>Fabric</RunAsAccountID>
+      <DomainAdminAccountID>DomainAdmin</DomainAdminAccountID>
+      <DeploymentDomainAdminAccountID>DeploymentDomainAdmin</DeploymentDomainAdminAccountID>
+      <BuiltInAdminAccountID>LocalAdmin</BuiltInAdminAccountID>
+      <VHDShareAccountID>Fabric</VHDShareAccountID>
+      <CACertAccountID>CACertificateUser</CACertAccountID>
+    </Accounts>
+    <ValidationRequirements>
+      <MinimumOperatingSystemVersion>10.0.14300</MinimumOperatingSystemVersion>
+      <MinimumNumberOfCoresPerMachine>12</MinimumNumberOfCoresPerMachine>
+      <MinimumPhysicalMemoryPerMachineGB>96</MinimumPhysicalMemoryPerMachineGB>
+      <MinimumNumberOfAdaptersPerMachine>0</MinimumNumberOfAdaptersPerMachine>
+      <MinimumAdapterSpeedBitsPerSecond>0</MinimumAdapterSpeedBitsPerSecond>
+      <MinimumSizeOfDataDisksGB>135</MinimumSizeOfDataDisksGB>
+      <MinimumSizeOfSystemDiskGB>180</MinimumSizeOfSystemDiskGB>
+      <MinimumNumberOfDataDisksPerMachine>3</MinimumNumberOfDataDisksPerMachine>
+      <MaximumNumberOfMissingDisksPerMachine>0</MaximumNumberOfMissingDisksPerMachine>
+      <SizeComparisonTolerancePercentage>1</SizeComparisonTolerancePercentage>
+    </ValidationRequirements>
+  </PrivateInfo>
+  <Nodes>    
+    <!-- Attribute Deployed describes the physical machine deployment status. Possible values are:
+                    'true'  -   machine is sucessfully deployed in intended role
+                    'false' -   machine is not yet deployed, but it is ready to be deployed by a scale-out interface
+                    ''      -   machine information is in the CustomerConfiguration.xml file, but no further actions will be taken
+              -->
+  </Nodes>  
+  <Actions>
+    <Action Type="MarkAllPhysicalMachineStatusComplete">
+      <Steps>
+        <PerNode RolePath="Cloud\Infrastructure\BareMetal">
+          <Step Index="0" Name="MarkPhysicalMachineStatusComplete" Description="Update the XML to mark the new nodes as deployed.">
+            <Task RolePath="BuiltIn" InterfaceType="MarkPhysicalMachineStatusComplete" />
+          </Step>
+        </PerNode>
+      </Steps>
+    </Action>
+    <Action Type="MarkAllPhysicalMachineStatusProvisioning">
+      <Steps>
+        <PerNode RolePath="Cloud\Infrastructure\BareMetal">
+          <Step Index="0" Name="MarkPhysicalMachineStatusProvisioning" Description="Update the XML to mark the new nodes as provisioning.">
+            <Task RolePath="BuiltIn" InterfaceType="MarkPhysicalMachineStatusProvisioning" />
+          </Step>
+        </PerNode>
+      </Steps>
+    </Action>
+  </Actions>
+</Role>

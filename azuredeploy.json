@@ -28,8 +28,10 @@
         "dataDiskSizeinGB": {
             "type": "int",
             "allowedValues": [
+                128,
                 256,
-                128
+                512,
+                1024
             ],
             "defaultValue": 256,
             "metadata": {
@@ -38,6 +40,17 @@
         },
         "dataDiskCount": {
             "type": "int",
+            "allowedValues": [
+                3,
+                4,
+                8,
+                12,
+                16,
+                20,
+                24,
+                28,
+                32
+            ],
             "defaultValue": 4,
             "metadata": {
                 "name": 4

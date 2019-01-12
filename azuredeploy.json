@@ -28,7 +28,6 @@
         "dataDiskSizeinGB": {
             "type": "int",
             "allowedValues": [
-                128,
                 256,
                 512,
                 1024

@@ -72,11 +72,12 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - Tested for ASDK 1.1811.0.101 with original ASDK VHD for LOD environment
 - Timeserver is now use FQDN instead of IP address for upcoming versions
 - Required roles installed by default for ASDKImage to prevent restart requirement during the installation
+- Removal of file roles.xml from repository
 
-**updates on 12.01.2019
+**updates on 13.01.2019
 - ARM template parameter values updated with supported numbers and sizes
 
 
-- Removal of file roles.xml from repository
+
 
 Feel free to post questions and enjoy!

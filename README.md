@@ -81,5 +81,4 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - Tested with ASDK 1.1901.0.95
 
 
-
 Feel free to post questions and enjoy!

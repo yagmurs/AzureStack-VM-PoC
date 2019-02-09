@@ -77,6 +77,8 @@ or **Deploy to Azure** (**deploy.azure.com**)
 **updates on 13.01.2019
 - ARM template parameter values updated with supported numbers and sizes
 
+**updates on 09.02.2019
+- Tested with ASDK 1.1901.0.95
 
 
 

@@ -74,11 +74,10 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - Required roles installed by default for ASDKImage to prevent restart requirement during the installation
 - Removal of file roles.xml from repository
 
-**updates on 13.01.2019
+**updates on 13.01.2019**
 - ARM template parameter values updated with supported numbers and sizes
 
-**updates on 09.02.2019
+**updates on 09.02.2019**
 - Tested with ASDK 1.1901.0.95
-
 
 Feel free to post questions and enjoy!

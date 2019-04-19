@@ -1,5 +1,5 @@
 Param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $Username = "__administrator",
 
@@ -13,20 +13,19 @@ Param (
     $ASDKImage,
 
     [string]
-    $AutoDownloadASDK
+    $AutoDownloadASDK,
+
+    [string]
+    $EnableRDSH
 )
 
-function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Retries = 5, [int]$RetryInterval = 10)
-{
-    while($true)
-    {
-        try
-        {
+function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Retries = 5, [int]$RetryInterval = 10) {
+    while ($true) {
+        try {
             Start-BitsTransfer -Source $Uri -Destination $DownloadLocation -DisplayName $Uri
             break
         }
-        catch
-        {
+        catch {
             $exceptionMessage = $_.Exception.Message
             Write-Host "Failed to download '$Uri': $exceptionMessage"
             if ($retries -gt 0) {
@@ -36,8 +35,7 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
                 Start-Sleep -Seconds $RetryInterval
     
             }
-            else
-            {
+            else {
                 $exception = $_.Exception
                 throw $exception
             }
@@ -60,12 +58,10 @@ $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbr
 
 DownloadWithRetry -Uri "$gitbranch/scripts/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
 
-if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
-{
+if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1") {
     Import-Module "$defaultLocalPath\ASDKHelperModule.psm1"
 }
-else
-{
+else {
     throw "required module $defaultLocalPath\ASDKHelperModule.psm1 not found"   
 }
 
@@ -91,8 +87,7 @@ New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Interne
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -PropertyType DWORD -Force
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -PropertyType DWORD -Force
 
-if ($ASDKImage)
-{
+if ($ASDKImage) {
     Rename-LocalUser -Name Administrator -NewName $username
     $WshShell = New-Object -comObject WScript.Shell
     $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
@@ -133,8 +128,7 @@ if ($ASDKImage)
     #workaround2
 }
 
-if ($AzureImage)
-{
+if ($AzureImage) {
     New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Force
     New-Item HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Force
     Set-ItemProperty -LiteralPath HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentials -Name 1 -Value "wsman/*" -Type STRING -Force
@@ -154,16 +148,14 @@ if ($AzureImage)
     #Download ASDK Downloader
     DownloadWithRetry -Uri "https://aka.ms/azurestackdevkitdownloader" -DownloadLocation "D:\AzureStackDownloader.exe"
 
-    if (!($AsdkFileList))
-    {
+    if (!($AsdkFileList)) {
         $AsdkFileList = @("AzureStackDevelopmentKit.exe")
         1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
     }
 
     $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
 
-    if ($AutoDownloadASDK -eq "true")
-    {
+    if ($AutoDownloadASDK -eq "true") {
         #Download ASDK files (BINs and EXE)
         Write-Log @writeLogParams -Message "Finding available ASDK versions"
 
@@ -187,8 +179,7 @@ if ($AzureImage)
         $vhdxFullPath = Join-Path -Path $d -ChildPath "cloudbuilder.vhdx"
         $foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
 
-        if (Test-Path -Path $vhdxFullPath)
-        {
+        if (Test-Path -Path $vhdxFullPath) {
             Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
             Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
             try {
@@ -201,8 +192,7 @@ if ($AzureImage)
                 throw "an error occured while mounting cloudbuilder.vhdxf file"
             }
 
-            foreach ($folder in $foldersToCopy)
-            {
+            foreach ($folder in $foldersToCopy) {
                 Write-Log @writeLogParams -Message "Copying folder $folder to $destPath"
                 Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
                 Write-Log @writeLogParams -Message "$folder done..."
@@ -227,11 +217,9 @@ if ($AzureImage)
         $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType ADFS}"
         $Shortcut.Save()
     }
-    else
-    {
+    else {
         #Creating desktop shortcut for Install-ASDK.ps1
-        if ($EnableDownloadASDK)
-        {
+        if ($EnableDownloadASDK) {
             $WshShell = New-Object -comObject WScript.Shell
             $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
             $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
@@ -260,8 +248,7 @@ if ($AzureImage)
             $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -Version $latestASDK}"
             $Shortcut.Save()
         }
-        else
-        {
+        else {
             $WshShell = New-Object -comObject WScript.Shell
             $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
             $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
@@ -286,7 +273,7 @@ if ($AzureImage)
     }
 
     # Enable differencing roles from ASDKImage except .NET framework 3.5
-    Enable-WindowsOptionalFeature -Online -All -NoRestart -FeatureName @("ActiveDirectory-PowerShell","DfsMgmt","DirectoryServices-AdministrativeCenter","DirectoryServices-DomainController","DirectoryServices-DomainController-Tools","DNS-Server-Full-Role","DNS-Server-Tools","DSC-Service","FailoverCluster-AutomationServer","FailoverCluster-CmdInterface","FSRM-Management","IIS-ASPNET45","IIS-HttpTracing","IIS-ISAPIExtensions","IIS-ISAPIFilter","IIS-NetFxExtensibility45","IIS-RequestMonitor","ManagementOdata","NetFx4Extended-ASPNET45","NFS-Administration","RSAT-ADDS-Tools-Feature","RSAT-AD-Tools-Feature","Server-Manager-RSAT-File-Services","UpdateServices-API","UpdateServices-RSAT","UpdateServices-UI","WAS-ConfigurationAPI","WAS-ProcessModel","WAS-WindowsActivationService","WCF-HTTP-Activation45","Microsoft-Hyper-V-Management-Clients")
+    Enable-WindowsOptionalFeature -Online -All -NoRestart -FeatureName @("ActiveDirectory-PowerShell", "DfsMgmt", "DirectoryServices-AdministrativeCenter", "DirectoryServices-DomainController", "DirectoryServices-DomainController-Tools", "DNS-Server-Full-Role", "DNS-Server-Tools", "DSC-Service", "FailoverCluster-AutomationServer", "FailoverCluster-CmdInterface", "FSRM-Management", "IIS-ASPNET45", "IIS-HttpTracing", "IIS-ISAPIExtensions", "IIS-ISAPIFilter", "IIS-NetFxExtensibility45", "IIS-RequestMonitor", "ManagementOdata", "NetFx4Extended-ASPNET45", "NFS-Administration", "RSAT-ADDS-Tools-Feature", "RSAT-AD-Tools-Feature", "Server-Manager-RSAT-File-Services", "UpdateServices-API", "UpdateServices-RSAT", "UpdateServices-UI", "WAS-ConfigurationAPI", "WAS-ProcessModel", "WAS-WindowsActivationService", "WCF-HTTP-Activation45", "Microsoft-Hyper-V-Management-Clients")
 }
 
 #Download OneNodeRole.xml
@@ -294,22 +281,22 @@ DownloadWithRetry -Uri "$gitbranch/scripts/OneNodeRole.xml" -DownloadLocation "$
 [xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
 $WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
 $dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
-if ($null -ne $WindowsFeature.Feature.Name)
-{
+if ($null -ne $WindowsFeature.Feature.Name) {
     $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
-    if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0)
-    {
+    if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0) {
         Write-Log @writeLogParams -Message "Following roles will be installed"
         Write-Log @writeLogParams -Message "$featuresToInstall"
         Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
     }
+    if ($EnableRDSH) {
+        Write-Log @writeLogParams -Message "User also chose to enable RDSH. Adding the Remote Desktop Session Host role"
+        Enable-WindowsOptionalFeature -FeatureName AppServer Licensing-Diagnosis-UI -Online -All -NoRestart
+    }
 }
 
-if ($null -ne $WindowsFeature.RemoveFeature.Name)
-{
+if ($null -ne $WindowsFeature.RemoveFeature.Name) {
     $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
-    if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0)
-    {
+    if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0) {
         Write-Log @writeLogParams -Message "Following roles will be uninstalled"
         Write-Log @writeLogParams -Message "$featuresToRemove"
         Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
@@ -318,4 +305,3 @@ if ($null -ne $WindowsFeature.RemoveFeature.Name)
 
 Rename-LocalUser -Name $username -NewName Administrator
 Restart-Computer -Force
-

@@ -80,4 +80,8 @@ or **Deploy to Azure** (**deploy.azure.com**)
 **updates on 09.02.2019**
 - Tested with ASDK 1.1901.0.95
 
+**updates on 02.05.2019**
+- Tested with ASDK 1.1904.0.36
+- Added option for installing RDSH on ASDK host as ARM template parameter. Thanks Matt McSpirit for the contribution.
+
 Feel free to post questions and enjoy!

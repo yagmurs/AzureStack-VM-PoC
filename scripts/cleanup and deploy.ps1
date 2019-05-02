@@ -14,7 +14,7 @@ $SecureAdminPassword = Read-Host -AsSecureString -Prompt "Provide local Administ
 [string]$publicDnsNamePrefix = "yagmursasdkinstance" # This will will be concatenated with $instancenumber. Ex. yagmursasdkinstance1.eastus2.cloudapp.azure.com
 [string]$location = 'East US2' # can be any region that supports E and D VM sizes that supports nested virtualization.
 [string]$virtualMachineSize = "Standard_E32s_v3" # 1811 and upper versions require 256GB RAM
-[ValidateSet("development", "master")][string]$gitBranch = "development" # github branch 
+[ValidateSet("development", "master")][string]$gitBranch = "master" # github branch 
 [string]$resourceGroupName = "$resourceGroupNamePrefix-$instanceNumber"
 [string]$publicDnsName = "$publicDnsNamePrefix$instanceNumber"
 

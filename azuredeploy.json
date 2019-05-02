@@ -160,7 +160,7 @@
         },
         "branch": {
             "type": "string",
-            "defaultValue": "master",
+            "defaultValue": "development",
             "allowedValues": [
                 "master",
                 "development"

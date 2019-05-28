@@ -339,8 +339,8 @@ if ($AutoInstallASDK)
     
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
-    $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-    $options = New-ScheduledJobOption -RequireNetwork
+    $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:02:00
+    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle
 
 $AutoInstallASDKsb = @"
 
@@ -348,7 +348,7 @@ $AutoInstallASDKsb = @"
     `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
     `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
     $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
-    Get-ScheduledJob -name $taskName3 | Unregister-ScheduledJob -Force
+    Get-Scheduledtask -TaskName $taskName3 | Disable-ScheduledTask
 "@
 $AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 

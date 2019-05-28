@@ -362,7 +362,7 @@ if ($AutoInstallASDK)
         Get-ScheduledJob -name $taskName3 | Unregister-ScheduledJob -Force
     }
 
-    $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $LocalAdminPass)
+    $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
     $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
     $st.StartJob()
 }

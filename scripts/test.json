@@ -20,9 +20,9 @@
                 "Standard_D64s_v3",
                 "Standard_E64s_v3"
             ],
-            "defaultValue": "Standard_E32s_v3",
+            "defaultValue": "Standard_E16s_v3",
             "metadata": {
-                "name": "Standard_E32s_v3"
+                "name": "Standard_E16s_v3"
             }
         },
         "dataDiskSizeinGB": {

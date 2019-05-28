@@ -336,7 +336,11 @@ if ($AutoInstallASDK)
     $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
 
     $version = $latestASDK
-
+    
+    $taskName3 = "Auto ASDK Installer Service"
+    Write-Log @writeLogParams -Message "Registering $taskname3"
+    $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+    $options = New-ScheduledJobOption -RequireNetwork
 
 $AutoInstallASDKsb = @"
 
@@ -344,13 +348,11 @@ $AutoInstallASDKsb = @"
     `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
     `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
     $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
+    Get-ScheduledJob -name $taskName3 | Unregister-ScheduledJob -Force
 "@
 $AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 
-    $taskName3 = "Auto ASDK Installer Service"
-    Write-Log @writeLogParams -Message "Registering $taskname3"
-    $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-    $options = New-ScheduledJobOption -RequireNetwork
+
     if (Get-ScheduledJob -name $taskName3 -ErrorAction SilentlyContinue)
     {
         Get-ScheduledJob -name $taskName3 | Unregister-ScheduledJob -Force

@@ -212,7 +212,7 @@
         "scriptPath": "[concat('https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/', parameters('branch'), '/scripts/')]",
         "fileUri": "[concat(variables('scriptPath'), variables('scriptFileName'))]",
         "adminUsername": "__administrator",
-        "osDiskSizeinGB": 256,
+        "osDiskSizeinGB": 512,
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-NSG')]",
         "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]",

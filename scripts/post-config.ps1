@@ -28,7 +28,7 @@ Param (
     $AzureADTenant,
 
     [string]
-    $AzureADAdmin,
+    $AzureADGlobalAdmin,
 
     [string]
     $AzureADAdminPass,
@@ -335,7 +335,7 @@ if ($AutoInstallASDK)
 
         $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
 
-        $AadAdminUser = $AzureADAdmin
+        $AadAdminUser = $AzureADGlobalAdmin
         $AadPassword = $AzureADAdminPass | ConvertTo-SecureString -AsPlainText -Force
         $InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
 

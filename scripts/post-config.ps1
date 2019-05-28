@@ -324,34 +324,28 @@ Resize-Partition -DriveLetter c -Size $size.sizemax
 Rename-LocalUser -Name $username -NewName Administrator
 if ($AutoInstallASDK)
 {
-    $AutoInstallASDKScriptBlock = {
-        Import-Module $defaultLocalPath\ASDKHelperModule.psm1
+    Import-Module $defaultLocalPath\ASDKHelperModule.psm1
 
-        if (!($AsdkFileList))
-        {
-            $AsdkFileList = @("AzureStackDevelopmentKit.exe")
-            1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
-        }
-
-        $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
-
-        $AadAdminUser = $AzureADGlobalAdmin
-        $AadPassword = $AzureADGlobalAdminPass | ConvertTo-SecureString -AsPlainText -Force
-        $InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ($AadAdminUser, $AadPassword)
-
-        $version = $latestASDK
-        $SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
-        [ValidateSet("AAD", "ADFS")][string]$deploymentType = "AAD"
-
-        cd\
-        Set-Location .\AzureStackonAzureVM
-        .\Install-ASDK.ps1 -DownloadASDK `
-            -DeploymentType $deploymentType `
-            -LocalAdminPass $SecureAdminPassword `
-            -AADTenant $AzureADTenant `
-            -InfraAzureDirectoryTenantAdminCredential $InfraAzureDirectoryTenantAdminCredential `
-            -Version $version
+    if (!($AsdkFileList))
+    {
+        $AsdkFileList = @("AzureStackDevelopmentKit.exe")
+        1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
     }
+    [ValidateSet("AAD", "ADFS")][string]$deploymentType = "AAD"
+
+    $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
+
+    $version = $latestASDK
+
+
+$AutoInstallASDKsb = @"
+
+    `$lPass = "$LocalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
+    `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
+    `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
+    $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
+"@
+$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
@@ -362,9 +356,9 @@ if ($AutoInstallASDK)
         Get-ScheduledJob -name $taskName3 | Unregister-ScheduledJob -Force
     }
 
+    $SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
     $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
     $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
-    $st.StartJob()
 }
 
 Restart-Computer -Force

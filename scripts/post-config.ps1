@@ -340,7 +340,7 @@ if ($AutoInstallASDK)
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
     $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:02:00
-    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle
+    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:02:00
 
 $AutoInstallASDKsb = @"
 
@@ -348,11 +348,14 @@ $AutoInstallASDKsb = @"
     {
         Get-Scheduledtask -TaskName "$taskName3" | Disable-ScheduledTask 
     }
-    `$lPass = "$LocalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
-    `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
-    `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
-    $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
-   
+    else
+    {
+        `$lPass = "$LocalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
+        `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
+        `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
+        $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
+    }
+    
 "@
 $AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 

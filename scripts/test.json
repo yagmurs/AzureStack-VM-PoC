@@ -179,6 +179,13 @@
                 "name": "1234"
             }
         },
+        "ASDKConfigurator":{
+            "type": "string",
+            "defaultValue": "none",
+            "metadata": {
+                "name": "none"
+            }
+        },
         "enableRDSH": {
             "type": "bool",
             "defaultValue": false,

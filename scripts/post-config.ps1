@@ -347,7 +347,7 @@ $AutoInstallASDKsb = @"
     `$lPass = "$LocalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
     `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
     `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
-    Get-Scheduledtask -TaskName $taskName3 | Disable-ScheduledTask
+    Get-Scheduledtask -TaskName "$taskName3" | Disable-ScheduledTask
     $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
     
 "@

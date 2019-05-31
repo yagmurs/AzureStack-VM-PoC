@@ -339,13 +339,23 @@ if ($AutoInstallASDK)
     
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
-    $AtStartup = New-JobTrigger -AtStartup -RandomDelay 00:02:00
-    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:02:00
+    $trigger = New-JobTrigger -AtLogOn -User "$($env:ComputerName)\Administrator" -RandomDelay 00:01:00
+    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:01:00
+
+    #Enable Autologon
+    $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoAdminLogon" -Value "1" -type String 
+    Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:ComputerName)\Administrator" -type String  
+    Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$LocalAdminPass" -type String
+    Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "10" -type DWord
 
 $AutoInstallASDKsb = @"
 
     if ((Test-Path -Path "D:\Azure Stack Development Kit\cloudbuilder.vhdx") -and (Test-Path -Path "c:\CloudDeployment"))
     {
+        #Disable Autologon and task
+        Set-ItemProperty "$AutoLogonRegPath" "AutoAdminLogon" -Value "0" -type String
+        Remove-ItemProperty "$AutoLogonRegPath" -Name "DefaultPassword"
         Get-Scheduledtask -TaskName "$taskName3" | Disable-ScheduledTask 
     }
     else
@@ -355,7 +365,7 @@ $AutoInstallASDKsb = @"
         `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
         $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
     }
-    
+
 "@
 $AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 
@@ -366,7 +376,7 @@ $AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 
     $SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
     $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
-    $st = Register-ScheduledJob -Trigger $AtStartup -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
+    $st = Register-ScheduledJob -Trigger $trigger -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
 }
 
 Restart-Computer -Force

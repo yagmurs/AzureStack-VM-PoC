@@ -32,9 +32,12 @@ param (
 #region Variables
 $VerbosePreference = "Continue"
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
+$transcriptLog = "Install-ASDK-transcript.txt"
 $gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
 $gitbranchcode = $gitbranchconfig.branch.Trim()
 $gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+
+Start-Transcript -Path $(Join-Path -Path $defaultLocalPath -ChildPath $transcriptLog) -Append
 
 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1")
 {
@@ -444,7 +447,7 @@ if ($DeploymentType -eq "ADFS")
         $global:InstallAzSPOCParams.Add("NATIPv4DefaultGateway","192.168.137.1")
     }
 }
-
+Stop-Transcript
 #Azure Stack PoC installer setup
 Set-Location C:\CloudDeployment\Setup
 .\InstallAzureStackPOC.ps1 @InstallAzSPOCParams

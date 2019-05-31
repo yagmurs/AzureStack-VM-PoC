@@ -353,9 +353,9 @@ $AutoInstallASDKsb = @"
 
     if ((Test-Path -Path "D:\Azure Stack Development Kit\cloudbuilder.vhdx") -and (Test-Path -Path "c:\CloudDeployment"))
     {
-        #Disable Autologon and task
-        Set-ItemProperty "$AutoLogonRegPath" "AutoAdminLogon" -Value "0" -type String
-        Remove-ItemProperty "$AutoLogonRegPath" -Name "DefaultPassword"
+        #Disable Autologon and scheduled task
+        #Set-ItemProperty "$AutoLogonRegPath" "AutoAdminLogon" -Value "0" -type String
+        #Remove-ItemProperty "$AutoLogonRegPath" -Name "DefaultPassword"
         Get-Scheduledtask -TaskName "$taskName3" | Disable-ScheduledTask 
     }
     else

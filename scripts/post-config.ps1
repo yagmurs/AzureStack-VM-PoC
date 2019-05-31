@@ -340,7 +340,7 @@ if ($AutoInstallASDK)
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
     $trigger = New-JobTrigger -AtLogOn -User "$($env:ComputerName)\Administrator"
-    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:03:00
+    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:03:00 -RunElevated
 
     #Enable Autologon
     $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"

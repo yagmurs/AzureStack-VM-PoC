@@ -260,7 +260,7 @@ if ($pocParameters.Count -gt 0)
             if (-not ([System.Environment]::GetEnvironmentVariable('BGPNATVMVMNetAdapterFixed', [System.EnvironmentVariableTarget]::Machine) -eq $true))
             {
                 Write-Log @writeLogParams -Message  "Checking $BgpNatVm VM's presence and state"
-                $BgpNatVmObj = Get-VM -Name $BgpNatVm | ? state -eq running
+                $BgpNatVmObj = Get-VM -Name $BgpNatVm | Where-Object state -eq running
                 if ($BgpNatVmObj)
                 {
                     $null = Get-NetAdapter -Name $privateAdapterName -ErrorAction SilentlyContinue  

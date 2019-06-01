@@ -366,9 +366,6 @@ else
 }
 "@
 
-pause
-
-"@
 #$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 
     if (Get-ScheduledTask -name $taskName3 -ErrorAction SilentlyContinue)

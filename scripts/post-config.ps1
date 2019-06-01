@@ -395,6 +395,4 @@ $AutoInstallASDKsb = @"
     Register-ScheduledTask @registrationParams
 }
 
-
-
 Restart-Computer -Force

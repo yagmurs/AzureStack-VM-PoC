@@ -378,21 +378,23 @@ $AutoInstallASDKsb = @"
     #$SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
     #$localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
     #$st = Register-ScheduledJob -Trigger $trigger -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
+    
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKsb
+
+    $registrationParams = @{
+        TaskName = $taskName3
+        TaskPath = '\AzureStackonAzureVM'
+        Action = $action
+        Settings = New-ScheduledTaskSettingsSet -Priority 4
+        Force = $true
+    }
+        $registrationParams.Trigger = New-ScheduledTaskTrigger -AtLogOn
+        $registrationParams.User = "$($env:ComputerName)\Administrator"
+        $registrationParams.RunLevel = 'Highest'
+
+    Register-ScheduledTask @registrationParams
 }
 
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKsb
 
-$registrationParams = @{
-    TaskName = $taskName3
-    TaskPath = '\AzureStackonAzureVM'
-    Action = $action
-    Settings = New-ScheduledTaskSettingsSet -Priority 4
-    Force = $true
-}
-    $registrationParams.Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $registrationParams.User = "$($env:ComputerName)\Administrator"
-    $registrationParams.RunLevel = 'Highest'
-
-Register-ScheduledTask @registrationParams
 
 Restart-Computer -Force

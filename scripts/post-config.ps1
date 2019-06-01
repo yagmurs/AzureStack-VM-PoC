@@ -351,22 +351,21 @@ if ($AutoInstallASDK)
 
     
 $AutoInstallASDKsb = @"
-
-    if ((Test-Path -Path "D:\Azure Stack Development Kit\cloudbuilder.vhdx") -and (Test-Path -Path "c:\CloudDeployment"))
-    {
-        #Disable Autologon and scheduled task
-        #Set-ItemProperty "$AutoLogonRegPath" "AutoAdminLogon" -Value "0" -type String
-        #Remove-ItemProperty "$AutoLogonRegPath" -Name "DefaultPassword"
-        Get-Scheduledtask -TaskName "$taskName3" | Disable-ScheduledTask 
-    }
-    else
-    {
-        `$lPass = "$LocalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
-        `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
-        `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
-        $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
-    }
-
+if ((Test-Path -Path "D:\Azure Stack Development Kit\cloudbuilder.vhdx") -and (Test-Path -Path "c:\CloudDeployment"))
+{
+    #Disable Autologon and scheduled task
+    #Set-ItemProperty "$AutoLogonRegPath" "AutoAdminLogon" -Value "0" -type String
+    #Remove-ItemProperty "$AutoLogonRegPath" -Name "DefaultPassword"
+    Get-Scheduledtask -TaskName "$taskName3" | Disable-ScheduledTask 
+}
+else
+{
+    `$lPass = "$LocalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
+    `$aadPass = "$AzureADGlobalAdminPass" | ConvertTo-SecureString -AsPlainText -Force
+    `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
+    $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
+}
+pause
 "@
 #$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 

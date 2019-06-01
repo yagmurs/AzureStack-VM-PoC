@@ -350,7 +350,7 @@ if ($AutoInstallASDK)
     Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
 
     
-$AutoInstallASDKsb = @"
+    $AutoInstallASDKsb = @"
 if ((Test-Path -Path "D:\Azure Stack Development Kit\cloudbuilder.vhdx") -and (Test-Path -Path "c:\CloudDeployment"))
 {
     #Disable Autologon and scheduled task

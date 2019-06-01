@@ -339,16 +339,17 @@ if ($AutoInstallASDK)
     
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
-    $trigger = New-JobTrigger -AtLogOn -User "$($env:ComputerName)\Administrator"
-    $options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:03:00 -RunElevated
+    #$trigger = New-JobTrigger -AtLogOn -User "$($env:ComputerName)\Administrator"
+    #$options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:03:00 -RunElevated
 
     #Enable Autologon
     $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
     Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoAdminLogon" -Value "1" -type String 
     Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:ComputerName)\Administrator" -type String  
     Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$LocalAdminPass" -type String
-    Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "10" -type DWord
+    Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
 
+    
 $AutoInstallASDKsb = @"
 
     if ((Test-Path -Path "D:\Azure Stack Development Kit\cloudbuilder.vhdx") -and (Test-Path -Path "c:\CloudDeployment"))
@@ -367,16 +368,31 @@ $AutoInstallASDKsb = @"
     }
 
 "@
-$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
+#$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 
-    if (Get-ScheduledJob -name $taskName3 -ErrorAction SilentlyContinue)
+    if (Get-ScheduledTask -name $taskName3 -ErrorAction SilentlyContinue)
     {
-        Get-ScheduledJob -name $taskName3 | Unregister-ScheduledJob -Force
+        Get-Scheduledtask -name $taskName3 | Unregister-ScheduledTask -Force
     }
 
-    $SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
-    $localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
-    $st = Register-ScheduledJob -Trigger $trigger -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
+    #$SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
+    #$localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
+    #$st = Register-ScheduledJob -Trigger $trigger -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
 }
+
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKsb
+
+$registrationParams = @{
+    TaskName = $taskName3
+    TaskPath = '\AzureStackonAzureVM'
+    Action = $action
+    Settings = New-ScheduledTaskSettingsSet -Priority 4
+    Force = $true
+}
+    $registrationParams.Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $registrationParams.User = "$($env:ComputerName)\Administrator"
+    $registrationParams.RunLevel = 'Highest'
+
+Register-ScheduledTask @registrationParams
 
 Restart-Computer -Force

@@ -107,26 +107,31 @@ New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion
 
 if ($ASDKImage) {
     Rename-LocalUser -Name Administrator -NewName $username
-    $WshShell = New-Object -comObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
-    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-    $Shortcut.WorkingDirectory = "$defaultLocalPath"
-    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType AAD -SkipWorkaround}"
-    $Shortcut.Save()
+    if (!($AutoInstallASDK))
+    {
+        $WshShell = New-Object -comObject WScript.Shell
+        $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
+        $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        $Shortcut.WorkingDirectory = "$defaultLocalPath"
+        $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType AAD -SkipWorkaround}"
+        $Shortcut.Save()
 
-    $WshShell = New-Object -comObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
-    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-    $Shortcut.WorkingDirectory = "$defaultLocalPath"
-    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType ADFS -SkipWorkaround}"
-    $Shortcut.Save()
+        $WshShell = New-Object -comObject WScript.Shell
+        $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
+        $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        $Shortcut.WorkingDirectory = "$defaultLocalPath"
+        $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType ADFS -SkipWorkaround}"
+        $Shortcut.Save()
 
-    $WshShell = New-Object -comObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
-    $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-    $Shortcut.WorkingDirectory = "$defaultLocalPath"
-    $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -SkipWorkaround}"
-    $Shortcut.Save()
+        $WshShell = New-Object -comObject WScript.Shell
+        $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
+        $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        $Shortcut.WorkingDirectory = "$defaultLocalPath"
+        $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -SkipWorkaround}"
+        $Shortcut.Save()
+    }
+
+    $downloadASDK = $null
 
     Rename-LocalUser -Name $username -NewName Administrator
 
@@ -215,55 +220,9 @@ if ($AzureImage) {
             Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
             Dismount-DiskImage -ImagePath $vhdxFullPath       
         } 
-        
-        Write-Log @writeLogParams -Message "Creating shortcut AAD_Install-ASDK.lnk"
-        $WshShell = New-Object -comObject WScript.Shell
-        $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
-        $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-        $Shortcut.WorkingDirectory = "$defaultLocalPath"
-        $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType AAD}"
-        $Shortcut.Save()
-
-        Write-Log @writeLogParams -Message "Creating shortcut ADFS_Install-ASDK.lnk"
-        $WshShell = New-Object -comObject WScript.Shell
-        $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
-        $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-        $Shortcut.WorkingDirectory = "$defaultLocalPath"
-        $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType ADFS}"
-        $Shortcut.Save()
-    }
-    else {
-        #Creating desktop shortcut for Install-ASDK.ps1
-        if ($EnableDownloadASDK) {
-            $WshShell = New-Object -comObject WScript.Shell
-            $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
-            $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-            $Shortcut.WorkingDirectory = "$defaultLocalPath"
-            $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -DeploymentType AAD}"
-            $Shortcut.Save()
-
-            $WshShell = New-Object -comObject WScript.Shell
-            $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
-            $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-            $Shortcut.WorkingDirectory = "$defaultLocalPath"
-            $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -DeploymentType ADFS}"
-            $Shortcut.Save()
-
-            $WshShell = New-Object -comObject WScript.Shell
-            $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
-            $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-            $Shortcut.WorkingDirectory = "$defaultLocalPath"
-            $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK}"
-            $Shortcut.Save()
-
-            $WshShell = New-Object -comObject WScript.Shell
-            $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Latest_Install-ASDK.lnk")
-            $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-            $Shortcut.WorkingDirectory = "$defaultLocalPath"
-            $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -Version $latestASDK}"
-            $Shortcut.Save()
-        }
-        else {
+        if (!($AutoInstallASDK))
+        {
+            Write-Log @writeLogParams -Message "Creating shortcut AAD_Install-ASDK.lnk"
             $WshShell = New-Object -comObject WScript.Shell
             $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
             $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
@@ -271,20 +230,73 @@ if ($AzureImage) {
             $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType AAD}"
             $Shortcut.Save()
 
+            Write-Log @writeLogParams -Message "Creating shortcut ADFS_Install-ASDK.lnk"
             $WshShell = New-Object -comObject WScript.Shell
             $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
             $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
             $Shortcut.WorkingDirectory = "$defaultLocalPath"
             $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType ADFS}"
             $Shortcut.Save()
-
-            $WshShell = New-Object -comObject WScript.Shell
-            $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
-            $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-            $Shortcut.WorkingDirectory = "$defaultLocalPath"
-            $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1"
-            $Shortcut.Save()
         }
+        $downloadASDK = $null
+    }
+    else {
+        if (!($AutoInstallASDK))
+        {
+            #Creating desktop shortcut for Install-ASDK.ps1
+            if ($EnableDownloadASDK) {
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -DeploymentType AAD}"
+                $Shortcut.Save()
+
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -DeploymentType ADFS}"
+                $Shortcut.Save()
+
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK}"
+                $Shortcut.Save()
+
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Latest_Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DownloadASDK -Version $latestASDK}"
+                $Shortcut.Save()
+            }
+            else {
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\AAD_Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType AAD}"
+                $Shortcut.Save()
+
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\ADFS_Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1 -DeploymentType ADFS}"
+                $Shortcut.Save()
+
+                $WshShell = New-Object -comObject WScript.Shell
+                $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Desktop\Install-ASDK.lnk")
+                $Shortcut.TargetPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                $Shortcut.WorkingDirectory = "$defaultLocalPath"
+                $Shortcut.Arguments = "-Noexit -command & {.\Install-ASDK.ps1}"
+                $Shortcut.Save()
+            }
+        }
+        $downloadASDK = "-DownloadASDK"
     }
 
     # Enable differencing roles from ASDKImage except .NET framework 3.5
@@ -322,6 +334,7 @@ $size = Get-Volume -DriveLetter c | Get-PartitionSupportedSize
 Resize-Partition -DriveLetter c -Size $size.sizemax
 
 Rename-LocalUser -Name $username -NewName Administrator
+
 if ($AutoInstallASDK)
 {
     Import-Module $defaultLocalPath\ASDKHelperModule.psm1
@@ -339,8 +352,6 @@ if ($AutoInstallASDK)
     
     $taskName3 = "Auto ASDK Installer Service"
     Write-Log @writeLogParams -Message "Registering $taskname3"
-    #$trigger = New-JobTrigger -AtLogOn -User "$($env:ComputerName)\Administrator"
-    #$options = New-ScheduledJobOption -RequireNetwork -StartIfIdle -IdleDuration 00:03:00 -RunElevated
 
     #Enable Autologon
     $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
@@ -349,35 +360,26 @@ if ($AutoInstallASDK)
     Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$LocalAdminPass" -type String
     Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
     
-    $AutoInstallASDKsb = @" 
+    $AutoInstallASDKScriptBlock = @" 
 if ((Test-Path -Path 'D:\Azure Stack Development Kit\cloudbuilder.vhdx') -and (Test-Path -Path 'c:\CloudDeployment'))
 {
-    #Disable Autologon and scheduled task
-    #Set-ItemProperty "$AutoLogonRegPath" "AutoAdminLogon" -Value "0" -type String
-    #Remove-ItemProperty "$AutoLogonRegPath" -Name "DefaultPassword"
-    Get-ScheduledTask -TaskName "$taskName3" | Disable-ScheduledTask 
+    Get-ScheduledTask -TaskName "$taskName3" | Disable-ScheduledTask
 }
 else
 {
     `$lPass = `'$LocalAdminPass`' | ConvertTo-SecureString -AsPlainText -Force
     `$aadPass = `'$AzureADGlobalAdminPass`' | ConvertTo-SecureString -AsPlainText -Force
     `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential (`'$AzureADGlobalAdmin`', `$aadPass)
-    $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version "$version"
+    $defaultLocalPath\Install-ASDK.ps1 $downloadASDK -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version "$version"
 }
 "@
 
-#$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
-
     if (Get-ScheduledTask -name $taskName3 -ErrorAction SilentlyContinue)
     {
-        Get-Scheduledtask -name $taskName3 | Unregister-ScheduledTask -Force
+        Get-ScheduledTask -name $taskName3 | Unregister-ScheduledTask -Force
     }
 
-    #$SecureAdminPassword = $LocalAdminPass | ConvertTo-SecureString -AsPlainText -Force
-    #$localAdminCred = New-Object System.Management.Automation.PSCredential ($LocalAdminUsername, $SecureAdminPassword)
-    #$st = Register-ScheduledJob -Trigger $trigger -ScheduledJobOption $options -ScriptBlock $AutoInstallASDKScriptBlock -Name $taskName3 -Credential $localAdminCred
-    
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKsb
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKScriptBlock
 
     $registrationParams = @{
         TaskName = $taskName3
@@ -386,9 +388,9 @@ else
         Settings = New-ScheduledTaskSettingsSet -Priority 4
         Force = $true
     }
-        $registrationParams.Trigger = New-ScheduledTaskTrigger -AtLogOn
-        $registrationParams.User = "$($env:ComputerName)\Administrator"
-        $registrationParams.RunLevel = 'Highest'
+    $registrationParams.Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $registrationParams.User = "$($env:ComputerName)\Administrator"
+    $registrationParams.RunLevel = 'Highest'
 
     Register-ScheduledTask @registrationParams
 }

@@ -365,7 +365,9 @@ else
     `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential ("$AzureADGlobalAdmin", `$aadPass)
     $defaultLocalPath\Install-ASDK.ps1 -DownloadASDK -DeploymentType $deploymentType -LocalAdminPass `$lPass -AADTenant $AzureADTenant -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version $version
 }
+
 pause
+
 "@
 #$AutoInstallASDKScriptBlock = [scriptblock]::Create($AutoInstallASDKsb)
 

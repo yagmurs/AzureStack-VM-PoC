@@ -131,8 +131,6 @@ if ($ASDKImage) {
         $Shortcut.Save()
     }
 
-    $downloadASDK = $null
-
     Rename-LocalUser -Name $username -NewName Administrator
 
     Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
@@ -370,9 +368,29 @@ else
     `$lPass = `'$LocalAdminPass`' | ConvertTo-SecureString -AsPlainText -Force
     `$aadPass = `'$AzureADGlobalAdminPass`' | ConvertTo-SecureString -AsPlainText -Force
     `$InfraAzureDirectoryTenantAdminCredential = New-Object System.Management.Automation.PSCredential (`'$AzureADGlobalAdmin`', `$aadPass)
-    $defaultLocalPath\Install-ASDK.ps1 $downloadASDK -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version "$version"
-}
+
 "@
+if ($ASDKImage)
+{
+    $AutoInstallASDKScriptBlock += @" 
+    
+    $defaultLocalPath\Install-ASDK.ps1 -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential
+
+"@
+}
+
+if ($AzureImage)
+{
+    $AutoInstallASDKScriptBlock += @" 
+    
+    $defaultLocalPath\Install-ASDK.ps1 $downloadASDK -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -Version "$version"
+
+"@
+}
+
+$AutoInstallASDKScriptBlock += @" 
+}
+"@  
 
     if (Get-ScheduledTask -name $taskName3 -ErrorAction SilentlyContinue)
     {

@@ -336,16 +336,21 @@ function Copy-ASDKContent
     $foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
 
         try {
-            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
+            Write-Verbose "Mounting the following file $vhdxFullPath"
+            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter -Verbose
         }
         catch {
             throw "an error occured while mounting cloudbuilder.vhdx file"
         }
-
+        
+        Write-Verbose "Source Drive is now mounted as $driveLetter"
+        Write-Verbose "List of folder to be copied are $foldersToCopy"
         foreach ($folder in $foldersToCopy)
         {
-            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
+            Write-Verbose "Copying source folder $folder to C:\"
+            $path = Join-Path -Path ("$driveLetter" + ':') -ChildPath $folder
+            Write-Verbose $path
+            Copy-Item -Path $path -Destination C:\ -Recurse -Force -PassThru | Write-Verbose
         }
-        Dismount-DiskImage -ImagePath $vhdxFullPath
-        
+        Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose    
 }

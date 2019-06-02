@@ -341,6 +341,7 @@ function Copy-ASDKContent
             Write-Verbose "Mounting the following file $vhdxFullPath"
             $driveLetter = (Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Access ReadWrite -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Get-Volume).DriveLetter
             Write-Verbose "Source Drive is now mounted as $driveLetter"
+            Write-Verbose "Mounting the drive as psDrive as a workaround"
             $psDrive = New-PSDrive -Name $driveLetter -PSProvider FileSystem -Root "$($driveLetter):\"
         }
         catch {
@@ -354,6 +355,8 @@ function Copy-ASDKContent
             Write-Verbose "Copy source path is now $path\"
             Copy-Item -Path $path -Destination C:\ -Recurse -Force -PassThru | Write-Verbose
         }
+        Write-Verbose "Removing psDrive $psDrive"
         $psDrive | Remove-PSDrive
+        Write-Verbose "Dismounting the drive $driveLetter"
         Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose
 }

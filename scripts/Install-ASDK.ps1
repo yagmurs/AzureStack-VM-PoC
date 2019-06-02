@@ -33,9 +33,6 @@ param (
 $VerbosePreference = "Continue"
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
 $transcriptLog = "Install-ASDK-transcript.txt"
-#$gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
-#$gitbranchcode = $gitbranchconfig.branch.Trim()
-#$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 
 Start-Transcript -Path $(Join-Path -Path $defaultLocalPath -ChildPath $transcriptLog) -Append
 
@@ -159,8 +156,6 @@ workaround1
 
 if ($SkipWorkaround -eq $false)
 {   
-    #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
-    #workaround2
     $outFile = "C:\tools\nuget.exe"
     Rename-Item -Path $outFile -NewName "nuget_old.exe" -Verbose
     Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $outFile -Verbose
@@ -404,7 +399,6 @@ if ($DeploymentType -eq "AAD")
         TimeServer = $timeServer
         DNSForwarder = "8.8.8.8"
     }
-    #if ($version -lt 1812)
     if ($pocParameters.Count -gt 0)
     {
         $global:InstallAzSPOCParams.Add("NATIPv4Subnet","192.168.137.0/28")
@@ -425,7 +419,6 @@ if ($DeploymentType -eq "ADFS")
         DNSForwarder = "8.8.8.8"
         UseADFS = $true
     }
-    #if ($version -lt 1812)
     if ($pocParameters.Count -gt 0)
     {
         $global:InstallAzSPOCParams.Add("NATIPv4Subnet","192.168.137.0/28")

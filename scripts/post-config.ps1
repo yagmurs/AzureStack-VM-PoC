@@ -133,14 +133,14 @@ if ($ASDKImage) {
 
     Rename-LocalUser -Name $username -NewName Administrator
 
-    Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
-    Set-Location C:\CloudDeployment\Setup
-    .\BootstrapAzureStackDeployment.ps1
+    #Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
+    #Set-Location C:\CloudDeployment\Setup
+    #.\BootstrapAzureStackDeployment.ps1
 
-    Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
+    #Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 
-    Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
-    workaround1
+    #Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
+    #workaround1
 
     #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     #workaround2

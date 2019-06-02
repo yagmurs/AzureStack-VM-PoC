@@ -135,24 +135,7 @@ else
         Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
         Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
     
-        try {
-            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter
-            Write-Log @writeLogParams -Message "The drive is now mounted as $driveLetter`:"
-        }
-        catch {
-            Write-Log @writeLogParams -Message "an error occured while mounting cloudbuilder.vhdx file"
-            Write-Log @writeLogParams -Message $error[0].Exception
-            throw "an error occured while mounting cloudbuilder.vhdx file"
-        }
-
-        foreach ($folder in $foldersToCopy)
-        {
-            Write-Log @writeLogParams -Message "Copying folder $folder to C:\"
-            Copy-Item -Path (Join-Path -Path $($driveLetter + ':') -ChildPath $folder) -Destination C:\ -Recurse -Force
-            Write-Log @writeLogParams -Message "$folder done..."
-        }
-        Write-Log @writeLogParams -Message "Dismounting cloudbuilder.vhdx"
-        Dismount-DiskImage -ImagePath $vhdxFullPath
+        Copy-ASDKContent -vhdxFullPath $vhdxFullPath
         
         if (Test-Path "C:\CloudDeployment\Configuration\Version\Version.xml")
         {
@@ -166,19 +149,19 @@ else
     }        
 }
 
+Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
+Set-Location C:\CloudDeployment\Setup
+.\BootstrapAzureStackDeployment.ps1
+
+Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
+
+Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
+workaround1
+
 if ($SkipWorkaround -eq $false)
-{    
-    Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
-    Set-Location C:\CloudDeployment\Setup
-    .\BootstrapAzureStackDeployment.ps1
-
-    Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
-
-    Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
-    workaround1
-
-    Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
-    workaround2
+{   
+    #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
+    #workaround2
 }
 $pocParameters = Get-Help C:\CloudDeployment\Setup\InstallAzureStackPOC.ps1 -Parameter Nat* -ErrorAction SilentlyContinue
 

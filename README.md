@@ -89,5 +89,6 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - post-config.ps1 and Install-ASDK.ps1 scripts updated accordingly to support Automated ASDK setup.
 - old code cleanup and enhancements
 - branch selection in the ARM template
+- c:\tools\nuget.exe updated with latest version to be able to handle the issue regards to long path. (AzureImage)
 
 Feel free to post questions and enjoy!

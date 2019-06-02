@@ -82,8 +82,12 @@ or **Deploy to Azure** (**deploy.azure.com**)
 **updates on 09.02.2019**
 - Tested with ASDK 1.1901.0.95
 
-**updates on 02.05.2019**
+**updates on 03.06.2019**
 - Tested with ASDK 1.1904.0.36
 - Added option for installing RDSH on ASDK host as ARM template parameter. Thanks Matt McSpirit for the contribution.
+- ARM template updated with few parameters to be able to run Automated ASDK setup from ARM template.
+- post-config.ps1 and Install-ASDK.ps1 scripts updated accordingly to support Automated ASDK setup.
+- old code cleanup and enhancements
+- branch selection in the ARM template
 
 Feel free to post questions and enjoy!

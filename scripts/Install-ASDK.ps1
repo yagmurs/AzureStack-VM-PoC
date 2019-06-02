@@ -161,6 +161,10 @@ if ($SkipWorkaround -eq $false)
 {   
     #Write-Log @writeLogParams -Message "Applying second workaround since this version is 1802 or higher"
     #workaround2
+    $outFile = "C:\tools\nuget.exe"
+    Rename-Item -Path $outFile -NewName "nuget_old.exe"
+    Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $outFile
+    Unblock-File -Path $outFile -Confirm:$false
 }
 $pocParameters = Get-Help C:\CloudDeployment\Setup\InstallAzureStackPOC.ps1 -Parameter Nat* -ErrorAction SilentlyContinue
 

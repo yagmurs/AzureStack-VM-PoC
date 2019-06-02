@@ -92,7 +92,6 @@ $asdkDownloadPath = "d:\"
 $asdkExtractFolder = "Azure Stack Development Kit"
 $d = Join-Path -Path $asdkDownloadPath -ChildPath $asdkExtractFolder
 $vhdxFullPath = Join-Path -Path $d -ChildPath "cloudbuilder.vhdx"
-$foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
 
 if (Test-Path "C:\CloudDeployment\Configuration\Version\Version.xml")
 {
@@ -135,7 +134,7 @@ else
         Write-Log @writeLogParams -Message "About to Start Copying ASDK files to C:\"
         Write-Log @writeLogParams -Message "Mounting cloudbuilder.vhdx"
     
-        Copy-ASDKContent -vhdxFullPath $vhdxFullPath
+        Copy-ASDKContent -vhdxFullPath $vhdxFullPath -Verbose
         
         if (Test-Path "C:\CloudDeployment\Configuration\Version\Version.xml")
         {

@@ -330,27 +330,30 @@ function Start-SleepWithProgress($seconds)
 
 function Copy-ASDKContent 
 {
+[CmdletBinding()]    
     param (
         $vhdxFullPath
     )
+    
     $foldersToCopy = @('CloudDeployment', 'fwupdate', 'tools')
 
         try {
             Write-Verbose "Mounting the following file $vhdxFullPath"
-            $driveLetter = Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Select-Object -ExpandProperty driveletter -Verbose
+            $driveLetter = (Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Access ReadWrite -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Get-Volume).DriveLetter
+            Write-Verbose "Source Drive is now mounted as $driveLetter"
+            $psDrive = New-PSDrive -Name $driveLetter -PSProvider FileSystem -Root "$($driveLetter):\"
         }
         catch {
             throw "an error occured while mounting cloudbuilder.vhdx file"
         }
-        
-        Write-Verbose "Source Drive is now mounted as $driveLetter"
         Write-Verbose "List of folder to be copied are $foldersToCopy"
         foreach ($folder in $foldersToCopy)
         {
             Write-Verbose "Copying source folder $folder to C:\"
-            $path = Join-Path -Path ("$driveLetter" + ':') -ChildPath $folder
-            Write-Verbose $path
+            $path = "$driveLetter" + ":\" + "$folder"
+            Write-Verbose "Copy source path is now $path\"
             Copy-Item -Path $path -Destination C:\ -Recurse -Force -PassThru | Write-Verbose
         }
-        Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose    
+        $psDrive | Remove-PSDrive
+        Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose
 }

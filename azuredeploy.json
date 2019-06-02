@@ -147,6 +147,45 @@
                 "name": false
             }
         },
+        "autoInstallASDK": {
+            "defaultValue": false,
+            "allowedValues": [
+                true,
+                false
+            ],
+            "type": "bool",
+            "metadata": {
+                "name": false
+            }
+        },
+        "AzureADTenant": {
+            "defaultValue": "<Azure AD Tenant>.onmicrosoft.com",
+            "type": "string",
+            "metadata": {
+                "name": "<Azure AD Tenant>.onmicrosoft.com"
+            }
+        },
+        "AzureADGlobalAdmin": {
+            "defaultValue": "Alias@<Azure AD Tenant>.onmicrosoft.com",
+            "type": "string",
+            "metadata": {
+                "name": "Alias@<Azure AD Tenant>.onmicrosoft.com"
+            }
+        },
+        "AzureADGlobalAdminPassword": {
+            "type": "securestring",
+            "defaultValue": "1234",
+            "metadata": {
+                "name": "1234"
+            }
+        },
+        "ASDKConfigurator":{
+            "type": "string",
+            "defaultValue": "none",
+            "metadata": {
+                "name": "none"
+            }
+        },
         "enableRDSH": {
             "type": "bool",
             "defaultValue": false,
@@ -187,7 +226,8 @@
         "osDiskSizeinGB": 256,
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-NSG')]",
-        "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]"
+        "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]",
+        "autoInstallASDKparameters": "[if(bool(parameters('autoInstallASDK')), concat(' -AutoInstallASDK ',' -AzureADTenant ', parameters('AzureADTenant'), ' -AzureADGlobalAdmin ', parameters('AzureADGlobalAdmin'), ' -AzureADGlobalAdminPass ', parameters('AzureADGlobalAdminPassword'), ' -LocalAdminPass ', parameters('adminPassword')), '')]"
     },
     "resources": [
         {
@@ -268,7 +308,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK', ' ', '-AzureImage', ' ', '-AutoDownloadASDK', ' ', parameters('autoDownloadASDK'), ' ', '-EnableRDSH', ' ', parameters('enableRDSH'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -EnableDownloadASDK ', ' -AzureImage ', ' -AutoDownloadASDK ', parameters('autoDownloadASDK'), ' -EnableRDSH ', parameters('enableRDSH'), variables('autoInstallASDKparameters'))]"
                         }
                     }
                 },

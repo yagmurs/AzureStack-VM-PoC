@@ -37,7 +37,7 @@ Param (
     $LocalAdminPass,
 
     [string]
-    $branch
+    $branch = "master"
 )
 
 function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Retries = 5, [int]$RetryInterval = 10) {

@@ -34,7 +34,10 @@ Param (
     $AzureADGlobalAdminPass,
 
     [string]
-    $LocalAdminPass
+    $LocalAdminPass,
+
+    [string]
+    $branch
 )
 
 function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Retries = 5, [int]$RetryInterval = 10) {
@@ -69,12 +72,12 @@ $writeLogParams = @{
     LogFilePath = $logFileFullPath
 }
 
-DownloadWithRetry -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/config.ind" -DownloadLocation "$defaultLocalPath\config.ind"
-$gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
-$gitbranchcode = $gitbranchconfig.branch.Trim()
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+#DownloadWithRetry -Uri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/config.ind" -DownloadLocation "$defaultLocalPath\config.ind"
+#$gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
+#$gitbranchcode = $gitbranchconfig.branch.Trim()
+$branchFullPath = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$branch"
 
-DownloadWithRetry -Uri "$gitbranch/scripts/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
+DownloadWithRetry -Uri "$branchFullPath/scripts/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
 
 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1") {
     Import-Module "$defaultLocalPath\ASDKHelperModule.psm1"
@@ -84,7 +87,7 @@ else {
 }
 
 #Download Install-ASDK.ps1 (installer)
-DownloadWithRetry -Uri "$gitbranch/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
+DownloadWithRetry -Uri "$branchFullPath/scripts/Install-ASDK.ps1" -DownloadLocation "$defaultLocalPath\Install-ASDK.ps1"
 
 #Download and extract Mobaxterm
 DownloadWithRetry -Uri "https://aka.ms/mobaxtermLatest" -DownloadLocation "$defaultLocalPath\Mobaxterm.zip"
@@ -303,7 +306,7 @@ if ($AzureImage) {
 }
 
 #Download OneNodeRole.xml
-DownloadWithRetry -Uri "$gitbranch/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
+DownloadWithRetry -Uri "$branchFullPath/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
 [xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
 $WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
 $dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName

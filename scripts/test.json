@@ -308,7 +308,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' ', '-Username', ' ', variables('adminUsername'), ' ', '-EnableDownloadASDK', ' ', '-AzureImage', ' ', '-AutoDownloadASDK', ' ', parameters('autoDownloadASDK'), ' ', '-EnableRDSH', ' ', parameters('enableRDSH'), ' ', variables('autoInstallASDKparameters'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -EnableDownloadASDK ', ' -AzureImage ', ' -AutoDownloadASDK ', parameters('autoDownloadASDK'), ' -EnableRDSH ', parameters('enableRDSH'), variables('autoInstallASDKparameters'))]"
                         }
                     }
                 },

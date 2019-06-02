@@ -33,9 +33,9 @@ param (
 $VerbosePreference = "Continue"
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
 $transcriptLog = "Install-ASDK-transcript.txt"
-$gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
-$gitbranchcode = $gitbranchconfig.branch.Trim()
-$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
+#$gitbranchconfig = Import-Csv -Path $defaultLocalPath\config.ind -Delimiter ","
+#$gitbranchcode = $gitbranchconfig.branch.Trim()
+#$gitbranch = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$gitbranchcode"
 
 Start-Transcript -Path $(Join-Path -Path $defaultLocalPath -ChildPath $transcriptLog) -Append
 

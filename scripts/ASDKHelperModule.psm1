@@ -339,7 +339,7 @@ function Copy-ASDKContent
 
         try {
             Write-Verbose "Mounting the following file $vhdxFullPath"
-            $driveLetter = (Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Access ReadWrite -Passthru | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Get-Volume).DriveLetter
+            $driveLetter = (Mount-DiskImage -ImagePath $vhdxFullPath -StorageType VHDX -Access ReadWrite -Passthru -ErrorAction Stop | Get-DiskImage | Get-Disk | Get-Partition | Where-Object size -gt 500MB | Get-Volume).DriveLetter
             Write-Verbose "Source Drive is now mounted as $driveLetter"
             Write-Verbose "Mounting the drive as psDrive as a workaround"
             $psDrive = New-PSDrive -Name $driveLetter -PSProvider FileSystem -Root "$($driveLetter):\"

@@ -233,7 +233,7 @@
         {
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2016-04-30-preview",
+            "apiVersion": "2018-10-01",
             "location": "[parameters('sitelocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
@@ -294,7 +294,7 @@
                 {
                     "type": "extensions",
                     "name": "CustomScriptExtension",
-                    "apiVersion": "2016-04-30-preview",
+                    "apiVersion": "2018-10-01",
                     "location": "[parameters('sitelocation')]",
                     "dependsOn": [
                         "[parameters('virtualMachineName')]"
@@ -315,7 +315,7 @@
                 {
                     "type": "Microsoft.DevTestLab/schedules",
                     "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
-                    "apiVersion": "2017-04-26-preview",
+                    "apiVersion": "2019-02-01",
                     "location": "[parameters('sitelocation')]",
                     "tags": {},
                     "properties": {
@@ -341,7 +341,7 @@
         {
             "name": "[parameters('virtualNetworkName')]",
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2016-12-01",
+            "apiVersion": "2018-10-01",
             "location": "[parameters('sitelocation')]",
             "properties": {
                 "addressSpace": {
@@ -362,7 +362,7 @@
         {
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2016-09-01",
+            "apiVersion": "2018-10-01",
             "location": "[parameters('sitelocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
@@ -392,7 +392,7 @@
         {
             "name": "[variables('publicIpAddressName')]",
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-06-01",
+            "apiVersion": "2019-02-01",
             "location": "[parameters('sitelocation')]",
             "properties": {
                 "publicIPAllocationMethod": "[parameters('publicIpAddressType')]",
@@ -406,7 +406,7 @@
         {
             "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2016-09-01",
+            "apiVersion": "2019-02-01",
             "location": "[parameters('sitelocation')]",
             "properties": {
                 "securityRules": [

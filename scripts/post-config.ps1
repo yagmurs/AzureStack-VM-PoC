@@ -341,7 +341,7 @@ if ($ASDKImage)
 {
     $AutoInstallASDKScriptBlock += @" 
     
-    $defaultLocalPath\Install-ASDK.ps1 -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential
+    $defaultLocalPath\Install-ASDK.ps1 -DeploymentType "$deploymentType" -LocalAdminPass `$lPass -AADTenant "$AzureADTenant" -InfraAzureDirectoryTenantAdminCredential `$InfraAzureDirectoryTenantAdminCredential -SkipWorkaround
 
 "@
 }

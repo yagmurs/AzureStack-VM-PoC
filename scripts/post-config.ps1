@@ -113,11 +113,12 @@ if ($ASDKConfiguratorObject)
 {
     $AsdkConfigurator = $ASDKConfiguratorObject | ConvertFrom-Json -Verbose
     $ASDKConfiguratorParams = ConvertTo-HashtableFromPsCustomObject $AsdkConfigurator.ASDKConfiguratorParams
-    if ($AsdkConfigurator.Autorun)
-    {
-        #create configasdk folder
-        New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
 
+    #create configasdk folder
+    New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
+
+    if ($AsdkConfigurator.Autorun)
+        {
         #create download folder
         New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath -Force -Verbose
 

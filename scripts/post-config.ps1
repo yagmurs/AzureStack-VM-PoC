@@ -156,7 +156,7 @@ $script = @"
         }
 
         $script += "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $($ASDKConfiguratorParams)"
-        $script | Out-File -FilePath $AsdkConfigurator.path\ConfigASDK.ps1
+        $script | Out-File -FilePath $AsdkConfigurator.path\Run-ConfigASDK.ps1
     } 
 }
 if ($ASDKImage) {

@@ -316,7 +316,7 @@
                 {
                     "type": "Microsoft.DevTestLab/schedules",
                     "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
-                    "apiVersion": "2017-04-26-preview",
+                    "apiVersion": "2018-09-15",
                     "location": "[parameters('sitelocation')]",
                     "tags": {},
                     "properties": {

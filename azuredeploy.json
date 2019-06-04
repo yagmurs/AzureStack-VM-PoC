@@ -166,10 +166,10 @@
             }
         },
         "AzureADGlobalAdmin": {
-            "defaultValue": "Alias@<Azure AD Tenant>.onmicrosoft.com",
+            "defaultValue": "<alias>@<Azure AD Tenant>.onmicrosoft.com",
             "type": "string",
             "metadata": {
-                "name": "Alias@<Azure AD Tenant>.onmicrosoft.com"
+                "name": "<alias>@<Azure AD Tenant>.onmicrosoft.com"
             }
         },
         "AzureADGlobalAdminPassword": {
@@ -179,11 +179,24 @@
                 "name": "1234"
             }
         },
-        "ASDKConfigurator":{
-            "type": "string",
-            "defaultValue": "none",
-            "metadata": {
-                "name": "none"
+        "ASDKConfiguratorObject": {
+            "type": "secureObject",
+            "defaultValue": {
+                "command": "configASDK.ps1",
+                "path": "c:\\ConfigASDK",
+                "AutoRun": "false",
+                "ASDKConfiguratorParams": {
+                    "azureDirectoryTenantName": "<Azure AD Tenant>.onmicrosoft.com",
+                    "authenticationType": "AzureAD",
+                    "downloadPath": "D:\\ASDKfiles",
+                    "ISOPath": "D:\\WS2016EVALISO.iso",
+                    "azureStackAdminPwd": "<password>",
+                    "VMpwd": "<password>",
+                    "AzureADUsername": "<alias>@<Azure AD Tenant>.onmicrosoft.com",
+                    "azureAdPwd": "<password>",
+                    "registerASDK": "true",
+                    "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                }
             }
         },
         "enableRDSH": {
@@ -309,7 +322,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -EnableDownloadASDK ', ' -AzureImage ', ' -AutoDownloadASDK ', parameters('autoDownloadASDK'), ' -EnableRDSH ', parameters('enableRDSH'), variables('autoInstallASDKparameters'))]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -EnableDownloadASDK ', ' -AzureImage ', ' -AutoDownloadASDK ', parameters('autoDownloadASDK'), ' -EnableRDSH ', parameters('enableRDSH'), variables('autoInstallASDKparameters'), ' -ASDKConfiguratorObject ', parameters('ASDKConfiguratorObject'))]"
                         }
                     }
                 },

@@ -360,3 +360,24 @@ function Copy-ASDKContent
         Write-Verbose "Dismounting the drive $driveLetter"
         Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose
 }
+
+function ConvertTo-HashtableFromPsCustomObject { 
+    param ( 
+        [Parameter(  
+            Position = 0,   
+            Mandatory = $true,   
+            ValueFromPipeline = $true,  
+            ValueFromPipelineByPropertyName = $true  
+        )] [object[]]$psCustomObject 
+    ); 
+    
+    process { 
+        foreach ($myPsObject in $psCustomObject) { 
+            $output = @{}; 
+            $myPsObject | Get-Member -MemberType *Property | % { 
+                $output.($_.name) = $myPsObject.($_.name); 
+            } 
+            $output; 
+        } 
+    } 
+}

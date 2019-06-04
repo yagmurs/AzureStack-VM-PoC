@@ -37,7 +37,10 @@ Param (
     $LocalAdminPass,
 
     [string]
-    $branch = "master"
+    $branch = "master",
+
+    [string]
+    $ASDKConfiguratorObject
 )
 
 function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Retries = 5, [int]$RetryInterval = 10) {
@@ -66,6 +69,8 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
 
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
 New-Item -Path $defaultLocalPath -ItemType Directory -Force
+$transcriptLog = "post-config-transcript.txt"
+Start-Transcript -Path $(Join-Path -Path $defaultLocalPath -ChildPath $transcriptLog) -Append
 
 $logFileFullPath = "$defaultLocalPath\postconfig.log"
 $writeLogParams = @{
@@ -104,7 +109,56 @@ New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Interne
 New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Force
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -PropertyType DWORD -Force
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -PropertyType DWORD -Force
+if ($ASDKConfiguratorObject)
+{
+    $AsdkConfigurator = $ASDKConfiguratorObject | ConvertFrom-Json -Verbose
+    $ASDKConfiguratorParams = ConvertTo-HashtableFromPsCustomObject $AsdkConfigurator.ASDKConfiguratorParams
+    if ($AsdkConfigurator.Autorun)
+    {
+        #create configasdk folder
+        New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
 
+        #create download folder
+        New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath -Force -Verbose
+
+        #download configurator
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile $AsdkConfigurator.path\ConfigASDK.ps1 -Verbose
+
+        #download iso files
+        if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
+        {
+            DownloadWithRetry -Uri "https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso" -DownloadLocation $ASDKConfiguratorParams.IsoPath
+        }
+        if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
+        {
+            $ProgressPreference = "SilentlyContinue"
+            DownloadWithRetry -Uri "http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO" -DownloadLocation $ASDKConfiguratorParams.IsoPath
+        }
+        #create asdkconfigurator command to be called
+        $commandToRun = "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $()"
+        # @ASDKConfiguratorParams
+    }
+    else {
+$script = @"
+            New-Item -ItemType Directory -Path $($AsdkConfigurator.path) -Force -Verbose
+            New-Item -ItemType Directory -Path $($ASDKConfiguratorParams.downloadPath) -Force -Verbose
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile $($AsdkConfigurator.path)\ConfigASDK.ps1 -Verbose
+"@
+        if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
+        {
+            $script += "DownloadWithRetry -Uri "https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso" -DownloadLocation $($ASDKConfiguratorParams.IsoPath)"
+        }
+        if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
+        {
+            $script += "DownloadWithRetry -Uri "http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO" -DownloadLocation $($ASDKConfiguratorParams.IsoPath)"
+        }
+
+        $script += "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $($ASDKConfiguratorParams)"
+        $script | Out-File -FilePath $AsdkConfigurator.path\ConfigASDK.ps1
+    } 
+}
 if ($ASDKImage) {
     if (!($AutoInstallASDK))
     {
@@ -379,5 +433,5 @@ $AutoInstallASDKScriptBlock += @"
 
     Register-ScheduledTask @registrationParams
 }
-
+Stop-Transcript
 Restart-Computer -Force

@@ -54,7 +54,7 @@ function findLatestASDK
     $versionArray = @()
     $versionArrayToTest = @()
     $version = @(Get-Date -Format "yyMM")
-    $suffix = @('-36', '-3','-2','-1','') #'-36',
+    $suffix = @('-40', '-36', '-1','')
     
     for ($i = 0; $i -lt $count; $i++)
     {       

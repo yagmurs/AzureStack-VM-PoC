@@ -123,11 +123,11 @@ if ($ASDKConfiguratorObject)
         $paramsArray = @()
         foreach ($param in $ASDKConfiguratorParams.keys)
         {
-            if ($($ASDKConfiguratorParams["$param"]) -eq 'true')
+            if ($ASDKConfiguratorParams["$param"] -eq 'true' -or $ASDKConfiguratorParams["$param"] -eq '' -or $null -eq $ASDKConfiguratorParams["$param"])
             {
                 $paramsArray += "-" + "$param" + ":`$true"
             }
-            elseif ($($ASDKConfiguratorParams["$param"]) -eq 'false')
+            elseif ($ASDKConfiguratorParams["$param"] -eq 'false')
             {
                 $paramsArray += "-" + "$param" + ":`$false"
             }
@@ -151,11 +151,11 @@ if ($ASDKConfiguratorObject)
             Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile (Join-Path -Path $AsdkConfigurator.path -ChildPath ConfigASDK.ps1) -Verbose
 
             #download iso files
-            if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
+            if ($ASDKConfiguratorParams.IsoPath2019)
             {
-                DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $ASDKConfiguratorParams.IsoPath
+                DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $ASDKConfiguratorParams.IsoPath2019
             }
-            if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
+            if ($ASDKConfiguratorParams.IsoPath)
             {
                 DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $ASDKConfiguratorParams.IsoPath
             }
@@ -173,15 +173,15 @@ Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile $($AsdkConf
 
 "@
 
-            if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
+            if ($ASDKConfiguratorParams.IsoPath2019)
             {
                 $script += @"
-DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $($ASDKConfiguratorParams.IsoPath)
+DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $($ASDKConfiguratorParams.IsoPath2019)
 
 "@
             }
 
-            if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
+            if ($ASDKConfiguratorParams.IsoPath)
             {
                 $script += @"
 DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $($ASDKConfiguratorParams.IsoPath)

@@ -149,7 +149,7 @@ if ($ASDKConfiguratorObject)
                 DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $ASDKConfiguratorParams.IsoPath
             }
 
-            $commandsToRun |  Out-File -FilePath (Join-Path -Path $AsdkConfigurator.path -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
+            $commandsToRun |  Out-File -FilePath (Join-Path -Path $defaultLocalPath -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
         }
 
         if ($AsdkConfigurator.Autorun -eq 'false') 

@@ -353,6 +353,12 @@ $taskstoCompleteUponSuccess = {
                 }
                 Get-ChildItem -Path "C:\Users\Public\Desktop" -Filter "*.lnk" | Remove-Item -Force
                 createDesktopShortcuts
+                #test ASDKConfigurator presence
+                $ASDKConfigScriptPath = (Join-Path -Path $defaultLocalPath -ChildPath Run-ConfigASDK.ps1)
+                if (Test-Path -Path $ASDKConfigScriptPath)
+                {
+                    Start-Process powershell.exe -ArgumentList "-file $ASDKConfigScriptPath"
+                }
                 Unregister-ScheduledJob -Name $taskName2 -Force
                 break
             }

@@ -123,7 +123,18 @@ if ($ASDKConfiguratorObject)
         $paramsArray = @()
         foreach ($param in $ASDKConfiguratorParams.keys)
         {
-            $paramsArray += "-" + "$param " + "`'" + "$($ASDKConfiguratorParams["$param"])" + "`'"
+            if ($($ASDKConfiguratorParams["$param"]) -eq 'true')
+            {
+                $paramsArray += "-" + "$param" + ":`$true"
+            }
+            elseif ($($ASDKConfiguratorParams["$param"]) -eq 'false')
+            {
+                $paramsArray += "-" + "$param" + ":`$false"
+            }
+            else 
+            {
+                $paramsArray += "-" + "$param " + "`'" + "$($ASDKConfiguratorParams["$param"])" + "`'"
+            }
         }
 
         $paramsString = $paramsArray -join " "

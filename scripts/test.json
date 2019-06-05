@@ -161,17 +161,17 @@
             }
         },
         "AzureADTenant": {
-            "defaultValue": "<Azure AD Tenant>.onmicrosoft.com",
+            "defaultValue": "<AzureADTenant>.onmicrosoft.com",
             "type": "string",
             "metadata": {
-                "name": "<Azure AD Tenant>.onmicrosoft.com"
+                "name": "<AzureADTenant>.onmicrosoft.com"
             }
         },
         "AzureADGlobalAdmin": {
-            "defaultValue": "<alias>@<Azure AD Tenant>.onmicrosoft.com",
+            "defaultValue": "<alias>@<AzureADTenant>.onmicrosoft.com",
             "type": "string",
             "metadata": {
-                "name": "<alias>@<Azure AD Tenant>.onmicrosoft.com"
+                "name": "<alias>@<AzureADTenant>.onmicrosoft.com"
             }
         },
         "AzureADGlobalAdminPassword": {
@@ -197,6 +197,7 @@
                     "AzureADUsername": "<alias>@<AzureADTenant>.onmicrosoft.com",
                     "azureAdPwd": "<password>",
                     "registerASDK": "true",
+                    "useAzureCredsForRegistration":"true",
                     "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 }
             }

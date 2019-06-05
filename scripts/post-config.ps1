@@ -80,6 +80,7 @@ $writeLogParams = @{
 $branchFullPath = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/$branch"
 
 DownloadWithRetry -Uri "$branchFullPath/scripts/ASDKHelperModule.psm1" -DownloadLocation "$defaultLocalPath\ASDKHelperModule.psm1"
+DownloadWithRetry -Uri "$branchFullPath/scripts/testedVersions" -DownloadLocation "$defaultLocalPath\testedVersions"
 
 if (Test-Path "$defaultLocalPath\ASDKHelperModule.psm1") {
     Import-Module "$defaultLocalPath\ASDKHelperModule.psm1" -ErrorAction Stop
@@ -250,9 +251,15 @@ if ($AzureImage) {
         $AsdkFileList = @("AzureStackDevelopmentKit.exe")
         1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
     }
-
-    $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
-
+    if (Test-Path -Path $defaultLocalPath\testedVersions)
+    {
+        $latestASDK = Get-Content $defaultLocalPath\testedVersions | Select-Object -First 1
+    }
+    else
+    {
+        $latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
+    }
+    
     if ($AutoDownloadASDK -eq "true") {
         #Download ASDK files (BINs and EXE)
         Write-Log @writeLogParams -Message "Finding available ASDK versions"
@@ -404,8 +411,6 @@ if ($AutoInstallASDK)
         1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
     }
     [ValidateSet("AAD", "ADFS")][string]$deploymentType = "AAD"
-
-    #$latestASDK = (findLatestASDK -asdkURIRoot "https://azurestack.azureedge.net/asdk" -asdkFileList $AsdkFileList)[0]
 
     $version = $latestASDK
     

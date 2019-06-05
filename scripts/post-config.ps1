@@ -109,66 +109,83 @@ New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Interne
 New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Force
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -PropertyType DWORD -Force
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -PropertyType DWORD -Force
+
 if ($ASDKConfiguratorObject)
 {
-    $AsdkConfigurator = $ASDKConfiguratorObject | ConvertFrom-Json -Verbose -ErrorAction Stop
-    $ASDKConfiguratorParams = ConvertTo-HashtableFromPsCustomObject $AsdkConfigurator.ASDKConfiguratorParams
-
-    #create configasdk folder
-    New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
-
-    if ($AsdkConfigurator.Autorun -eq 'true')
-        {
-        #create download folder
-        New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath -Force -Verbose
-
-        #download configurator
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile (Join-Path -Path $AsdkConfigurator.path -ChildPath ConfigASDK.ps1) -Verbose
-
-        #download iso files
-        if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
-        {
-            DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $ASDKConfiguratorParams.IsoPath
-        }
-        if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
-        {
-            $ProgressPreference = "SilentlyContinue"
-            DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $ASDKConfiguratorParams.IsoPath
-        }
-    }
-    if ($AsdkConfigurator.Autorun -eq 'false') 
+    $AsdkConfigurator = ConvertFrom-Json $ASDKConfiguratorObject | ConvertFrom-Json
+    if ($?)
     {
-        $script = @"
+        $ASDKConfiguratorParams = ConvertTo-HashtableFromPsCustomObject $AsdkConfigurator.ASDKConfiguratorParams
+
+        #create configasdk folder
+        New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
+
+        $paramsArray = @()
+        foreach ($param in $ASDKConfiguratorParams.keys)
+        {
+            $paramsArray += "-" + "$param " + "`'" + "$($ASDKConfiguratorParams["$param"])" + "`'"
+        }
+
+        $paramsString = $paramsArray -join " "
+
+        $commandsToRun = "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $paramsString"
+
+        if ($AsdkConfigurator.Autorun -eq 'true')
+            {
+            #create download folder
+            New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath -Force -Verbose
+
+            #download configurator
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile (Join-Path -Path $AsdkConfigurator.path -ChildPath ConfigASDK.ps1) -Verbose
+
+            #download iso files
+            if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
+            {
+                DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $ASDKConfiguratorParams.IsoPath
+            }
+            if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
+            {
+                #DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $ASDKConfiguratorParams.IsoPath
+            }
+
+            $commandsToRun |  Out-File -FilePath (Join-Path -Path $AsdkConfigurator.path -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
+        }
+
+        if ($AsdkConfigurator.Autorun -eq 'false') 
+        {
+            $script = @"
 Import-Module "$defaultLocalPath\ASDKHelperModule.psm1" -ErrorAction Stop
-New-Item -ItemType Directory -Path $($AsdkConfigurator.path) -Force -Verbose
 New-Item -ItemType Directory -Path $($ASDKConfiguratorParams.downloadPath) -Force -Verbose
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile $($AsdkConfigurator.path)\ConfigASDK.ps1 -Verbose
 
 "@
-        if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
-        {
-            $script += @"
+
+            if ($ASDKConfiguratorParams.IsoPath -like "*WS2019EVALISO.iso")
+            {
+                $script += @"
 DownloadWithRetry -Uri https://software-download.microsoft.com/download/pr/17763.253.190108-0006.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso -DownloadLocation $($ASDKConfiguratorParams.IsoPath)
 
 "@
-        }
-        if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
-        {
-            $script += @"
+            }
+
+            if ($ASDKConfiguratorParams.IsoPath -like "*WS2016EVALISO.iso")
+            {
+                $script += @"
 DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $($ASDKConfiguratorParams.IsoPath)
 
 "@
-        }
+            }
 
-        $script += @"
-$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $($ASDKConfiguratorParams)
+            $script += @"
+$commandsToRun
 
 "@
 
-        $script |  Out-File -FilePath (Join-Path -Path $AsdkConfigurator.path -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
-    } 
+            $script |  Out-File -FilePath (Join-Path -Path $AsdkConfigurator.path -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
+        } 
+    }
 }
 
 if ($ASDKImage) {

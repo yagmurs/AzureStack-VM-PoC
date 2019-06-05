@@ -188,13 +188,13 @@
                 "path": "c:\\ConfigASDK",
                 "AutoRun": "false",
                 "ASDKConfiguratorParams": {
-                    "azureDirectoryTenantName": "<Azure AD Tenant>.onmicrosoft.com",
+                    "azureDirectoryTenantName": "<AzureADTenant>.onmicrosoft.com",
                     "authenticationType": "AzureAD",
                     "downloadPath": "D:\\ASDKfiles",
                     "ISOPath": "D:\\WS2016EVALISO.iso",
                     "azureStackAdminPwd": "<password>",
                     "VMpwd": "<password>",
-                    "AzureADUsername": "<alias>@<Azure AD Tenant>.onmicrosoft.com",
+                    "AzureADUsername": "<alias>@<AzureADTenant>.onmicrosoft.com",
                     "azureAdPwd": "<password>",
                     "registerASDK": "true",
                     "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -243,7 +243,8 @@
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-NSG')]",
         "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]",
         "singleQuote": "'",
-        "autoInstallASDKparameters": "[if(bool(parameters('autoInstallASDK')), concat(' -AutoInstallASDK ',' -AzureADTenant ', parameters('AzureADTenant'), ' -AzureADGlobalAdmin ', parameters('AzureADGlobalAdmin'), ' -AzureADGlobalAdminPass ', parameters('AzureADGlobalAdminPassword'), ' -LocalAdminPass ', parameters('adminPassword')), '')]"
+        "autoInstallASDKparameters": "[if(bool(parameters('autoInstallASDK')), concat(' -AutoInstallASDK ',' -AzureADTenant ', parameters('AzureADTenant'), ' -AzureADGlobalAdmin ', parameters('AzureADGlobalAdmin'), ' -AzureADGlobalAdminPass ', parameters('AzureADGlobalAdminPassword'), ' -LocalAdminPass ', parameters('adminPassword')), '')]",
+        "ASDKConfiguratorParameters": "[concat(' -ASDKConfiguratorObject ', variables('singleQuote'), replace(replace(string(parameters('ASDKConfiguratorObject')), '\\', '\\\\'), '\"', '\\\"'), variables('singleQuote'))"
     },
     "resources": [
         {
@@ -325,7 +326,7 @@
                             "fileUris": [
                                 "[variables('fileUri')]"
                             ],
-                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -EnableDownloadASDK ', ' -AzureImage ', ' -AutoDownloadASDK ', parameters('autoDownloadASDK'), ' -EnableRDSH ', parameters('enableRDSH'), variables('autoInstallASDKparameters'), ' -ASDKConfiguratorObject ', replace(string(parameters('ASDKConfiguratorObject')), '\"', '`\"')]"
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', variables('scriptFileName'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -EnableDownloadASDK ', ' -AzureImage ', ' -AutoDownloadASDK ', parameters('autoDownloadASDK'), ' -EnableRDSH ', parameters('enableRDSH'), variables('autoInstallASDKparameters'), variables('ASDKConfiguratorParameters'))]"
                         }
                     }
                 },

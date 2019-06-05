@@ -442,9 +442,9 @@ $AutoInstallASDKScriptBlock += @"
 }
 "@  
 
-    if (Get-ScheduledTask -name $taskName3 -ErrorAction SilentlyContinue)
+    if (Get-ScheduledTask -TaskName $taskName3 -ErrorAction SilentlyContinue)
     {
-        Get-ScheduledTask -name $taskName3 | Unregister-ScheduledTask -Force
+        Get-ScheduledTask -TaskName $taskName3 | Unregister-ScheduledTask -Force
     }
 
     $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKScriptBlock

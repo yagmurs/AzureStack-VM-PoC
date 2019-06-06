@@ -362,7 +362,6 @@ $taskstoCompleteUponSuccess = {
                     {
                         Get-ScheduledTask -TaskName $taskName4 | Unregister-ScheduledTask -Force
                     }
-                    Set-Location C:\ConfigASDK
                     
                     $commandToRun = Get-Content -Path $ASDKConfigScriptPath
                     $AutoInstallASDKConfiguratorScriptBlock = @"

@@ -366,7 +366,7 @@ $taskstoCompleteUponSuccess = {
                     
                     $commandToRun = Get-Content -Path $ASDKConfigScriptPath
                     $AutoInstallASDKConfiguratorScriptBlock = @"
-                    Set-Location C:\ConfigASDK
+                    Set-Location $defaultLocalPath
                     $commandToRun
 "@    
                     $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKConfiguratorScriptBlock

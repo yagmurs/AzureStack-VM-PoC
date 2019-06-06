@@ -447,6 +447,8 @@ else {
             else
             {
                 Write-Verbose "$timeServer TTL is $($dnsResult[0].ttl)" -Verbose
+                #As a workaround this solves name resolution issues with the timeserver, can be considered 
+                #Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
                 break    
             }
         }

@@ -355,9 +355,34 @@ $taskstoCompleteUponSuccess = {
                 createDesktopShortcuts
                 #test ASDKConfigurator presence
                 $ASDKConfigScriptPath = (Join-Path -Path $defaultLocalPath -ChildPath Run-ConfigASDK.ps1)
-                if (Test-Path -Path $ASDKConfigScriptPath)
+                if (Test-Path -Path $runASDKConfigurator)
                 {
-                    Start-Process powershell.exe -ArgumentList "-file $ASDKConfigScriptPath"
+                    $taskName4 = "Auto ASDK Configurator Service"
+                    if (Get-ScheduledTask -TaskName $taskName4 -ErrorAction SilentlyContinue)
+                    {
+                        Get-ScheduledTask -TaskName $taskName4 | Unregister-ScheduledTask -Force
+                    }
+                    Set-Location C:\ConfigASDK
+                    
+                    $commandToRun = Get-Content -Path $ASDKConfigScriptPath
+                    $AutoInstallASDKConfiguratorScriptBlock = @"
+                    Set-Location C:\ConfigASDK
+                    $commandToRun
+"@    
+                    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $AutoInstallASDKConfiguratorScriptBlock
+                
+                    $registrationParams = @{
+                        TaskName = $taskName4
+                        TaskPath = '\AzureStackonAzureVM'
+                        Action = $action
+                        Settings = New-ScheduledTaskSettingsSet -Priority 4
+                        Force = $true
+                    }
+                    $registrationParams.Trigger = New-ScheduledTaskTrigger -Once -At $((get-date).AddMinutes(2))
+                    $registrationParams.User = "AZURESTACK\AzureStackAdmin"
+                    $registrationParams.RunLevel = 'Highest'
+                
+                    Register-ScheduledTask @registrationParams
                 }
                 Unregister-ScheduledJob -Name $taskName2 -Force
                 break

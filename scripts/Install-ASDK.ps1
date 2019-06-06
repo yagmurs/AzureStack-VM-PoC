@@ -105,16 +105,18 @@ else
     if ($DownloadASDK) 
     {
         #Download ASDK files (BINs and EXE)
-        Write-Log @writeLogParams -Message "Finding available ASDK versions"
+        Write-Log @writeLogParams -Message "About to start downloading ASDK"
 
         if (!(Test-Path -Path $vhdxFullPath))
         {
             if ($null -eq $version -or $Version -eq "")
             {
+                Write-Log @writeLogParams -Message "No version info available switching to interactive mode"
                 $asdkFiles = ASDKDownloader -Interactive -Destination $asdkDownloadPath
             }
             else
             {
+                Write-Log @writeLogParams -Message "version explicitly specified $version"
                 $asdkFiles = ASDKDownloader -Version $Version -Destination $asdkDownloadPath
             }
             Write-Log @writeLogParams -Message "$asdkFiles"
@@ -418,6 +420,46 @@ if ($pocParameters.Count -gt 0) {
 else {
     Write-Log @writeLogParams -Message "timeserver is FQDN"
     $timeServer = $timeServiceProvider
+    $i = 0
+    $sleep = 1
+    $ttlThreshold = 120    
+    Write-Verbose "Making sure that $timeServer is reachable and TTL ($ttlThreshold) is longer enough to be resolved by the ASDK setup" -Verbose
+    Clear-DnsClientCache
+    Resolve-DnsName -Name $timeServer
+
+    while ($true)
+    {
+        if ($i -ge 100)
+        {
+            Write-Verbose "Name resolution threshold for $timeserver reached by $i try restarting the Host" -Verbose
+            break
+            break
+        }
+        $dnsResult = Resolve-DnsName -Name $timeServer -CacheOnly
+        if ($?)
+        {
+            if ($dnsResult[0].ttl -lt $ttlThreshold)
+            {
+                Write-Verbose "$timeServer TTL is less than $ttlThreshold" -Verbose
+                Clear-DnsClientCache
+                Resolve-DnsName -Name $timeServer
+            }
+            else
+            {
+                Write-Verbose "$timeServer TTL is $($dnsResult[0].ttl)" -Verbose
+                break    
+            }
+        }
+        else
+        {
+            Clear-DnsClientCache
+            Resolve-DnsName -Name $timeServer  
+        }
+        Write-Verbose "Sleeping for $sleep seconds" -Verbose
+        Start-Sleep -Seconds $sleep
+        $i++
+        Write-Verbose "Loop Count: $i" -Verbose
+    }
 }
 
 Write-Log @writeLogParams -Message "timeserver: $timeServer"

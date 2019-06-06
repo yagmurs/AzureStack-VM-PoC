@@ -425,7 +425,7 @@ if ($AutoInstallASDK)
     Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
     
     $AutoInstallASDKScriptBlock = @" 
-if ((Test-Path -Path 'D:\Azure Stack Development Kit\cloudbuilder.vhdx') -and (Test-Path -Path 'c:\CloudDeployment'))
+if ((Test-Path -Path 'D:\Azure Stack Development Kit\cloudbuilder.vhdx') -and (Test-Path -Path 'c:\CloudDeployment') -and (Test-Path -Path 'C:\CloudDeployment\Logs\Deployment.*.log'))
 {
     Get-ScheduledTask -TaskName "$taskName3" | Disable-ScheduledTask
 }

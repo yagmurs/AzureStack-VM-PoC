@@ -50,7 +50,14 @@ function Write-Log ([string]$Message, [string]$LogFilePath, [switch]$Overwrite)
 function findLatestASDK 
 {
     [CmdletBinding()]
-    Param($asdkURIRoot, [string[]]$asdkFileList, $count = 8)
+    Param(
+        $asdkURIRoot,
+        
+        [string[]]
+        $asdkFileList,
+
+        $count = 8
+    )
     $versionArray = @()
     $versionArrayToTest = @()
     $version = @(Get-Date -Format "yyMM")
@@ -86,8 +93,20 @@ function findLatestASDK
 }
 
 
-function testASDKFilesPresence ([string]$asdkURIRoot, $version, [array]$asdkfileList) 
+function testASDKFilesPresence 
 {
+    [CmdletBinding()]
+    param(
+        [string]
+        $asdkURIRoot,
+        
+        [string]
+        $version, 
+        
+        [array]
+        $asdkfileList
+    )
+    
     $Uris = @()
 
     foreach ($file in $asdkfileList)
@@ -138,12 +157,22 @@ function ASDKDownloader
 
     if ($Interactive)
     {
-        $versionArray = findLatestASDK -asdkURIRoot $ASDKURIRoot -asdkFileList $AsdkFileList
-        
-        Write-Verbose "Version is now: $Version" -Verbose
+        if (Test-Path -Path $defaultLocalPath\testedVersions)
+        {
+            Write-Verbose "found testedVersions information" -Verbose
+            $versionArray = Get-Content $defaultLocalPath\testedVersions
+        }
+        else
+        {
+            Write-Verbose "Calling findLatestASDK since no testedVersions information found" -Verbose
+            $versionArray = findLatestASDK -asdkURIRoot $ASDKURIRoot -asdkFileList $AsdkFileList
+        }
+                
         Write-Verbose "VersionArray is now: $versionArray" -Verbose
+
         if ($null -eq $Version -or $Version -eq "")
         {
+            Write-Verbose "No version info available going into interactive mode" -Verbose
             do
             {
                 Clear-Host
@@ -156,7 +185,6 @@ function ASDKDownloader
                 }
                 Write-Host ""
                 Write-Host -ForegroundColor Yellow -BackgroundColor DarkGray -NoNewline  -Object "Unless it is instructed, select only latest tested ASDK Version "
-                Write-Host -ForegroundColor Green -BackgroundColor DarkGray -Object $gitbranchconfig.lastversiontested
                 Write-Host ""
                 $s = (Read-Host -Prompt "Select ASDK version to install")
                 if ($s -match "\d")
@@ -166,6 +194,11 @@ function ASDKDownloader
             }
             until ($versionArray[$s] -in $versionArray)
             $version = $versionArray[$s]
+        }
+        else
+        {
+            Write-Verbose "Version explicitly specified skipping interactive mode, Version is now: $version" -Verbose
+            Write-Verbose "Version is now: $version" -Verbose    
         }
     }
         $downloadList = testASDKFilesPresence -asdkURIRoot $ASDKURIRoot -version $Version -asdkfileList $AsdkFileList

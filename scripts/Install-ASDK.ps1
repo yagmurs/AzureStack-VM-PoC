@@ -355,7 +355,7 @@ $taskstoCompleteUponSuccess = {
                 createDesktopShortcuts
                 #test ASDKConfigurator presence
                 $ASDKConfigScriptPath = (Join-Path -Path $defaultLocalPath -ChildPath Run-ConfigASDK.ps1)
-                if (Test-Path -Path $runASDKConfigurator)
+                if (Test-Path -Path $ASDKConfigScriptPath)
                 {
                     $taskName4 = "Auto ASDK Configurator Service"
                     if (Get-ScheduledTask -TaskName $taskName4 -ErrorAction SilentlyContinue)
@@ -364,6 +364,7 @@ $taskstoCompleteUponSuccess = {
                     }
                     
                     $commandToRun = Get-Content -Path $ASDKConfigScriptPath
+                    
                     $AutoInstallASDKConfiguratorScriptBlock = @"
                     Set-Location $defaultLocalPath
                     $commandToRun

@@ -213,13 +213,13 @@
         },
         "branch": {
             "type": "string",
-            "defaultValue": "development",
+            "defaultValue": "master",
             "allowedValues": [
                 "master",
                 "development"
             ],
             "metadata": {
-                "name": "development"
+                "name": "master"
             }
         },
         "siteLocation": {

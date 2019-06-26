@@ -92,6 +92,6 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - c:\tools\nuget.exe updated with latest version to be able to handle the issue regards to long path. (AzureImage)
 
 **update on 26.06.2019**
-- Tested with ASDK 1.1904.0.40
+- Tested with ASDK 1.1905.0.40
 
 Feel free to post questions and enjoy!

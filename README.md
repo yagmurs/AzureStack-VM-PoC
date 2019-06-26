@@ -91,4 +91,7 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - branch selection in the ARM template
 - c:\tools\nuget.exe updated with latest version to be able to handle the issue regards to long path. (AzureImage)
 
+**update on 26.06.2019**
+- Tested with ASDK 1.1904.0.40
+
 Feel free to post questions and enjoy!

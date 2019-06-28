@@ -159,7 +159,7 @@ if ($ASDKConfiguratorObject)
         {
             #create download folder
             New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath -Force -Verbose
-            New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath\ASDK -Force -Verbose
+            New-Item -ItemType Directory -Path (Join-Path -Path $ASDKConfiguratorParams.downloadPath -ChildPath ASDK) -Force -Verbose
 
             #download configurator
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12

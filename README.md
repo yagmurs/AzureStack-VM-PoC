@@ -97,7 +97,7 @@ or **Deploy to Azure** (**deploy.azure.com**)
 
 **updates on 29.06.2019**
 - Tested with ASDK 1.1906.0.30
-- Experimental integration with ASDK Configurator (Matt McSpirit's ConfigASDK script). Now you can pass ConfigASDK parameter values from ARM Template to fully automate ASDK installation and install resource providers on top of ASDK. (must be used with "Auto Install ASDK")
+- Experimental integration with ASDK Configurator (Matt McSpirit's ConfigASDK script). Now you can pass ConfigASDK parameter values from ARM Template to fully automate ASDK installation and install resource providers on top of ASDK installation. (must be used with "Auto Install ASDK")
 - ASDK Configurator Object parameter added to accept input for ASDK Configurator. Example values assigned to the parameter values. Any ConfigASDK parameters may be used.
 
 Feel free to post questions and enjoy!

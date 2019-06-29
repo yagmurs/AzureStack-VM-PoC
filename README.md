@@ -84,12 +84,18 @@ or **Deploy to Azure** (**deploy.azure.com**)
 - Tested with ASDK 1.1904.0.36
 - Added option for installing RDSH on ASDK host as ARM template parameter. Thanks Matt McSpirit for the contribution.
 - ARM template updated with few parameters to be able to run Automated ASDK setup from ARM template.
+- Automated installation only supports Azure AD Identity
 - post-config.ps1 and Install-ASDK.ps1 scripts updated accordingly to support Automated ASDK setup.
 - old code cleanup and enhancements
 - branch selection in the ARM template
 - c:\tools\nuget.exe updated with latest version to be able to handle the issue regards to long path. (AzureImage)
 
-**update on 26.06.2019**
+**updates on 26.06.2019**
 - Tested with ASDK 1.1905.0.40
+
+**updates on 29.06.2019**
+- Tested with ASDK 1.1906.0.30
+- Experimental integration with ASDK Configurator (Matt McSpirit's ConfigASDK script). Now you can pass ConfigASDK parameter values from ARM Template to fully automate ASDK installation and install resource providers on top of ASDK installation. (must be used with "Auto Install ASDK")
+- ASDK Configurator Object parameter added to accept input for ASDK Configurator. Example values assigned to the parameter values. Any ConfigASDK parameters may be used.
 
 Feel free to post questions and enjoy!

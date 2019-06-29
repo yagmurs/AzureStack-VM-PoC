@@ -117,9 +117,22 @@ if ($ASDKConfiguratorObject)
     if ($?)
     {
         $ASDKConfiguratorParams = ConvertTo-HashtableFromPsCustomObject $AsdkConfigurator.ASDKConfiguratorParams
+        if (!($ASDKConfiguratorParams.downloadPath))
+        {
+            $ASDKConfiguratorParams.Add("downloadPath", "D:\ASDKfiles")
+        }
+
+        if ($ASDKConfiguratorParams.AzureADUsername -match '<|>' -or $ASDKConfiguratorParams.azureDirectoryTenantName -match '<|>' -or $ASDKConfiguratorParams.azureStackAdminPwd -match '<|>' -or $ASDKConfiguratorParams.VMpwd -match '<|>' -or $ASDKConfiguratorParams.azureAdPwd -match '<|>')
+        {
+            $AsdkConfigurator.Autorun = "false"
+            $AsdkConfigurator.Add("Autorun", "false")
+        }
 
         #create configasdk folder
-        New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
+        if ($AsdkConfigurator.path)
+        {
+            New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
+        }
 
         $paramsArray = @()
         foreach ($param in $ASDKConfiguratorParams.keys)
@@ -143,9 +156,10 @@ if ($ASDKConfiguratorObject)
         $commandsToRun = "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $paramsString"
 
         if ($AsdkConfigurator.Autorun -eq 'true')
-            {
+        {
             #create download folder
             New-Item -ItemType Directory -Path $ASDKConfiguratorParams.downloadPath -Force -Verbose
+            New-Item -ItemType Directory -Path (Join-Path -Path $ASDKConfiguratorParams.downloadPath -ChildPath ASDK) -Force -Verbose
 
             #download configurator
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12

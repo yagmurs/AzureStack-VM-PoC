@@ -96,5 +96,6 @@ or **Deploy to Azure** (**deploy.azure.com**)
 
 **update on 29.06.2019**
 - Tested with ASDK 1.1906.0.30
+- Experimental integration with ASDK Configurator (Matt McSpirit's ConfigASDK). Now you can pass ConfigASDK parameter values from ARM Template.
 
 Feel free to post questions and enjoy!

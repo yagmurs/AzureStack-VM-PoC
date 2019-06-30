@@ -157,10 +157,10 @@ function ASDKDownloader
 
     if ($Interactive)
     {
-        if (Test-Path -Path $defaultLocalPath\testedVersions)
+        if (Test-Path -Path $script:defaultLocalPath\testedVersions)
         {
             Write-Verbose "found testedVersions information" -Verbose
-            $versionArray = Get-Content $defaultLocalPath\testedVersions
+            $versionArray = Get-Content $script:defaultLocalPath\testedVersions
         }
         else
         {

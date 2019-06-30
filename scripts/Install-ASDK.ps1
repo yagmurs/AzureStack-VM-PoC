@@ -31,7 +31,7 @@ param (
 
 #region Variables
 $VerbosePreference = "Continue"
-$defaultLocalPath = "C:\AzureStackOnAzureVM"
+$global:defaultLocalPath = "C:\AzureStackOnAzureVM"
 $transcriptLog = "Install-ASDK-transcript.txt"
 
 Start-Transcript -Path $(Join-Path -Path $defaultLocalPath -ChildPath $transcriptLog) -Append

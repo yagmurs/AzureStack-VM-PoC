@@ -157,10 +157,12 @@ function ASDKDownloader
 
     if ($Interactive)
     {
-        if (Test-Path -Path $script:defaultLocalPath\testedVersions)
+        Write-Verbose "ASDKDownloader Interactive mode enabled" -Verbose
+        Write-Verbose "`$defaultLocalPath is $defaultLocalPath" -Verbose
+        if (Test-Path -Path $defaultLocalPath\testedVersions)
         {
             Write-Verbose "found testedVersions information" -Verbose
-            $versionArray = Get-Content $script:defaultLocalPath\testedVersions
+            $versionArray = Get-Content $defaultLocalPath\testedVersions
         }
         else
         {

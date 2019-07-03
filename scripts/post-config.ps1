@@ -67,6 +67,10 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
     }
 }
 
+
+$size = Get-Volume -DriveLetter c | Get-PartitionSupportedSize
+Resize-Partition -DriveLetter c -Size $size.sizemax
+
 $defaultLocalPath = "C:\AzureStackOnAzureVM"
 New-Item -Path $defaultLocalPath -ItemType Directory -Force
 $transcriptLog = "post-config-transcript.txt"
@@ -411,9 +415,6 @@ if ($null -ne $WindowsFeature.RemoveFeature.Name) {
         Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
     }
 }
-
-$size = Get-Volume -DriveLetter c | Get-PartitionSupportedSize
-Resize-Partition -DriveLetter c -Size $size.sizemax
 
 Rename-LocalUser -Name $username -NewName Administrator
 

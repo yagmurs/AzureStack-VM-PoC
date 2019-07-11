@@ -410,19 +410,21 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
+$timeServiceProvider = @("time.windows.com") | Get-Random
+#$timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 
 if ($pocParameters.Count -gt 0) {
     Write-Log @writeLogParams -Message "timeserver is IP address"
-    $timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+    #$timeServer = (Test-NetConnection -ComputerName $timeServiceProvider).ResolvedAddresses.ipaddresstostring | Get-Random
+    $timeServer = (Resolve-DnsName $timeServiceProvider).IP4Address | Get-Random
 }
 else {
     Write-Log @writeLogParams -Message "timeserver is FQDN"
     $timeServer = $timeServiceProvider
     $i = 0
     $sleep = 1
-    $ttlThreshold = 120    
+    $ttlThreshold = 100    
     Write-Verbose "Making sure that $timeServer is reachable and TTL ($ttlThreshold) is longer enough to be resolved by the ASDK setup" -Verbose
     Clear-DnsClientCache
     Resolve-DnsName -Name $timeServer
@@ -463,6 +465,7 @@ else {
         Write-Verbose "Loop Count: $i" -Verbose
     }
 }
+
 
 Write-Log @writeLogParams -Message "timeserver: $timeServer"
 

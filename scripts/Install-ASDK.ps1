@@ -424,7 +424,7 @@ else {
     $timeServer = $timeServiceProvider
     $i = 0
     $sleep = 1
-    $ttlThreshold = 120    
+    $ttlThreshold = 100    
     Write-Verbose "Making sure that $timeServer is reachable and TTL ($ttlThreshold) is longer enough to be resolved by the ASDK setup" -Verbose
     Clear-DnsClientCache
     Resolve-DnsName -Name $timeServer

@@ -435,7 +435,7 @@ else {
         {
             Write-Verbose "Name resolution threshold for $timeserver reached by $i try restarting the Host" -Verbose
             #As a workaround following line solves name resolution issues with the timeserver, can be considered 
-            #Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
+            Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
             break
             break
         }

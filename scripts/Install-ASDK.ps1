@@ -410,8 +410,8 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
-$timeServiceProvider = @("time.windows.com") | Get-Random
-#$timeServiceProvider = @("pool.ntp.org") | Get-Random
+#$timeServiceProvider = @("time.windows.com") | Get-Random
+$timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 
 if ($pocParameters.Count -gt 0) {
@@ -434,6 +434,8 @@ else {
         if ($i -ge 100)
         {
             Write-Verbose "Name resolution threshold for $timeserver reached by $i try restarting the Host" -Verbose
+            #As a workaround following line solves name resolution issues with the timeserver, can be considered 
+            #Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
             break
             break
         }
@@ -449,8 +451,6 @@ else {
             else
             {
                 Write-Verbose "$timeServer TTL is $($dnsResult[0].ttl)" -Verbose
-                #As a workaround this solves name resolution issues with the timeserver, can be considered 
-                #Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
                 break    
             }
         }

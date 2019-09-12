@@ -393,7 +393,7 @@ function Copy-ASDKContent
         Write-Verbose "Removing psDrive $psDrive"
         $psDrive | Remove-PSDrive
         Write-Verbose "Dismounting the drive $driveLetter"
-        Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose
+        Dismount-DiskImage -ImagePath $vhdxFullPath
 }
 
 function ConvertTo-HashtableFromPsCustomObject { 

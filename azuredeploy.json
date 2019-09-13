@@ -190,13 +190,14 @@
                     "authenticationType": "AzureAD",
                     "downloadPath": "D:\\ASDKfiles",
                     "ISOPath": "D:\\WS2016EVALISO.iso",
-                    "azureStackAdminPwd": "<password>",
+                    "asdkHostPwd": "<password>",
                     "VMpwd": "<password>",
                     "AzureADUsername": "<alias>@<AzureADTenant>.onmicrosoft.com",
                     "azureAdPwd": "<password>",
-                    "registerASDK": "true",
+                    "registerAzS": "true",
                     "useAzureCredsForRegistration":"true",
-                    "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                    "skipMySQL": "true"
                 }
             }
         },

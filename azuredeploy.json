@@ -196,8 +196,7 @@
                     "azureAdPwd": "<password>",
                     "registerAzS": "true",
                     "useAzureCredsForRegistration":"true",
-                    "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                    "skipMySQL": "true"
+                    "azureRegSubId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 }
             }
         },

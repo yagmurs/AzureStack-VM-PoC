@@ -115,6 +115,7 @@ New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Interne
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3' -Name 1803 -Value 0 -PropertyType DWORD -Force
 New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0' -Name 1803 -Value 0 -PropertyType DWORD -Force
 
+
 if ($ASDKConfiguratorObject)
 {
     $AsdkConfigurator = ConvertFrom-Json $ASDKConfiguratorObject | ConvertFrom-Json
@@ -126,13 +127,13 @@ if ($ASDKConfiguratorObject)
             $ASDKConfiguratorParams.Add("downloadPath", "D:\ASDKfiles")
         }
 
-        if ($ASDKConfiguratorParams.AzureADUsername -match '<|>' -or $ASDKConfiguratorParams.azureDirectoryTenantName -match '<|>' -or $ASDKConfiguratorParams.azureStackAdminPwd -match '<|>' -or $ASDKConfiguratorParams.VMpwd -match '<|>' -or $ASDKConfiguratorParams.azureAdPwd -match '<|>')
+        if ($ASDKConfiguratorParams.AzureADUsername -match '<|>' -or $ASDKConfiguratorParams.azureDirectoryTenantName -match '<|>' -or $ASDKConfiguratorParams.asdkHostPwd -match '<|>' -or $ASDKConfiguratorParams.VMpwd -match '<|>' -or $ASDKConfiguratorParams.azureAdPwd -match '<|>')
         {
             $AsdkConfigurator.Autorun = "false"
             $AsdkConfigurator.Add("Autorun", "false")
         }
 
-        #create configasdk folder
+        #create AzSPoC folder
         if ($AsdkConfigurator.path)
         {
             New-Item -ItemType Directory -Path $AsdkConfigurator.path -Force -Verbose
@@ -157,7 +158,7 @@ if ($ASDKConfiguratorObject)
 
         $paramsString = $paramsArray -join " "
 
-        $commandsToRun = "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "ConfigASDK.ps1") $paramsString"
+        $commandsToRun = "$(Join-Path -Path $AsdkConfigurator.path -ChildPath "AzSPoC.ps1") $paramsString"
 
         if ($AsdkConfigurator.Autorun -eq 'true')
         {
@@ -167,7 +168,7 @@ if ($ASDKConfiguratorObject)
 
             #download configurator
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile (Join-Path -Path $AsdkConfigurator.path -ChildPath ConfigASDK.ps1) -Verbose
+            Invoke-Webrequest http://bit.ly/AzSPoC -UseBasicParsing -OutFile (Join-Path -Path $AsdkConfigurator.path -ChildPath AzSPoC.ps1) -Verbose
 
             #download iso files
             if ($ASDKConfiguratorParams.IsoPath2019)
@@ -179,7 +180,7 @@ if ($ASDKConfiguratorObject)
                 DownloadWithRetry -Uri http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO -DownloadLocation $ASDKConfiguratorParams.IsoPath
             }
 
-            $commandsToRun |  Out-File -FilePath (Join-Path -Path $defaultLocalPath -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
+            $commandsToRun |  Out-File -FilePath (Join-Path -Path $defaultLocalPath -ChildPath Run-AzSPoC.ps1)  -Encoding ASCII
         }
 
         if ($AsdkConfigurator.Autorun -eq 'false') 
@@ -188,7 +189,7 @@ if ($ASDKConfiguratorObject)
 Import-Module "$defaultLocalPath\ASDKHelperModule.psm1" -ErrorAction Stop
 New-Item -ItemType Directory -Path $($ASDKConfiguratorParams.downloadPath) -Force -Verbose
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-Webrequest http://bit.ly/configasdk -UseBasicParsing -OutFile $($AsdkConfigurator.path)\ConfigASDK.ps1 -Verbose
+Invoke-Webrequest http://bit.ly/AzSPoC -UseBasicParsing -OutFile $($AsdkConfigurator.path)\AzSPoC.ps1 -Verbose
 
 "@
 
@@ -213,7 +214,7 @@ $commandsToRun
 
 "@
 
-            $script |  Out-File -FilePath (Join-Path -Path $AsdkConfigurator.path -ChildPath Run-ConfigASDK.ps1)  -Encoding ASCII
+            $script |  Out-File -FilePath (Join-Path -Path $AsdkConfigurator.path -ChildPath Run-AzSPoC.ps1)  -Encoding ASCII
         } 
     }
 }

@@ -152,7 +152,7 @@ function ASDKDownloader
     if (!($AsdkFileList))
     {
         $AsdkFileList = @("AzureStackDevelopmentKit.exe")
-        1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
+        1..15 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
     }
 
     if ($Interactive)

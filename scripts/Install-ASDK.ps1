@@ -156,6 +156,11 @@ Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
 workaround1
 
+if ($version -ge 1910)
+{
+    workaround4
+}
+
 if ($SkipWorkaround -eq $false)
 {   
     $outFile = "C:\tools\nuget.exe"

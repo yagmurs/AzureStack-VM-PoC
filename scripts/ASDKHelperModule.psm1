@@ -248,7 +248,7 @@ function workaround4
     Write-Verbose "Applying workaround to fix Cluster IP Address on DNS record" -Verbose
     $storageFilePath = "C:\CloudDeployment\Classes\Storage\StorageHelpers.psm1"
     $storageFile = Get-Content -Path $storageFilePath
-    $storageFile = $storageFile.Replace('$clusterCreationIps = @($clusterCreationIps[0])','$clusterCreationIps = "192.168.200.65"') 
+    $storageFile = $storageFile.Replace('$clusterCreationIps = @($clusterCreationIps[0])','$clusterCreationIps = @("192.168.200.65")') 
     Set-Content -Value $storageFile -Path $storageFilePath -Force
 }
 

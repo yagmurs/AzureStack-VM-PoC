@@ -1,0 +1,390 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "defaultValue": "AzS-HOST1",
+            "type": "string",
+            "metadata": {
+                "name": "AzS-HOST1"
+            }
+        },
+        "virtualMachineSize": {
+            "defaultValue": "Standard_E16s_v3",
+            "allowedValues": [
+                "Standard_E16s_v3",
+                "Standard_E20s_v3",
+                "Standard_D32s_v3",
+                "Standard_E32-16s_v3",
+                "Standard_E32s_v3",
+                "Standard_D64s_v3",
+                "Standard_E64s_v3"
+            ],
+            "type": "string",
+            "metadata": {
+                "name": "Standard_E16s_v3"
+            }
+        },
+        "dataDiskSizeinGB": {
+            "defaultValue": 256,
+            "allowedValues": [
+                256,
+                128
+            ],
+            "type": "int",
+            "metadata": {
+                "name": 256
+            }
+        },
+        "dataDiskCount": {
+            "defaultValue": 4,
+            "type": "int",
+            "metadata": {
+                "name": 4
+            }
+        },
+        "virtualNetworkName": {
+            "defaultValue": "AzureStack-VNET",
+            "type": "string",
+            "metadata": {
+                "name": "AzureStack-VNET"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "addressPrefix": {
+            "defaultValue": "10.0.0.0/24",
+            "type": "string",
+            "metadata": {
+                "name": "10.0.0.0/24"
+            }
+        },
+        "subnetName": {
+            "defaultValue": "default",
+            "type": "string",
+            "metadata": {
+                "name": "default"
+            }
+        },
+        "subnetPrefix": {
+            "defaultValue": "10.0.0.0/24",
+            "type": "string",
+            "metadata": {
+                "name": "10.0.0.0/24"
+            }
+        },
+        "publicIpAddressType": {
+            "defaultValue": "Dynamic",
+            "allowedValues": [
+                "Dynamic",
+                "Static"
+            ],
+            "type": "string",
+            "metadata": {
+                "name": "Dynamic"
+            }
+        },
+        "publicDnsName": {
+            "type": "string"
+        },
+        "osDiskVhdUri": {
+            "defaultValue": "https://<Azure Blob Storage Prefix>.blob.core.windows.net/<Container Name>/<VHD Name>.vhd",
+            "type": "string",
+            "metadata": {
+                "description": "Uri of the your user image",
+                "name": "https://<Azure Blob Storage Prefix>.blob.core.windows.net/<Container Name>/<VHD Name>.vhd"
+            }
+        },
+        "postConfigScriptLocation": { 
+            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts",
+            "type": "string",
+            "metadata": {
+                "description": "the post config script location",
+                "name": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts"
+            }
+        },
+        "postConfigScriptFilename": { 
+            "defaultValue": "post-config.ps1",
+            "type": "string",
+            "metadata": {
+                "description": "the post config script file name",
+                "name": "post-config.ps1"
+            }
+        },
+        "autoInstallASDK": {
+            "defaultValue": false,
+            "allowedValues": [
+                true,
+                false
+            ],
+            "type": "bool",
+            "metadata": {
+                "name": false
+            }
+        },
+        "AzureADTenant": {
+            "defaultValue": "<Azure AD Tenant>.onmicrosoft.com",
+            "type": "string",
+            "metadata": {
+                "name": "<Azure AD Tenant>.onmicrosoft.com"
+            }
+        },
+        "AzureADGlobalAdmin": {
+            "defaultValue": "Alias@<Azure AD Tenant>.onmicrosoft.com",
+            "type": "string",
+            "metadata": {
+                "name": "Alias@<Azure AD Tenant>.onmicrosoft.com"
+            }
+        },
+        "AzureADGlobalAdminPassword": {
+            "type": "securestring",
+            "defaultValue": "1234",
+            "metadata": {
+                "name": "1234"
+            }
+        },
+        "branch": {
+            "type": "string",
+            "defaultValue": "development",
+            "allowedValues": [
+                "master",
+                "development"
+            ],
+            "metadata": {
+                "name": "development"
+            }
+        },
+        "siteLocation": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "name": "[resourceGroup().location]"
+            }
+        }
+    },
+    "variables": {
+        "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
+        "fileUri": "[concat(parameters('postConfigScriptLocation'), '/', parameters('postConfigScriptFileName'))]",
+        "adminUsername": "__administrator",
+        "osDiskSizeinGB": 256,
+        "location": "[resourceGroup().location]",
+        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",
+        "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-NSG')]",
+        "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]",
+        "imageName": "asdk_latest",
+        "autoInstallASDKparameters": "[if(bool(parameters('autoInstallASDK')), concat(' -AutoInstallASDK ',' -AzureADTenant ', parameters('AzureADTenant'), ' -AzureADGlobalAdmin ', parameters('AzureADGlobalAdmin'), ' -AzureADGlobalAdminPass ', parameters('AzureADGlobalAdminPassword'), ' -LocalAdminPass ', parameters('adminPassword')), '')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/images",
+            "name": "[variables('imageName')]",
+            "apiVersion": "2017-03-30",
+            "location": "[variables('location')]",
+            "properties": {
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Windows",
+                        "osState": "Generalized",
+                        "blobUri": "[parameters('osDiskVhdUri')]",
+                        "storageAccountType": "Premium_LRS"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('virtualMachineName')]",
+            "apiVersion": "2017-03-30",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[concat('Microsoft.Compute/images/', variables('imageName'))]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[variables('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": "true"
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "id": "[resourceId('Microsoft.Compute/Images', variables('imageName'))]"
+                    },
+                    "osDisk": {
+                        "createOption":"FromImage",
+                        "diskSizeGB": "[variables('osDiskSizeinGB')]",
+                        "name": "[concat(parameters('virtualMachineName'),'-osdisk')]",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                    }
+                    },
+                    "copy": [{
+                            "name": "dataDisks",
+                            "count": "[parameters('dataDiskCount')]",
+                            "input": {
+                                "createOption": "Empty",
+                                "lun": "[copyIndex('dataDisks')]",
+                                "name": "[concat(parameters('virtualMachineName'),'-disk',copyIndex('dataDisks'))]",
+                                "diskSizeGB": "[parameters('dataDiskSizeinGB')]",
+                                "caching": "ReadOnly",
+                                "managedDisk": {
+                                    "storageAccountType": "Premium_LRS"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "licenseType": "Windows_Server"
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "CustomScriptExtension",
+                    "apiVersion": "2017-12-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[parameters('virtualMachineName')]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.8",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[variables('fileUri')]"
+                            ],
+                            "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ', parameters('postConfigScriptFilename'), ' -Username ', variables('adminUsername'), ' -Branch ', parameters('branch'), ' -ASDKImage ', variables('autoInstallASDKparameters'))]"
+                        }
+                    }
+                }
+            ] 
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "apiVersion": "2016-12-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('networkInterfaceName')]",
+            "apiVersion": "2016-09-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIpAddressName')]",
+            "apiVersion": "2017-06-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[parameters('publicIpAddressType')]",
+                "publicIPAddressVersion": "IPv4",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('publicDnsName')]",
+                    "fqdn": "[concat(parameters('publicDnsName'), '.',variables('location'), '.cloudapp.azure.com')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "apiVersion": "2016-09-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "3389",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "allow-psremoting",
+                        "properties": {
+                            "priority": 1010,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "5985",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[concat(parameters('virtualMachineName'),'\\','Administrator')]"
+        },
+        "IPAddress": {
+            "type": "string",
+            "value": "[reference(variables('publicIpAddressName')).dnssettings.fqdn]"
+        }
+    }
+}

@@ -247,7 +247,8 @@ function workaround4
 {
     Write-Verbose "Applying workaround to fix Cluster IP Address on DNS record" -Verbose
     New-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\Windows Azure" -Name OsImageName -Value "Azs SDK OS" -Force
-    "192.168.200.65	s-cluster	s-cluster.azurestack.local" | Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Force
+    "192.168.200.65	s-cluster" | Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Force
+    "192.168.200.65	s-cluster.azurestack.local" | Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Force
 }
 
 function createDesktopShortcuts

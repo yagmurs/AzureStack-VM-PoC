@@ -246,10 +246,8 @@ function workaround3
 function workaround4
 {
     Write-Verbose "Applying workaround to fix Cluster IP Address on DNS record" -Verbose
-    $storageFilePath = "C:\CloudDeployment\Classes\Storage\StorageHelpers.psm1"
-    $storageFile = Get-Content -Path $storageFilePath
-    $storageFile = $storageFile.Replace('$clusterCreationIps = @($clusterCreationIps[0])','$clusterCreationIps = @("192.168.200.65")') 
-    Set-Content -Value $storageFile -Path $storageFilePath -Force
+    New-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\Windows Azure" -Name OsImageName -Value "Azs SDK OS" -Force
+    "192.168.200.65	s-cluster	s-cluster.azurestack.local" | Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Force
 }
 
 function createDesktopShortcuts

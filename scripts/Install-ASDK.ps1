@@ -156,7 +156,7 @@ Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
 workaround1
 
-if ($version -eq 1910)
+if ($version -eq 1910 -or $version -eq 2002)
 {
     workaround4
 }

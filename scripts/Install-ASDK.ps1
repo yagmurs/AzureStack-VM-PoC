@@ -456,9 +456,9 @@ if (Get-ScheduledJob -name $taskName5 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $fixDNSRecord -Name $taskName5 -Trigger $trigger -ScheduledJobOption $option
 
-#$timeServiceProvider = @("time.windows.com")
-$timeServiceProvider = @("time.google.com")
-#$timeServiceProvider = @("pool.ntp.org")
+#$timeServiceProvider = @("time.windows.com") | Get-Random
+$timeServiceProvider = @("time.google.com") | Get-Random
+#$timeServiceProvider = @("pool.ntp.org") | Get-Random
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 
 if ($pocParameters.Count -gt 0) {

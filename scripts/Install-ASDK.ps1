@@ -417,8 +417,48 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
-#$timeServiceProvider = @("time.windows.com") | Get-Random
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
+$fixDNSRecord = {
+    $script:defaultLocalPath = "C:\AzureStackOnAzureVM"
+    [int]$defaultPollIntervalInSeconds = 60
+    $script:logFileFullPath = "$defaultLocalPath\fixDNSRecord.log"
+    $script:writeLogParams = @{
+        LogFilePath = $logFileFullPath
+    }
+    $recordName = "s-cluster"
+    $dcName = "azs-dc01"
+    $zoneName = "azurestack.local"
+    $newIP = "192.168.200.65"
+    $taskName5 = "Fix DNS Record"
+    while (1)
+    {
+        $aRecord = Get-DnsServerResourceRecord -ComputerName $dcName -ZoneName $zoneName -name $recordName -ErrorAction SilentlyContinue
+        $aRecord
+        if ($aRecord) {
+            $newARecord = $aRecord.Clone()
+            $newARecord.RecordData.IPv4Address = $newIP
+            Write-Log @writeLogParams -Message "$($aRecord.hostname) DNS Record updated to $($newARecord.RecordData.IPv4Address)"
+            Set-DnsServerResourceRecord -ComputerName $dcName -ZoneName $zoneName -NewInputObject $newARecord -OldInputObject $aRecord
+            Write-Log @writeLogParams -Message "Unregistering $taskname5"
+            Unregister-ScheduledJob -Name $taskName5 -Force
+            break
+        } 
+        Write-Log @writeLogParams -Message "Waiting for $defaultPollIntervalInSeconds seconds to re-check DNS record for $recordName on $dcName from $zoneName"
+        Start-Sleep $defaultPollIntervalInSeconds
+    }
+}
+
+$taskName5 = "Fix DNS Record"
+$trigger = New-JobTrigger -AtLogOn
+$option = New-ScheduledJobOption
+if (Get-ScheduledJob -name $taskName5 -ErrorAction SilentlyContinue)
+{
+    Get-ScheduledJob -name $taskName5 | Unregister-ScheduledJob -Force
+}
+Register-ScheduledJob -ScriptBlock $fixDNSRecord -Name $taskName5 -Trigger $trigger -ScheduledJobOption $option
+
+#$timeServiceProvider = @("time.windows.com")
+$timeServiceProvider = @("time.google.com")
+#$timeServiceProvider = @("pool.ntp.org")
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 
 if ($pocParameters.Count -gt 0) {

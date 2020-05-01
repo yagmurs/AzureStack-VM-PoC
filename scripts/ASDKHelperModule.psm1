@@ -245,11 +245,12 @@ function workaround3
 
 function workaround4
 {
-    Write-Verbose "Applying workaround to fix Cluster IP Address on DNS record" -Verbose
+    Write-Verbose "Applying workaround to fix Azure Cluster parameters" -Verbose
     $storageFilePath = "C:\CloudDeployment\Classes\Storage\StorageHelpers.psm1"
-    $storageFile = Get-Content -Path $storageFilePath
-    $storageFile = $storageFile.Replace('Add-DnsServerResourceRecord -ComputerName $activeDNS -ZoneName $domainFqdn -IPv4Address $clusterCreationIps[0] -Name $clusterShortName -A','Add-DnsServerResourceRecord -ComputerName $activeDNS -ZoneName $domainFqdn -IPv4Address "192.168.200.65" -Name $clusterShortName -A') 
-    Set-Content -Value $storageFile -Path $storageFilePath -Force
+    $storageFile = Get-Content $storageFilePath
+    $lineNumber = ($storageFile | Select-String -Pattern 'if\(\$isOneNode\)')[0].linenumber
+    $storageFile[$lineNumber + 2] += "`n            `$clusterParams.ManagementPointNetworkType = 'Singleton'"
+    Set-Content -Value $storageFile -Path $storageFilePath
 }
 
 function createDesktopShortcuts

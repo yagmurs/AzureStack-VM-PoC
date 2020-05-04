@@ -255,6 +255,7 @@ function workaround4
 
 function workaround5
 {
+    Write-Verbose "Applying workaround to fix RDAgent installation issue" -Verbose
     New-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\Windows Azure" -Name OsImageName -Value "MicrosoftAzureStack.vhdx"
 }
 

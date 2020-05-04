@@ -160,6 +160,7 @@ workaround1
 if ($version -eq 1910 -or $version -eq 2002)
 {
     workaround4
+    workaround5
 }
 
 
@@ -417,6 +418,7 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
+<##>
 $fixDNSRecord = {
     $script:defaultLocalPath = "C:\AzureStackOnAzureVM"
     [int]$defaultPollIntervalInSeconds = 60
@@ -446,7 +448,7 @@ $fixDNSRecord = {
         Start-Sleep $defaultPollIntervalInSeconds
     }
 }
-
+<#
 $taskName5 = "Fix DNS Record"
 $trigger = New-JobTrigger -AtLogOn
 $option = New-ScheduledJobOption
@@ -455,7 +457,7 @@ if (Get-ScheduledJob -name $taskName5 -ErrorAction SilentlyContinue)
     Get-ScheduledJob -name $taskName5 | Unregister-ScheduledJob -Force
 }
 Register-ScheduledJob -ScriptBlock $fixDNSRecord -Name $taskName5 -Trigger $trigger -ScheduledJobOption $option
-
+#>
 #$timeServiceProvider = @("time.windows.com") | Get-Random
 $timeServiceProvider = @("time.google.com") | Get-Random
 #$timeServiceProvider = @("pool.ntp.org") | Get-Random

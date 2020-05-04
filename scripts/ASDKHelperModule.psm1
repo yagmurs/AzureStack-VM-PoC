@@ -253,6 +253,11 @@ function workaround4
     Set-Content -Value $storageFile -Path $storageFilePath
 }
 
+function workaround5
+{
+    New-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\Windows Azure" -Name OsImageName -Value "MicrosoftAzureStack.vhdx"
+}
+
 function createDesktopShortcuts
 {
     #Create all user desktop shotcuts for Azure Stack Admin and Tenant portal

@@ -4,6 +4,7 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
     {
         try
         {
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
             Start-BitsTransfer -Source $Uri -Destination $DownloadLocation -DisplayName $Uri
             break
         }
@@ -149,6 +150,8 @@ function ASDKDownloader
         [string]
         $Destination = "D:\"
     )
+
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
     if (!($AsdkFileList))
     {
         $AsdkFileList = @("AzureStackDevelopmentKit.exe")

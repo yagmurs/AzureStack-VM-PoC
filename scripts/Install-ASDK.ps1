@@ -157,7 +157,7 @@ Write-Log @writeLogParams -Message "Applying first workaround to tackle bare met
 workaround1
 
 
-if ($version -eq 1910 -or $version -eq 2002)
+if ($version -eq 1910 -or $version -eq 2002 -or $version -eq 2005)
 {
     workaround4
     workaround5

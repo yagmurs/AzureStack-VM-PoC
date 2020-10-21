@@ -8,7 +8,7 @@
       <FileLog Location="D:\AzureStack\MiniDump\*.dmp" />
       <FileLog Location="$env:SystemRoot\*.dmp" />
       <FileLog Location="$env:SystemDrive\MASLogs\" />
-      <FileLog Location="D:\AzureStack\CrashDumps\*.dmp" />
+       <FileLog Location="D:\AzureStack\CrashDumps\*.dmp" />
       <FileLog Location="$env:SystemDrive\Windows\ServiceProfiles\NetworkService\AppData\Local\CrashDumps\*.dmp" />
       <FileLog Location="$env:SystemDrive\Windows\System32\Config\SystemProfile\AppData\Local\CrashDumps\*.dmp" />
       <FileLog Location="$env:SystemDrive\Windows\SetupComplete.log" />
@@ -18,23 +18,17 @@
       <FileLog Location="$env:SystemDrive\Monitoring\Data\Configuration\MonAgentHost*.log" />
       <FileLog Location="$env:SystemDrive\Monitoring\Data\Tables\V2Faults*.tsf" />
       <FileLog Location="$env:SystemDrive\vstoretrace\*.etl" />
-      <FileLog Location="$env:SystemDrive\Logs\WireServerLogs\" />
-      <FileLog Location="$env:SystemDrive\AzureStackPackageMangager\Logs\" />
       <FileLog Location="$env:SystemDrive\Windows\System32\Configuration\ConfigurationStatus\*.mof" />
       <FileLog Location="$env:SystemDrive\Windows\System32\Configuration\ConfigurationStatus\*.json" />
-      <FileLog Location="$env:SystemDrive\Windows\debug\" />
+      <FileLog Location="$env:SystemDrive\Windows\debug\netlogon*" />
       <FileLog Location="$env:ProgramData\Microsoft\Windows Defender\Support\MpSupportFiles.cab" />
-      <FileLog Location="$env:SystemDrive\Temp\SDN\" />
       <ShareLog Location="[DiagnosticsShare]\BareMetal\*" />
-      <ShareLog Location="[DiagnosticsShare]\CPI\HostAgent\*" />
       <WindowsEventLog Pattern="System" />
       <WindowsEventLog Pattern="Application" />
       <WindowsEventLog Pattern="*TraceCollector*" />
       <WindowsEventLog Pattern="*Microsoft-Windows-DSC*" />
       <WindowsEventLog Pattern="Microsoft-Windows-GroupPolicy/Operational" />
       <WindowsEventLog Pattern="Microsoft-Windows-NTLM/Operational" />
-      <WindowsEventLog Pattern="Microsoft-Windows Azure-Fabric-Agent/Operational" />
-      <WindowsEventLog Pattern="Microsoft-Windows Azure-Fabric-Agent/Admin" />
     </Logs>
     <NugetStore Path="$env:SystemDrive\CloudDeployment\NuGetStore" />
     <SecurityInfo>
@@ -45,11 +39,6 @@
         <Account Name="AzS-Host-TCSA" ManagedPasswordIntervalInDays="1" PrincipalsAllowedToRetrieveManagedPassword="AzS-Sto-SG">
           <Membership>
             <MemberOf GroupName="AzS-FsAcl-InfraSG" />
-          </Membership>
-        </Account>
-        <Account Name="AzS-Host-HASA" ManagedPasswordIntervalInDays="1" PrincipalsAllowedToRetrieveManagedPassword="AzS-Sto-SG">
-          <Membership>
-            <MemberOf GroupName="AzS-HA-R-SrvSG" />
           </Membership>
         </Account>
       </ServiceAccounts>
@@ -64,8 +53,7 @@
     <DefenderUpdates Path="[CloudMediaPath]\Updates\DefenderUpdates\x64" />
     <CodeIntegrityPolicy Audit="True" StagingFolder="[CloudMediaPath]\Security\CodeIntegrity" FileName="MASPolicy.bin" FileNameForHost="MASPolicyForHost.bin" />
     <SkipDriverInjection>False</SkipDriverInjection>
-    <Drivers Build="14393" Path="[CloudMediaPath]\Drivers" />
-    <Drivers Build="17763" Path="[CloudMediaPath]\DriversRS5" />
+    <Drivers Path="[CloudMediaPath]\Drivers" />
     <pp:Import Path=".\HardwareInventoryInformaton.xml" />
     <DumpMinimumPhysicalDiskBytes>18446744073709551615</DumpMinimumPhysicalDiskBytes> <!-- [UInt64]::MaxValue. Effectively disabled on ASDK. If re-enabling, checks for boot disk should change to IsBoot rather than BootFromDisk. -->
     <JEA>
@@ -109,18 +97,16 @@
     <DeploymentContent>
       <!-- Deployment content is injected into the bare metal image. -->
       <NugetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.TraceCollector" SourcePath="lib\net46" DestinationPath="TraceCollector" />
-      <NugetArtifact Name="Microsoft.AzureStack.Common.Infrastructure.TraceCollectorConfiguration" SourcePath="content\TraceCollector\Client" DestinationPath="TraceCollector\Configuration" />
+      <NugetArtifact Name="Microsoft.AzureStack.Common.Infrastructure.TraceCollectorConfiguration" SourcePath="content\TraceCollector\DVM" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.TraceCollector" SourcePath="content\PerfCollector\BareMetal" DestinationPath="TraceCollector\PerfCounterConfiguration" />
-      <NugetArtifact Name="Microsoft.AzureStack.Infrastructure.Agent" SourcePath="content\Pluto" DestinationPath="Pluto" />
       <NugetArtifact Name="Microsoft.AzureStack.Common.Tools.Diagnostics" SourcePath="lib\net46" DestinationPath="Program Files\WindowsPowerShell\Modules" />
       <NugetArtifact Name="Microsoft.AzureStack.Deployment.ACSDSC" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
       <NugetArtifact Name="Microsoft.AzureStack.Deployment.DSC" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
       <NugetArtifact Name="Microsoft.AzureStack.Deployment.NCDSC" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
       <NugetArtifact Name="Microsoft.AzureStack.Fabric.Compute.HostInstaller" SourcePath="content\TraceCollector" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Fabric.Health.MAConfig" SourcePath="Monitoring" DestinationPath="Monitoring" />
-      <NugetArtifact Name="Microsoft.AzureStack.Fabric.HostAgent" SourcePath="TraceCollector" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Fabric.Storage.SCPSModule" SourcePath="content" DestinationPath="Windows\System32\WindowsPowerShell\v1.0\Modules" />
-      <NugetArtifact Name="Microsoft.AzureStack.Fabric.MonitoringAgent" SourcePath="Monitoring" DestinationPath="Monitoring" />
+      <NugetArtifact Name="Microsoft.AzureStack.MonitoringAgent" SourcePath="Monitoring" DestinationPath="Monitoring" />
       <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\TraceCollector\Blob" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\Deployment" DestinationPath="ACS\Deployment" />
       <NugetArtifact Name="Microsoft.AzureStack.Services.Storage" SourcePath="lib\net46\BlobService" DestinationPath="ACS\BlobService" />
@@ -131,19 +117,11 @@
       <NugetArtifact Name="Microsoft.AzureStack.Fabric.Backup.IBCAdapterClient" SourcePath="" DestinationPath="NugetStore" NugetInstall="true" />
       <NugetArtifact Name="Microsoft.AzureStack.Fabric.Backup.IBCAdapterClient" SourcePath="content\TraceCollector" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Fabric.Health" SourcePath="Deployment\BareMetalTraceCollector" DestinationPath="TraceCollector\Configuration" />
-      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Health.HealthAgent" SourcePath="Content\HealthAgent" DestinationPath="HealthAgent"/>
-      <NugetArtifact Name="Microsoft.AzureStack.Fabric.Health.HealthAgent" SourcePath="TraceCollector" DestinationPath="TraceCollector\Configuration"/>
       <NuGetArtifact Name="Microsoft.AzureStack.Solution.Deploy.CloudDeployment" SourcePath="content\AzureStackDiagnostics" DestinationPath="Program Files\WindowsPowerShell\Modules" />
       <NuGetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.StorageDiagnostic" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules" />
+      <NugetArtifact Name="Microsoft.AzureStack.Deployment.ExternalDNSDSC" SourcePath="content\TraceCollector\DNSClient" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Deployment.ExternalDNSDSC" SourcePath="content\TraceCollector\VMSIF" DestinationPath="TraceCollector\Configuration" />
       <NugetArtifact Name="Microsoft.AzureStack.Deployment.ExternalDNSDSC" SourcePath="content\TraceCollector\VFPHostProxy\BareMetal" DestinationPath="TraceCollector\Configuration" />
-      <NugetArtifact Name="Microsoft.AzureStack.Common.Infrastructure.Telemetry.TelemetryReporter" SourcePath="lib\net46" DestinationPath="Program Files\WindowsPowerShell\Modules\Microsoft.AzureStack.Diagnostics.DataCollection\TelemetryReporter" />
-      <NuGetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.LogTransporter.Functions" SourcePath="" DestinationPath="NugetStore" NugetInstall="true" />
-      <NuGetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.LogTransporter.Functions" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules\Microsoft.AzureStack.Solution.Diagnostics.LogTransporter.Functions" />
-      <NuGetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.LogTransporter.Workflows" SourcePath="" DestinationPath="NugetStore" NugetInstall="true" />
-      <NuGetArtifact Name="Microsoft.AzureStack.Solution.Diagnostics.LogTransporter.Workflows" SourcePath="content" DestinationPath="Program Files\WindowsPowerShell\Modules\Microsoft.AzureStack.Solution.Diagnostics.LogTransporter.Workflows" />
-      <!-- RS5 CTL files -->
-      <NugetArtifact Name="Microsoft.AzureStack.Solution.Deploy.Security" SourcePath="content\WuCTLFiles" DestinationPath="WuCTLFiles" />
     </DeploymentContent>
     <WindowsFeature>
       <Feature Name="BitLocker" />
@@ -153,7 +131,6 @@
       <Feature Name="FailoverCluster-Mgmt" />
       <Feature Name="FailoverCluster-PowerShell" />
       <Feature Name="FileServerVSSAgent" />
-      <Feature Name="SMBBW" />
       <Feature Name="Microsoft-Hyper-V-Management-PowerShell" />
       <Feature Name="Microsoft-Hyper-V-Offline" />
       <Feature Name="Microsoft-Hyper-V-Online" />
@@ -250,9 +227,6 @@
       <RemoveFeature Name="WorkFolders-Server" />
       <RemoveFeature Name="WSS-Product-Package" />
     </WindowsFeature>
-    <Health>
-      <HealthAgent CategoryType="Core" CategoryName="PhysicalNode" />
-    </Health>
   </PublicInfo>
   <PrivateInfo>
     <!-- Do not change the Deployment Guid. For re-deploying update 'IdempotentRun' property to "False"-->

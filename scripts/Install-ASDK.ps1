@@ -156,6 +156,14 @@ Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
 workaround1
 
+
+if ($version -eq 1910 -or $version -eq 2002 -or $version -eq 2005)
+{
+    workaround4
+    workaround5
+}
+
+
 if ($SkipWorkaround -eq $false)
 {   
     $outFile = "C:\tools\nuget.exe"
@@ -410,8 +418,54 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
+<<<<<<< HEAD
 #$timeServiceProvider = @("time.windows.com") | Get-Random
 $timeServiceProvider = @("pool.ntp.org") | Get-Random
+=======
+<##>
+$fixDNSRecord = {
+    $script:defaultLocalPath = "C:\AzureStackOnAzureVM"
+    [int]$defaultPollIntervalInSeconds = 60
+    $script:logFileFullPath = "$defaultLocalPath\fixDNSRecord.log"
+    $script:writeLogParams = @{
+        LogFilePath = $logFileFullPath
+    }
+    $recordName = "s-cluster"
+    $dcName = "azs-dc01"
+    $zoneName = "azurestack.local"
+    $newIP = "192.168.200.65"
+    $taskName5 = "Fix DNS Record"
+    while (1)
+    {
+        $aRecord = Get-DnsServerResourceRecord -ComputerName $dcName -ZoneName $zoneName -name $recordName -ErrorAction SilentlyContinue
+        $aRecord
+        if ($aRecord) {
+            $newARecord = $aRecord.Clone()
+            $newARecord.RecordData.IPv4Address = $newIP
+            Write-Log @writeLogParams -Message "$($aRecord.hostname) DNS Record updated to $($newARecord.RecordData.IPv4Address)"
+            Set-DnsServerResourceRecord -ComputerName $dcName -ZoneName $zoneName -NewInputObject $newARecord -OldInputObject $aRecord
+            Write-Log @writeLogParams -Message "Unregistering $taskname5"
+            Unregister-ScheduledJob -Name $taskName5 -Force
+            break
+        } 
+        Write-Log @writeLogParams -Message "Waiting for $defaultPollIntervalInSeconds seconds to re-check DNS record for $recordName on $dcName from $zoneName"
+        Start-Sleep $defaultPollIntervalInSeconds
+    }
+}
+<#
+$taskName5 = "Fix DNS Record"
+$trigger = New-JobTrigger -AtLogOn
+$option = New-ScheduledJobOption
+if (Get-ScheduledJob -name $taskName5 -ErrorAction SilentlyContinue)
+{
+    Get-ScheduledJob -name $taskName5 | Unregister-ScheduledJob -Force
+}
+Register-ScheduledJob -ScriptBlock $fixDNSRecord -Name $taskName5 -Trigger $trigger -ScheduledJobOption $option
+#>
+#$timeServiceProvider = @("time.windows.com") | Get-Random
+$timeServiceProvider = @("time.google.com") | Get-Random
+#$timeServiceProvider = @("pool.ntp.org") | Get-Random
+>>>>>>> development
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 
 if ($pocParameters.Count -gt 0) {
@@ -434,6 +488,8 @@ else {
         if ($i -ge 100)
         {
             Write-Verbose "Name resolution threshold for $timeserver reached by $i try restarting the Host" -Verbose
+            #As a workaround following line solves name resolution issues with the timeserver, can be considered 
+            Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
             break
             break
         }
@@ -449,8 +505,6 @@ else {
             else
             {
                 Write-Verbose "$timeServer TTL is $($dnsResult[0].ttl)" -Verbose
-                #As a workaround this solves name resolution issues with the timeserver, can be considered 
-                #Get-NetAdapter | Disable-NetAdapter -PassThru -Confirm:$false | Enable-NetAdapter
                 break    
             }
         }

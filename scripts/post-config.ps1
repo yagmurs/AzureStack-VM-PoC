@@ -387,32 +387,33 @@ if ($AzureImage) {
 
     # Enable differencing roles from ASDKImage except .NET framework 3.5
     Enable-WindowsOptionalFeature -Online -All -NoRestart -FeatureName @("ActiveDirectory-PowerShell", "DfsMgmt", "DirectoryServices-AdministrativeCenter", "DirectoryServices-DomainController", "DirectoryServices-DomainController-Tools", "DNS-Server-Full-Role", "DNS-Server-Tools", "DSC-Service", "FailoverCluster-AutomationServer", "FailoverCluster-CmdInterface", "FSRM-Management", "IIS-ASPNET45", "IIS-HttpTracing", "IIS-ISAPIExtensions", "IIS-ISAPIFilter", "IIS-NetFxExtensibility45", "IIS-RequestMonitor", "ManagementOdata", "NetFx4Extended-ASPNET45", "NFS-Administration", "RSAT-ADDS-Tools-Feature", "RSAT-AD-Tools-Feature", "Server-Manager-RSAT-File-Services", "UpdateServices-API", "UpdateServices-RSAT", "UpdateServices-UI", "WAS-ConfigurationAPI", "WAS-ProcessModel", "WAS-WindowsActivationService", "WCF-HTTP-Activation45", "Microsoft-Hyper-V-Management-Clients")
-}
 
-#Download OneNodeRole.xml
-DownloadWithRetry -Uri "$branchFullPath/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
-[xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
-$WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
-$dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
-if ($null -ne $WindowsFeature.Feature.Name) {
-    $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
-    if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0) {
-        Write-Log @writeLogParams -Message "Following roles will be installed"
-        Write-Log @writeLogParams -Message "$featuresToInstall"
-        Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
-    }
-    if ($EnableRDSH) {
-        Write-Log @writeLogParams -Message "User also chose to enable RDSH. Adding the Remote Desktop Session Host role"
-        Enable-WindowsOptionalFeature -FeatureName AppServer Licensing-Diagnosis-UI -Online -All -NoRestart
-    }
-}
 
-if ($null -ne $WindowsFeature.RemoveFeature.Name) {
-    $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
-    if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0) {
-        Write-Log @writeLogParams -Message "Following roles will be uninstalled"
-        Write-Log @writeLogParams -Message "$featuresToRemove"
-        Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
+    #Download OneNodeRole.xml
+    DownloadWithRetry -Uri "$branchFullPath/scripts/OneNodeRole.xml" -DownloadLocation "$defaultLocalPath\OneNodeRole.xml"
+    [xml]$rolesXML = Get-Content -Path "$defaultLocalPath\OneNodeRole.xml" -Raw
+    $WindowsFeature = $rolesXML.role.PublicInfo.WindowsFeature
+    $dismFeatures = (Get-WindowsOptionalFeature -Online).FeatureName
+    if ($null -ne $WindowsFeature.Feature.Name) {
+        $featuresToInstall = $dismFeatures | Where-Object { $_ -in $WindowsFeature.Feature.Name }
+        if ($null -ne $featuresToInstall -and $featuresToInstall.Count -gt 0) {
+            Write-Log @writeLogParams -Message "Following roles will be installed"
+            Write-Log @writeLogParams -Message "$featuresToInstall"
+            Enable-WindowsOptionalFeature -FeatureName $featuresToInstall -Online -All -NoRestart
+        }
+        if ($EnableRDSH) {
+            Write-Log @writeLogParams -Message "User also chose to enable RDSH. Adding the Remote Desktop Session Host role"
+            Enable-WindowsOptionalFeature -FeatureName AppServer Licensing-Diagnosis-UI -Online -All -NoRestart
+        }
+    }
+
+    if ($null -ne $WindowsFeature.RemoveFeature.Name) {
+        $featuresToRemove = $dismFeatures | Where-Object { $_ -in $WindowsFeature.RemoveFeature.Name }
+        if ($null -ne $featuresToRemove -and $featuresToRemove.Count -gt 0) {
+            Write-Log @writeLogParams -Message "Following roles will be uninstalled"
+            Write-Log @writeLogParams -Message "$featuresToRemove"
+            Disable-WindowsOptionalFeature -FeatureName $featuresToRemove -Online -Remove -NoRestart
+        }
     }
 }
 

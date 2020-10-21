@@ -4,6 +4,7 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
     {
         try
         {
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
             Start-BitsTransfer -Source $Uri -Destination $DownloadLocation -DisplayName $Uri
             break
         }
@@ -149,10 +150,12 @@ function ASDKDownloader
         [string]
         $Destination = "D:\"
     )
+
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
     if (!($AsdkFileList))
     {
         $AsdkFileList = @("AzureStackDevelopmentKit.exe")
-        1..10 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
+        1..15 | ForEach-Object {$AsdkFileList += "AzureStackDevelopmentKit-$_" + ".bin"}
     }
 
     if ($Interactive)
@@ -241,6 +244,22 @@ function workaround3
     $DeploySingleNodeCommonFile = Get-Content -Path $DeploySingleNodeCommonFilePath
     $DeploySingleNodeCommonFile = $DeploySingleNodeCommonFile.Replace('$credentialSuccess = Invoke-Command -ComputerName ''LocalHost'' -Credential $builtInAdminCredential -ErrorAction ''SilentlyContinue'' { $true }','$credentialSuccess = $true') 
     Set-Content -Value $DeploySingleNodeCommonFile -Path $DeploySingleNodeCommonFilePath -Force
+}
+
+function workaround4
+{
+    Write-Verbose "Applying workaround to fix Azure Cluster parameters" -Verbose
+    $storageFilePath = "C:\CloudDeployment\Classes\Storage\StorageHelpers.psm1"
+    $storageFile = Get-Content $storageFilePath
+    $lineNumber = ($storageFile | Select-String -Pattern 'if\(\$isOneNode\)')[0].linenumber
+    $storageFile[$lineNumber + 2] += "`n            `$clusterParams.ManagementPointNetworkType = 'Singleton'"
+    Set-Content -Value $storageFile -Path $storageFilePath
+}
+
+function workaround5
+{
+    Write-Verbose "Applying workaround to fix RDAgent installation issue" -Verbose
+    New-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\Windows Azure" -Name OsImageName -Value "MicrosoftAzureStack.vhdx"
 }
 
 function createDesktopShortcuts
@@ -393,7 +412,7 @@ function Copy-ASDKContent
         Write-Verbose "Removing psDrive $psDrive"
         $psDrive | Remove-PSDrive
         Write-Verbose "Dismounting the drive $driveLetter"
-        Dismount-DiskImage -ImagePath $vhdxFullPath -PassThru | Write-Verbose
+        Dismount-DiskImage -ImagePath $vhdxFullPath
 }
 
 function ConvertTo-HashtableFromPsCustomObject { 

@@ -418,10 +418,6 @@ if (Get-ScheduledJob -name $taskName2 -ErrorAction SilentlyContinue)
 }
 Register-ScheduledJob -ScriptBlock $taskstoCompleteUponSuccess -Name $taskName2 -Trigger $trigger -ScheduledJobOption $option
 
-<<<<<<< HEAD
-#$timeServiceProvider = @("time.windows.com") | Get-Random
-$timeServiceProvider = @("pool.ntp.org") | Get-Random
-=======
 <##>
 $fixDNSRecord = {
     $script:defaultLocalPath = "C:\AzureStackOnAzureVM"
@@ -465,7 +461,6 @@ Register-ScheduledJob -ScriptBlock $fixDNSRecord -Name $taskName5 -Trigger $trig
 #$timeServiceProvider = @("time.windows.com") | Get-Random
 $timeServiceProvider = @("time.google.com") | Get-Random
 #$timeServiceProvider = @("pool.ntp.org") | Get-Random
->>>>>>> development
 Write-Log @writeLogParams -Message "Picking random timeserver from $timeServiceProvider"
 
 if ($pocParameters.Count -gt 0) {

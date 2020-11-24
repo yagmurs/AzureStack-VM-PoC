@@ -117,7 +117,7 @@ if ($UseExistingStorageAccount)
 }
 else
 {
-   New-AzResourceGroup -Name $ResourceGroupName -Location $Region
+   New-AzResourceGroup -Name $ResourceGroupName -Location $Region -WhatIf:$WhatIf
    $i = 0
    do 
    {
@@ -135,7 +135,7 @@ else
    
    New-AzStorageContainer -Name "asdk" -Context $sa.context
    
-   Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
+   Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force -WhatIf:$WhatIf
    
    do {
       Start-Sleep -Seconds 30
@@ -156,4 +156,4 @@ $templateParameterObject = @{
    osDiskVhdUri = $osDiskVhdUri
 }
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject -WhatIf:$WhatIf

@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.1.1.4
+.VERSION 0.1.1.5
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -26,41 +26,42 @@
    Deploys Azure VM for Azure Stack Hub Development kit
 
 .EXAMPLE
-   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
-   Resource Group: AzureStackVMOnAzureVM on East US 2 region, Credential will be popped up!
-
 Deploy-AzureStackonAzureVM
 
-.EXAMPLE
-   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
-   Resource Group: myResourceGroup on West Europe region, Credential will be popped up!
+Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
+Resource Group: AzureStackVMOnAzureVM on East US 2 region, New VM Credentials will be prompted.
 
+.EXAMPLE
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Europe'
 
-.EXAMPLE
-   This option deploys Azure Stack Hub Development kit from predefined Uri, this can be used
-   if previously, Credential will be popped up! ASDK image previously copied or created manually
-   on Storage Account the storage account that this Uri belongs to has to be on the same subscription. 
+Deploy new Storage Account (SA), copy VM image to new SA and then deploy Azure Stack 
+Hub Development kit VM under Resource Group: myResourceGroup on West Europe region, New VM
+Credentials will be prompted.
 
+.EXAMPLE
 Deploy-AzureStackonAzureVM -UseExistingStorageAccount
 
-.EXAMPLE
-   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to
-   Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. May be used for silent deployment.
+This option deploys Azure Stack Hub Development kit from predefined Uri, this can be used
+if there a storage account and the VHD file already copied or created beforehand, New VM 
+Credentials will be prompted. The Uri of ASDK image (VHD file) on the Storage Account must 
+belong to the same subscription that the VM is getting deployed.
 
+.EXAMPLE
 $VmCredential = Get-Credentail = "Administrator"
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCredential
 
-.EXAMPLE
-   Deploys with default options and start Azure Stack Hub Develoepment kit installation within
-   the VM after VM starts. Currently there is no validation for credentials and Tenant existance
-   Make sure tenant name and credentials are correct.
+Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to
+Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. May be used for silent 
+deployment.
 
+.EXAMPLE
 Deploy-AzureStackonAzureVM.ps1 -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential admin@<TenantName>.onmicrosoft.com -AutoInstallASDK -Verbose
 
+Deploys with default options and start Azure Stack Hub Develoepment kit installation within
+the VM after VM starts. Currently there is no validation for credentials and Tenant existance
+Make sure tenant name and credentials are correct.
 #>
-[CmdletBinding(
-   ConfirmImpact='High')]
+[CmdletBinding(ConfirmImpact='High')]
 
 param(
         [Parameter(Mandatory=$false)]
@@ -76,13 +77,13 @@ param(
         [string]$ResourceGroupName = 'AzureStackVMOnAzureVM',
         
         [Parameter(Mandatory=$false)]
-        [string]$version = "2008",
+        [string]$Version = "2008",
         
         [Parameter(Mandatory=$true)]
         [pscredential]$VmCredential, #Local Admin Credential for the VM
         
         [Parameter(Mandatory=$false)]
-        [string]$publicDnsName = "asdkonazure" + "$(get-random)",
+        [string]$PublicDnsName = "asdkonazure" + "$(get-random)",
 
         [Parameter(Mandatory=$false)]
         [string]$VhdUri, #this must a Azure Storage Account Uri and must be under the same subscription that the VM is getting deployed.
@@ -111,7 +112,7 @@ $saPrefix = "asdk"
 
 #endregion
 
-#Testing for running on Cloudshell
+#Testing if running on Cloudshell
 if (-not ($PSCloudShellUtilityModuleInfo))
 {
    Write-Verbose -Message "Logging into Azure using Device Authentication option"
@@ -229,4 +230,6 @@ else
    }
 }
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM `
+   -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" `
+   -TemplateParameterObject $templateParameterObject

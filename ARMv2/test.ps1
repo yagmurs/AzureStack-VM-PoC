@@ -133,5 +133,4 @@ $templateParameterObject = @{
    osDiskVhdUri = $osDiskVhdUri
 }
 
-#New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateFile .\ARMv2\azuredeploy.json -TemplateParameterObject $templateParameterObject
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject

@@ -37,10 +37,10 @@ Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCre
 #>
 
 #Requires -Version 5
-#Requires -Module @{ ModuleName = 'Az'; RequiredVersion = '4.8.0' }
-#Requires -Module @{ ModuleName = 'Az.Accounts'; RequiredVersion = '2.1.0' }
-#Requires -Module @{ ModuleName = 'Az.Storage'; RequiredVersion = '2.7.0' }
-#Requires -Module @{ ModuleName = 'Az.Resources'; RequiredVersion = '2.5.1' }
+#Requires -Module @{ ModuleName = 'Az'; ModuleVersion = '4.8.0' }
+#Requires -Module @{ ModuleName = 'Az.Accounts'; ModuleVersion = '2.1.0' }
+#Requires -Module @{ ModuleName = 'Az.Storage'; ModuleVersion = '2.7.0' }
+#Requires -Module @{ ModuleName = 'Az.Resources'; ModuleVersion = '2.5.1' }
 
 param(
         [Parameter(Mandatory=$false)]
@@ -73,6 +73,11 @@ param(
 if (-not ($PSCloudShellUtilityModuleInfo))
 {
    Connect-AzAccount -UseDeviceAuthentication
+}
+
+if ($Overwrite)
+{
+   Get-AzResourceGroup -Name $ResourceGroupName | Remove-AzResourceGroup -Force -Verbose 
 }
 
 if ($UseExistingStorageAccount) 

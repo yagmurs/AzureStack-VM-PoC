@@ -1,22 +1,46 @@
 # Azure Stack on Azure VM project
 
-Creates a new VM and installs prerequisites to install AzureStack Development kit (ASDK) to run PoC
+Creates new VM and install prerequisites for Azure Stack Hub Development kit (ASDK) to run Proof of Concept.
 
-> Run the following PowerShell command to install the new installation script. This will also downloads required modules from powershell gallery.
+## Version Compatibility
+
+The current version of the Deploy-AzureStackonAzureVM.ps1 script has been tested with the following versions:
+
+* ASDK build 1.2008.0.59 (2008)
+* ASDK build 1.2005.0.40 (2005)
+
+**IMPORTANT** - this version of the Deploy-AzureStackonAzureVM.ps1 script has been tested with ASDK build 2008 and 2005, and requires minimum of following PowerShell modules
+
+* Az.Accounts - (2.2.1)
+* Az.Storage - (3.0.0)
+* Az.Resources - (3.0.1)
+
+## Description
+
+Deploy-AzureStackonAzureVM.ps1 script prepares Storage Account and copy VHD file before you calling [ARM Template](/ARMv2/azuredeploy.json)
+
+## Step by Step Guidance
+
+### Step 1 - Download the Deploy-AzureStackonAzureVM.ps1 script
+
+Run the following PowerShell command to install the new installation script. This will also downloads required modules from powershell gallery.
 
 ```powershell
 Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
 ```
 
-> Can be run from Azure Cloudshell as well. :)
+Can be run from Azure Cloudshell as well. :)
 
-Once script downloaded from PowerShell gallery, run the following command to check available examples.
+### Step 2 - Run the Deploy-AzureStackonAzureVM.ps1 script
+
+Once script downloaded from PowerShell gallery, run the following command to locate some examples. 
 
 ```powershell
 Get-Help Deploy-AzureStackonAzureVM.ps1 -Examples
 ```
 
-Note: If you run Deploy-AzureStackonAzureVM.ps1 without providing any parameters it will use default parameters except local Administrator password for new VM.
+If your scenario does not require customization, simply run Deploy-AzureStackonAzureVM.ps1 without any parameters.
+if you provide any parameters, It will use default parameters and will prompt for local Administrator password for the new VM.
 
 ```powershell
 Deploy-AzureStackonAzureVM.ps1 -Verbose
@@ -25,4 +49,3 @@ Deploy-AzureStackonAzureVM.ps1 -Verbose
  > Yagmur Sahin
  >
  > Twitter: [@yagmurs](https://twitter.com/yagmurs)
- 

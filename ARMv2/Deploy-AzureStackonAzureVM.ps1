@@ -1,3 +1,24 @@
+<#PSScriptInfo
+
+.VERSION 0.1.0.0
+
+.GUID 523642c3-73da-49a0-8ae8-08b835c426e2
+
+.AUTHOR Microsoft Corporation
+
+.COMPANYNAME Microsoft
+
+.EXTERNALMODULEDEPENDENCIES
+
+.TAGS Azure Stack Hub, ASDK
+
+.RELEASENOTES
+   Author:         Yagmur Sahin
+   Twitter:        @yagmurs
+   Creation Date:  23 November 2020
+   Purpose/Change: Initial script development
+#>
+
 <#
 .Synopsis
    Deploys Azure VM for Azure Stack Hub Development kit
@@ -18,22 +39,6 @@ Deploy-AzureStackonAzureVM -UseExistingStorageAccount
    May be used for silent deployment.
 $VmCredential = Get-Credentail = "Administrator"
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCredential
-.INPUTS
-   Inputs to this cmdlet (if any)
-.OUTPUTS
-   Output from this cmdlet (if any)
-.NOTES
-   Version:        0.1
-   Author:         Yagmur Sahin
-   Twitter:        @yagmurs
-   Creation Date:  23 November 2020
-   Purpose/Change: Initial script development
-.COMPONENT
-   The component this cmdlet belongs to
-.ROLE
-   The role this cmdlet belongs to
-.FUNCTIONALITY
-   The functionality that best describes this cmdlet
 #>
 [CmdletBinding(
    ConfirmImpact='High')]

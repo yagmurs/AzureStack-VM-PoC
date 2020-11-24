@@ -16,8 +16,8 @@ Deploy-AzureStackonAzureVM -UseExistingStorageAccount
 .EXAMPLE
    Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. 
    May be used for silent deployment.
-$Credential = Get-Credentail = "Local Administrator Password"
-Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $Credential
+$VmCredential = Get-Credentail = "Administrator"
+Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCredential
 .INPUTS
    Inputs to this cmdlet (if any)
 .OUTPUTS
@@ -37,10 +37,10 @@ Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $Crede
 #>
 
 #Requires -Version 5
-#Requires -Module @{ ModuleName = 'Az'; RequiredVersion = '5.1.0' }
-#Requires -Module @{ ModuleName = 'Az.Accounts'; RequiredVersion = '2.2.1' }
-#Requires -Module @{ ModuleName = 'Az.Storage'; RequiredVersion = '3.0.0' }
-#Requires -Module @{ ModuleName = 'Az.Resources'; RequiredVersion = '3.0.1' }
+#Requires -Module @{ ModuleName = 'Az'; RequiredVersion = '4.8.0' }
+#Requires -Module @{ ModuleName = 'Az.Accounts'; RequiredVersion = '2.1.0' }
+#Requires -Module @{ ModuleName = 'Az.Storage'; RequiredVersion = '2.7.0' }
+#Requires -Module @{ ModuleName = 'Az.Resources'; RequiredVersion = '2.5.1' }
 
 param(
         [Parameter(Mandatory=$false)]
@@ -59,7 +59,7 @@ param(
         [string]$version = "2008",
         
         [Parameter(Mandatory=$true)]
-        [pscredential]$Credential, #Local Admin Credential for the VM
+        [pscredential]$VmCredential, #Local Admin Credential for the VM
         
         [Parameter(Mandatory=$false)]
         [string]$publicDnsName = "asdkonazure" + "$(get-random)",
@@ -70,8 +70,10 @@ param(
         [Parameter(Mandatory=$false)]
         [int]$DataDiskCount = 6
     )
-
-Connect-AzAccount -UseDeviceAuthentication
+if (-not ($PSCloudShellUtilityModuleInfo))
+{
+   Connect-AzAccount -UseDeviceAuthentication
+}
 
 if ($UseExistingStorageAccount) 
 {
@@ -127,7 +129,7 @@ else
 Write-Verbose -Message $osDiskVhdUri
 
 $templateParameterObject = @{
-   adminPassword = $Credential.Password
+   adminPassword = $VmCredential.Password
    publicDnsName = $publicDnsName
    dataDiskCount = $DataDiskCount
    osDiskVhdUri = $osDiskVhdUri

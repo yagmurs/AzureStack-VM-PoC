@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.1.0.0
+.VERSION 0.1.1.3
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -10,7 +10,7 @@
 
 .EXTERNALMODULEDEPENDENCIES
 
-.TAGS Azure Stack Hub, ASDK
+.TAGS Azure Stack Hub, ASDK, AzureStack, AzureStackHub, "Azure Stack"
 
 .RELEASENOTES
    Author:         Yagmur Sahin
@@ -39,6 +39,11 @@ Deploy-AzureStackonAzureVM -UseExistingStorageAccount
    May be used for silent deployment.
 $VmCredential = Get-Credentail = "Administrator"
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCredential
+.EXAMPLE
+   Deploys with default options and start Azure Stack Hub Develoepment kit installation within the VM after VM starts. Currently there is no validation for credentials and Tenant existance
+   Make sure tenant name and credentials are correct.
+Deploy-AzureStackonAzureVM.ps1 -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential admin@<TenantName>.onmicrosoft.com -AutoInstallASDK -Verbose
+
 #>
 [CmdletBinding(
    ConfirmImpact='High')]
@@ -69,22 +74,43 @@ param(
         [string]$VhdUri, #this must a Azure Storage Account Uri and must be under the same subscription that the VM is getting deployed.
 
         [Parameter(Mandatory=$false)]
-        [int]$DataDiskCount = 6
+        [int]$DataDiskCount = 6,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$AutoInstallASDK,
+
+        [Parameter(Mandatory=$false)]
+        [string]$AzureADTenant,
+
+        [Parameter(Mandatory=$false)]
+        [pscredential]$AzureADGlobalAdminCredential
     )
 
 #Requires -Version 5
-#Requires -Module @{ ModuleName = 'Az'; ModuleVersion = '4.8.0' }
-#Requires -Module @{ ModuleName = 'Az.Accounts'; ModuleVersion = '2.1.0' }
-#Requires -Module @{ ModuleName = 'Az.Storage'; ModuleVersion = '2.7.0' }
-#Requires -Module @{ ModuleName = 'Az.Resources'; ModuleVersion = '2.5.1' }
+#Requires -Module @{ ModuleName = 'Az.Accounts'; ModuleVersion = '2.2.1' }, @{ ModuleName = 'Az.Storage'; ModuleVersion = '3.0.0' }, @{ ModuleName = 'Az.Resources'; ModuleVersion = '3.0.1' }
 
+#region variables
+
+$sleepTimer = 60
+$container = "asdk"
+$saPrefix = "asdk"
+
+#endregion
+
+#Testing for running on Cloudshell
 if (-not ($PSCloudShellUtilityModuleInfo))
 {
+   Write-Verbose -Message "Logging into Azure using Device Authentication option"
    Connect-AzAccount -UseDeviceAuthentication
+}
+else
+{
+   Write-Verbose -Message "CloudShell detected, no need to login, using current credentials"
 }
 
 if ($Overwrite)
 {
+   Write-Verbose -Message "Since Overwrite option is specified the current Resource Group and all resources belongs to RG will be deleted."
    Get-AzResourceGroup -Name $ResourceGroupName | Remove-AzResourceGroup -Force -Verbose -Confirm
 }
 
@@ -101,7 +127,7 @@ if ($UseExistingStorageAccount)
          Get-AzStorageBlob -Blob $uriSplit[-1] -Container $uriSplit[-2] -Context $sa.context
          if ($?)
          {
-            Write-Verbose -Message "Blob file: $uriSplit[-1] exist under container: $uriSplit[-2]"
+            Write-Verbose -Message "Blob file: $($uriSplit[-1]) exist under container: $($uriSplit[-2])"
             $osDiskVhdUri = $VhdUri
          }
          else 
@@ -121,11 +147,13 @@ if ($UseExistingStorageAccount)
 }
 else
 {
+   #Create new Resource Group
    New-AzResourceGroup -Name $ResourceGroupName -Location $Region
    $i = 0
    do 
    {
-      $saName = "asdk" + (Get-Random)
+      #Randomizing new name for SA and testing for availiability, up to 10 retries.
+      $saName = $saPrefix + (Get-Random)
       Write-Verbose -Message "Testing Storage Account name availability: $saName"
       if ($i -gt 10)
       {
@@ -133,31 +161,58 @@ else
       }
    } until ((Get-AzStorageAccountNameAvailability -Name $saName).NameAvailable)
    
-   Write-Verbose "Creating Storage Account: $saName"
+   Write-Verbose -Message "Creating Storage Account: $saName"
    $sa = New-AzStorageAccount -Location $Region -ResourceGroupName $ResourceGroupName -SkuName Standard_LRS -Name $saName
    $sourceUri = "https://asdkstore.blob.core.windows.net/asdk/$version.vhd"
    
-   New-AzStorageContainer -Name "asdk" -Context $sa.context
+   New-AzStorageContainer -Name $container -Context $sa.context
    
-   Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
+   Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
    
    do {
-      Start-Sleep -Seconds 30
-      $result = Get-AzStorageAccount -Name $sa.StorageAccountName -ResourceGroupName $ResourceGroupName | Get-AzStorageBlob -Container "asdk" | Get-AzStorageBlobCopyState
+      Start-Sleep -Seconds $sleepTimer
+      $result = Get-AzStorageAccount -Name $sa.StorageAccountName -ResourceGroupName $ResourceGroupName | Get-AzStorageBlob -Container $container | Get-AzStorageBlobCopyState
       $remaining = [Math]::Round(($result.TotalBytes - $result.BytesCopied) / 1gb,2)
-      Write-Verbose -Message "Waiting copy to finish remaining $remaining GB" -Verbose 
+      Write-Verbose -Message "Waiting copy to finish remaining $remaining GB"
+      if ($remaining -lt 60)
+      {
+         $sleepTimer = 10
+      }
    } until ($result.Status -eq "success") 
 
-   $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "asdk/$version.vhd"
+   $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container/$version.vhd"
 }
 
 Write-Verbose -Message $osDiskVhdUri
-
-$templateParameterObject = @{
-   adminPassword = $VmCredential.Password
-   publicDnsName = $publicDnsName
-   dataDiskCount = $DataDiskCount
-   osDiskVhdUri = $osDiskVhdUri
+if ($AutoInstallASDK)
+{
+   if ($AzureADGlobalAdminCredential -and $AzureADTenant)
+   {
+      $templateParameterObject = @{
+         adminPassword = $VmCredential.Password
+         publicDnsName = $publicDnsName
+         dataDiskCount = $DataDiskCount
+         osDiskVhdUri = $osDiskVhdUri
+         autoInstallASDK = $true
+         AzureADTenant = $AzureADTenant
+         AzureADGlobalAdmin = $AzureADGlobalAdminCredential.UserName
+         AzureADGlobalAdminPassword = $AzureADGlobalAdminCredential.Password
+      }
+   }
+   else
+   {
+      Write-Error -Message "Make sure Azure AD Global Administrator Credentails and Azure AD Tenant name is specified" -ErrorAction Stop
+   }
+}
+else
+{
+   $templateParameterObject = @{
+      adminPassword = $VmCredential.Password
+      publicDnsName = $publicDnsName
+      dataDiskCount = $DataDiskCount
+      osDiskVhdUri = $osDiskVhdUri
+      autoInstallASDK = $false
+   }
 }
 
 New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject

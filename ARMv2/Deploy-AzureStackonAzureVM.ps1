@@ -103,7 +103,6 @@ if ($UseExistingStorageAccount)
       }
       else
       {
-         Get-AzStorageAccountNameAvailability
          Write-Error "Storage account: $VhdUri is not belongs to the subscription, please specify Storage Account from same subscription" -ErrorAction Stop    
       }
    }
@@ -114,13 +113,28 @@ if ($UseExistingStorageAccount)
 }
 else
 {
-   $saName = "asdk" + (Get-Random)
    New-AzResourceGroup -Name $ResourceGroupName -Location $Region
+   $i = 0
+   do 
+   {
+      $saName = "asdk" + (Get-Random)
+      Write-Verbose -Message "Testing Storage Account name availability: $saName"
+      if ($i -gt 10)
+      {
+         Write-Error "Randomization of Storage Account name failed after 10 retry, you may re-run the script to overcome the issue" -ErrorAction Stop
+      }
+   } until ((Get-AzStorageAccountNameAvailability -Name $saName).NameAvailable)
+   
+   Write-Verbose "Creating Storage Account: $saName"
+   
    $sa = New-AzStorageAccount -Location $Region -ResourceGroupName $ResourceGroupName -SkuName Standard_LRS -Name $saName
-
+   
    $sourceUri = "https://asdkstore.blob.core.windows.net/asdk/$version.vhd"
+   
    New-AzStorageContainer -Name "asdk" -Context $sa.context
+   
    Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
+   
    do {
       Start-Sleep -Seconds 60
       $result = Get-AzStorageAccount -Name $sa.StorageAccountName -ResourceGroupName $ResourceGroupName | Get-AzStorageBlob -Container "asdk" | Get-AzStorageBlobCopyState

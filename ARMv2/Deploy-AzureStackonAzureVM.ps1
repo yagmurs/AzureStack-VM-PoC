@@ -35,12 +35,9 @@ Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCre
 .FUNCTIONALITY
    The functionality that best describes this cmdlet
 #>
-
-#Requires -Version 5
-#Requires -Module @{ ModuleName = 'Az'; ModuleVersion = '4.8.0' }
-#Requires -Module @{ ModuleName = 'Az.Accounts'; ModuleVersion = '2.1.0' }
-#Requires -Module @{ ModuleName = 'Az.Storage'; ModuleVersion = '2.7.0' }
-#Requires -Module @{ ModuleName = 'Az.Resources'; ModuleVersion = '2.5.1' }
+[CmdletBinding(
+   SupportsShouldProcess=$true,
+   ConfirmImpact='High')]
 
 param(
         [Parameter(Mandatory=$false)]
@@ -70,6 +67,13 @@ param(
         [Parameter(Mandatory=$false)]
         [int]$DataDiskCount = 6
     )
+
+#Requires -Version 5
+#Requires -Module @{ ModuleName = 'Az'; ModuleVersion = '4.8.0' }
+#Requires -Module @{ ModuleName = 'Az.Accounts'; ModuleVersion = '2.1.0' }
+#Requires -Module @{ ModuleName = 'Az.Storage'; ModuleVersion = '2.7.0' }
+#Requires -Module @{ ModuleName = 'Az.Resources'; ModuleVersion = '2.5.1' }
+
 if (-not ($PSCloudShellUtilityModuleInfo))
 {
    Connect-AzAccount -UseDeviceAuthentication
@@ -77,7 +81,7 @@ if (-not ($PSCloudShellUtilityModuleInfo))
 
 if ($Overwrite)
 {
-   Get-AzResourceGroup -Name $ResourceGroupName | Remove-AzResourceGroup -Force -Verbose 
+   Get-AzResourceGroup -Name $ResourceGroupName | Remove-AzResourceGroup -Force -Verbose -WhatIf:$WhatIf
 }
 
 if ($UseExistingStorageAccount) 
@@ -121,14 +125,12 @@ else
       Write-Verbose -Message "Testing Storage Account name availability: $saName"
       if ($i -gt 10)
       {
-         Write-Error "Randomization of Storage Account name failed after 10 retry, you may re-run the script to overcome the issue" -ErrorAction Stop
+         Write-Error "Randomization of Storage Account name failed after 10 retries, you may re-run the script to overcome the issue" -ErrorAction Stop
       }
    } until ((Get-AzStorageAccountNameAvailability -Name $saName).NameAvailable)
    
    Write-Verbose "Creating Storage Account: $saName"
-   
    $sa = New-AzStorageAccount -Location $Region -ResourceGroupName $ResourceGroupName -SkuName Standard_LRS -Name $saName
-   
    $sourceUri = "https://asdkstore.blob.core.windows.net/asdk/$version.vhd"
    
    New-AzStorageContainer -Name "asdk" -Context $sa.context
@@ -136,7 +138,7 @@ else
    Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
    
    do {
-      Start-Sleep -Seconds 60
+      Start-Sleep -Seconds 30
       $result = Get-AzStorageAccount -Name $sa.StorageAccountName -ResourceGroupName $ResourceGroupName | Get-AzStorageBlob -Container "asdk" | Get-AzStorageBlobCopyState
       $remaining = [Math]::Round(($result.TotalBytes - $result.BytesCopied) / 1gb,2)
       Write-Verbose -Message "Waiting copy to finish remaining $remaining GB" -Verbose 

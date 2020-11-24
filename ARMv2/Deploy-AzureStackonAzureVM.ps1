@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.1.1.3
+.VERSION 0.1.1.4
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -24,24 +24,38 @@
    Deploys Azure VM for Azure Stack Hub Development kit
 .DESCRIPTION
    Deploys Azure VM for Azure Stack Hub Development kit
+
 .EXAMPLE
-   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to Resource Group: AzureStackVMOnAzureVM on East US 2 region, Credential will be popped up!
+   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
+   Resource Group: AzureStackVMOnAzureVM on East US 2 region, Credential will be popped up!
+
 Deploy-AzureStackonAzureVM
+
 .EXAMPLE
-   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to Resource Group: myResourceGroup on West Europe region, Credential will be popped up!
+   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
+   Resource Group: myResourceGroup on West Europe region, Credential will be popped up!
+
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Europe'
+
 .EXAMPLE
-   This option deploys Azure Stack Hub Development kit from predefined Uri, this can be used if previously, Credential will be popped up!
-   ASDK image previously copied or created manually on Storage Account the storage account that this Uri belongs to has to be on the same subscription. 
+   This option deploys Azure Stack Hub Development kit from predefined Uri, this can be used
+   if previously, Credential will be popped up! ASDK image previously copied or created manually
+   on Storage Account the storage account that this Uri belongs to has to be on the same subscription. 
+
 Deploy-AzureStackonAzureVM -UseExistingStorageAccount
+
 .EXAMPLE
-   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. 
-   May be used for silent deployment.
+   Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to
+   Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. May be used for silent deployment.
+
 $VmCredential = Get-Credentail = "Administrator"
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCredential
+
 .EXAMPLE
-   Deploys with default options and start Azure Stack Hub Develoepment kit installation within the VM after VM starts. Currently there is no validation for credentials and Tenant existance
+   Deploys with default options and start Azure Stack Hub Develoepment kit installation within
+   the VM after VM starts. Currently there is no validation for credentials and Tenant existance
    Make sure tenant name and credentials are correct.
+
 Deploy-AzureStackonAzureVM.ps1 -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential admin@<TenantName>.onmicrosoft.com -AutoInstallASDK -Verbose
 
 #>

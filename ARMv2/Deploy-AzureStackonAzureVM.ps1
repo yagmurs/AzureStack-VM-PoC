@@ -36,7 +36,6 @@ Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCre
    The functionality that best describes this cmdlet
 #>
 [CmdletBinding(
-   SupportsShouldProcess=$true,
    ConfirmImpact='High')]
 
 param(
@@ -81,7 +80,7 @@ if (-not ($PSCloudShellUtilityModuleInfo))
 
 if ($Overwrite)
 {
-   Get-AzResourceGroup -Name $ResourceGroupName | Remove-AzResourceGroup -Force -Verbose -WhatIf:$WhatIf
+   Get-AzResourceGroup -Name $ResourceGroupName | Remove-AzResourceGroup -Force -Verbose -Confirm
 }
 
 if ($UseExistingStorageAccount) 
@@ -117,7 +116,7 @@ if ($UseExistingStorageAccount)
 }
 else
 {
-   New-AzResourceGroup -Name $ResourceGroupName -Location $Region -WhatIf:$WhatIf
+   New-AzResourceGroup -Name $ResourceGroupName -Location $Region
    $i = 0
    do 
    {
@@ -135,7 +134,7 @@ else
    
    New-AzStorageContainer -Name "asdk" -Context $sa.context
    
-   Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force -WhatIf:$WhatIf
+   Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer "asdk" -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
    
    do {
       Start-Sleep -Seconds 30
@@ -156,4 +155,4 @@ $templateParameterObject = @{
    osDiskVhdUri = $osDiskVhdUri
 }
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject -WhatIf:$WhatIf
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/ARMv2/azuredeploy.json" -TemplateParameterObject $templateParameterObject

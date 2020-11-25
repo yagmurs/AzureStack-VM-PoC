@@ -1,0 +1,160 @@
+<mxfile host="65bd71144e" modified="2020-11-25T17:17:46.860Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="FFSIX3f0-8faSkN36v4F" version="13.6.5">
+    <diagram name="Page-1" id="c7558073-3199-34d8-9f00-42111426c3f3">
+        <mxGraphModel dx="1572" dy="722" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="826" pageHeight="1169" background="#F4F1DE" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-102" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="2" target="cG2_kJA4LDKCriuzKhNR-101" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-106" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="2" target="cG2_kJA4LDKCriuzKhNR-105" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="240" y="400"/>
+                            <mxPoint x="240" y="400"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-109" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="2" target="cG2_kJA4LDKCriuzKhNR-113" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-104" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-101" target="cG2_kJA4LDKCriuzKhNR-103" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-122" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.45;entryY=0.013;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-101" target="cG2_kJA4LDKCriuzKhNR-115" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-101" value="UseExistingStorageAccount" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="140" y="170" width="200" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-103" value="&lt;br&gt;existing&lt;br&gt;SA" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.database;whiteSpace=wrap;rounded=0;sketch=0;fillColor=#F2CC8F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="170" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-110" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-105" target="cG2_kJA4LDKCriuzKhNR-108" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-105" value="&lt;br&gt;&lt;br&gt;asdkstore&lt;br&gt;SA&lt;br&gt;(public)" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.database;whiteSpace=wrap;rounded=0;sketch=0;fillColor=#F2CC8F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="210" y="410" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-108" value="&lt;br&gt;&lt;br&gt;brand&lt;br&gt;new&lt;br&gt;SA" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.database;whiteSpace=wrap;rounded=0;sketch=0;fillColor=#F2CC8F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="445" y="410" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-111" value="Copy VHD" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;rounded=1;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="343" y="430" width="70" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-114" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-113" target="cG2_kJA4LDKCriuzKhNR-108" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-116" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-113" target="cG2_kJA4LDKCriuzKhNR-115" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="315"/>
+                            <mxPoint x="600" y="315"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-113" value="without&amp;nbsp;&lt;br&gt;UseExistingStorageAccount&lt;br&gt;parameter&lt;br&gt;creates new SA&amp;nbsp;&lt;br&gt;and copy VHD" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="275" width="190" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-118" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-115" target="cG2_kJA4LDKCriuzKhNR-117" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-115" value="Prepares ARM &lt;br&gt;parameters and &lt;br&gt;calls the template" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="590" y="275" width="170" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-121" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="cG2_kJA4LDKCriuzKhNR-120" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="840" y="523"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-123" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="8" target="cG2_kJA4LDKCriuzKhNR-103" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="50" y="150"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-125" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="11" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-117" value="ARM template" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="770" y="275" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-119" value="asdkvhd" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.vhd;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="212.5" y="500" width="55" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-120" value="asdkvhd" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.vhd;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="447.5" y="500" width="55" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-128" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="6" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="990" y="236"/>
+                            <mxPoint x="990" y="90"/>
+                        </Array>
+                        <mxPoint x="1070" y="90" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-126" value="&lt;b&gt;Prepares VM&lt;/b&gt;&lt;br&gt;Enable Hyper-v&lt;br&gt;Create desktop shortcuts&lt;br&gt;Disable IEESC&lt;br&gt;Enable File download&lt;br&gt;Create script folder and content&lt;br&gt;optionally adds scheduled task to call Install-ASDK.ps1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;rounded=1;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="921.5" y="370" width="310" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-129" value="&lt;b&gt;Start Installation&lt;/b&gt;&lt;br&gt;calls&amp;nbsp;BootstrapAzureStackDeployment.ps1&lt;br&gt;Applies couple of workaround to run on Azure&lt;br&gt;calls&amp;nbsp;InstallAzureStackPOC.ps1&lt;br&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;rounded=1;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="990" y="130" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cG2_kJA4LDKCriuzKhNR-130" value="asdkvhd" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.vhd;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="25" y="260" width="55" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#E07A5F;fillColor=#F2CC8F;fontColor=#393C56;" edge="1" parent="1" source="2" target="4">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="99" y="315"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="2" value="&lt;span&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;b&gt;Deploy-AzureStackonAzureVM.ps1&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#006EAF;fillColor=#1ba1e2;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="213" y="290.5" width="53" height="49" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;b&gt;ASDKHelperModule.psm1&lt;/b&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.powershell_file;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" vertex="1" parent="1">
+                    <mxGeometry x="74" y="431" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;span style=&quot;color: rgb(57 , 60 , 86)&quot;&gt;&lt;b&gt;postconfig.ps1&lt;/b&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#006EAF;fillColor=#1ba1e2;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="1050" y="290.5" width="53" height="49" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;span style=&quot;color: rgb(57 , 60 , 86)&quot;&gt;&lt;b&gt;Install-ASDK.ps1&lt;/b&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#005700;fillColor=#008a00;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="1094" y="60" width="53" height="49" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;font color=&quot;#000000&quot; style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;VM Image&lt;/font&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/VM_Images.svg;rounded=0;sketch=0;strokeColor=#E07A5F;fillColor=#F2CC8F;" vertex="1" parent="1">
+                    <mxGeometry x="815" y="170" width="50" height="46" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" edge="1" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="8">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="840" y="150"/>
+                        </Array>
+                        <mxPoint x="840" y="275" as="sourcePoint"/>
+                        <mxPoint x="50" y="170" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="13" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E07A5F;fillColor=#F2CC8F;fontColor=#393C56;" edge="1" parent="1" source="11">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="870" y="190" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="963" y="190"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="11" value="&lt;font color=&quot;#000000&quot; style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Azure VM&lt;/font&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Virtual_Machine_2.svg;rounded=0;sketch=0;strokeColor=#E07A5F;fillColor=#F2CC8F;" vertex="1" parent="1">
+                    <mxGeometry x="936.2" y="290.5" width="53.8" height="49.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" edge="1" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="11">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="910" y="315" as="sourcePoint"/>
+                        <mxPoint x="980" y="315" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

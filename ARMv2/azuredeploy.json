@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "virtualMachineName": {
@@ -26,14 +26,15 @@
             }
         },
         "dataDiskSizeinGB": {
-            "defaultValue": 256,
-            "allowedValues": [
-                256,
-                128
-            ],
             "type": "int",
+            "defaultValue":256,
+            "allowedValues": [
+                128,
+                256,
+                512
+            ],
             "metadata": {
-                "name": 256
+                "name":256
             }
         },
         "dataDiskCount": {
@@ -97,11 +98,11 @@
             }
         },
         "postConfigScriptLocation": { 
-            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts",
+            "defaultValue": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts",
             "type": "string",
             "metadata": {
                 "description": "the post config script location",
-                "name": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/development/scripts"
+                "name": "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/scripts"
             }
         },
         "postConfigScriptFilename": { 
@@ -115,8 +116,8 @@
         "autoInstallASDK": {
             "defaultValue": false,
             "allowedValues": [
-                true,
-                false
+                false,
+                true
             ],
             "type": "bool",
             "metadata": {
@@ -146,13 +147,13 @@
         },
         "branch": {
             "type": "string",
-            "defaultValue": "development",
+            "defaultValue": "master",
             "allowedValues": [
                 "master",
                 "development"
             ],
             "metadata": {
-                "name": "development"
+                "name": "master"
             }
         },
         "siteLocation": {
@@ -208,7 +209,7 @@
                     "adminUsername": "[variables('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "windowsConfiguration": {
-                        "provisionVmAgent": "true"
+                        "provisionVmAgent": true
                     }
                 },
                 "hardwareProfile": {
@@ -255,7 +256,7 @@
                 {
                     "type": "extensions",
                     "name": "CustomScriptExtension",
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2019-07-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
                         "[parameters('virtualMachineName')]"
@@ -263,8 +264,9 @@
                     "properties": {
                         "publisher": "Microsoft.Compute",
                         "type": "CustomScriptExtension",
-                        "typeHandlerVersion": "1.8",
+                        "typeHandlerVersion": "1.9",
                         "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {},
                         "settings": {
                             "fileUris": [
                                 "[variables('fileUri')]"

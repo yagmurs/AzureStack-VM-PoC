@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.1.1.5
+.VERSION 0.1.1.6
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -48,14 +48,14 @@ belong to the same subscription that the VM is getting deployed.
 
 .EXAMPLE
 $VmCredential = Get-Credentail = "Administrator"
-Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Credential $VmCredential
+Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -VmCredential $VmCredential
 
 Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to
 Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. May be used for silent 
 deployment.
 
 .EXAMPLE
-Deploy-AzureStackonAzureVM.ps1 -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential admin@<TenantName>.onmicrosoft.com -AutoInstallASDK -Verbose
+Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential admin@<TenantName>.onmicrosoft.com -Verbose
 
 Deploys with default options and start Azure Stack Hub Develoepment kit installation within
 the VM after VM starts. Currently there is no validation for credentials and Tenant existance
@@ -80,7 +80,7 @@ param(
         [string]$Version = "2008",
         
         [Parameter(Mandatory=$true)]
-        [pscredential]$VmCredential, #Local Admin Credential for the VM
+        [pscredential]$VmCredential, #Local Administrator Credential for the VM
         
         [Parameter(Mandatory=$false)]
         [string]$PublicDnsName = "asdkonazure" + "$(get-random)",

@@ -46,6 +46,45 @@ if you provide any parameters, It will use default parameters and will prompt fo
 Deploy-AzureStackonAzureVM.ps1 -Verbose
 ```
 
+## Step by Step Guidance for Unattended Installation ASDK
+
+### Step 1 - Download the Deploy-AzureStackonAzureVM.ps1 script
+
+Run the following PowerShell command to install the new installation script. If it is not done so.
+
+```powershell
+Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
+```
+
+### Step 2 - Run the Deploy-AzureStackonAzureVM.ps1 script for Unattended Installation ASDK
+
+Following code samples will deploy VM then starts ASDK deployment within the VM.
+
+Run the following code by changing **"\<TenantName>"** section accordingly. You will be prompted for passwords of VM and Azure AD GA user.
+
+```powershell
+$VmCredential = Get-Credential -Credential "Administrator"
+$AzureADTenant = "<TenantName>.onmicrosoft.com"
+$AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant
+
+Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADTenant -VmCredential $VmCredential -Verbose
+```
+
+or
+
+Once the following code run, you will be prompted for Azure AD Tenant, Azure AD GA Credentials and VM Credentails.
+
+```powershell
+$VmCredential = Get-Credential -Credential "Administrator"
+$AzureADTenant = Read-Host -Prompt "Enter Azure AD Tenant name in the following format: <TenantName>.onmicrosoft.com"
+$AzureADGlobalAdmin = Read-Host -Prompt "Enter Azure AD Tenant Global Administrator's UPN in the following format: <Admin>@<TenantName>.onmicrosoft.com"
+$AzureADGlobalAdminCredential = Get-Credential $AzureADGlobalAdmin
+
+Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADTenant -VmCredential $VmCredential -Verbose
+```
+
+Note: Values and permissions for **AzureADGlobalAdminCredential** and **AzureADTenant** not getting validated at the moment. Make sure them are correct.
+
  > Yagmur Sahin
  >
  > Twitter: [@yagmurs](https://twitter.com/yagmurs)

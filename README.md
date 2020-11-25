@@ -85,6 +85,22 @@ Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -A
 
 Note: Values and permissions for **AzureADGlobalAdminCredential** and **AzureADTenant** not getting validated at the moment. Make sure them are correct.
 
+## Support Statement
+
+This solution (Running ASDK on top of Azure VM) is not officially support by **Microsoft** and experimental, may not work in the future.
+
+## Issues and features
+
+### How to file a bug
+
+1. Go to our [issue tracker on GitHub](https://github.com/yagmurs/AzureStack-VM-PoC/issues)
+1. Search for existing issues using the search field at the top of the page
+1. File a new issue including the info listed below
+
+### Requesting a feature
+
+Feel free to file new feature requests as an issue on GitHub, just like a bug.
+
  > Yagmur Sahin
  >
  > Twitter: [@yagmurs](https://twitter.com/yagmurs)

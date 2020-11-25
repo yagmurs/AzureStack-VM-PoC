@@ -10,12 +10,12 @@
 
 .EXTERNALMODULEDEPENDENCIES
 
-.TAGS Azure Stack Hub, ASDK, AzureStack, AzureStackHub, "Azure Stack"
+.TAGS Azure Stack Hub, ASDK, AzureStack, AzureStackHub, "Azure Stack", "Azure Stack Hub"
 
 .RELEASENOTES
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
-   Creation Date:  23 November 2020
+   Creation Date:  24 November 2020
    Purpose/Change: Initial script development
 #>
 

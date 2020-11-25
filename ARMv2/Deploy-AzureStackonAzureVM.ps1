@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.1.1.6
+.VERSION 0.1.1.7
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -16,7 +16,7 @@
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
    Creation Date:  24 November 2020
-   Purpose/Change: Initial script development
+   Purpose/Change: Updated examples and minor changes
 #>
 
 <#
@@ -55,7 +55,11 @@ Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. May be us
 deployment.
 
 .EXAMPLE
-Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential admin@<TenantName>.onmicrosoft.com -Verbose
+$VmCredential = Get-Credential -Credential "Administrator"
+$AzureADTenant = "<TenantName>.onmicrosoft.com"
+$AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant
+
+Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential <admin>@<TenantName>.onmicrosoft.com -Verbose
 
 Deploys with default options and start Azure Stack Hub Develoepment kit installation within
 the VM after VM starts. Currently there is no validation for credentials and Tenant existance

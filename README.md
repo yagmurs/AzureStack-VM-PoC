@@ -67,7 +67,7 @@ $VmCredential = Get-Credential -Credential "Administrator"
 $AzureADTenant = "<TenantName>.onmicrosoft.com"
 $AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant
 
-Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADTenant -VmCredential $VmCredential -Verbose
+Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADGlobalAdminCredential -VmCredential $VmCredential -Verbose
 ```
 
 or
@@ -80,7 +80,7 @@ $AzureADTenant = Read-Host -Prompt "Enter Azure AD Tenant name in the following 
 $AzureADGlobalAdmin = Read-Host -Prompt "Enter Azure AD Tenant Global Administrator's UPN in the following format: <Admin>@<TenantName>.onmicrosoft.com"
 $AzureADGlobalAdminCredential = Get-Credential $AzureADGlobalAdmin
 
-Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADTenant -VmCredential $VmCredential -Verbose
+Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADGlobalAdminCredential -VmCredential $VmCredential -Verbose
 ```
 
 Note: Values and permissions for **AzureADGlobalAdminCredential** and **AzureADTenant** not getting validated at the moment. Make sure them are correct.

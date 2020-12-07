@@ -87,6 +87,7 @@ param(
         [pscredential]$VmCredential, #Local Administrator Credential for the VM
         
         [Parameter(Mandatory=$false)]
+        [ValidatePattern('^[a-z][a-z0-9-]{1,61}[a-z0-9]$')]
         [string]$PublicDnsName = "asdkonazure" + "$(get-random)",
 
         [Parameter(Mandatory=$false)]

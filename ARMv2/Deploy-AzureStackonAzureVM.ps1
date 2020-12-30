@@ -185,7 +185,16 @@ else
    $sourceUri = "https://asdkstore.blob.core.windows.net/asdk/$version.vhd"
    
    New-AzStorageContainer -Name $container -Context $sa.context
+
+#this requires AzCopy - please note CloudShell already has a working copy of AzCopy
+   $sastoken = New-AzStorageContainerSASToken -Context $sa.Context -name $container -Permission racwdl
+   $destination = $sa.Context.BlobEndPoint+$container+$sastoken
    
+   azcopy cp $sourceUri $destination
+
+
+<#
+   #use this if you preffer AzStorageBlobCopy (this is slower than azcopy) 
    Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
    
    do {
@@ -198,7 +207,7 @@ else
          $sleepTimer = 10
       }
    } until ($result.Status -eq "success") 
-
+#>
    $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container/$version.vhd"
 }
 

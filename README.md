@@ -65,14 +65,14 @@ Run the following code by changing **"\<TenantName>"** section accordingly. You 
 ```powershell
 $VmCredential = Get-Credential -Credential "Administrator"
 $AzureADTenant = "<TenantName>.onmicrosoft.com"
-$AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant
+$AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant and MFA is not enabled.
 
 Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADGlobalAdminCredential -VmCredential $VmCredential -Verbose
 ```
 
 or
 
-Once the following code run, you will be prompted for Azure AD Tenant, Azure AD GA Credentials and VM Credentails.
+Once the following code run, you will be prompted for Azure AD Tenant, Azure AD GA Credentials and VM Credentails (Azure AD user with Global Admin role without MFA).
 
 ```powershell
 $VmCredential = Get-Credential -Credential "Administrator"

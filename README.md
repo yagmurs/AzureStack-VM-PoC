@@ -33,8 +33,6 @@ Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
 
 ```
 
-
-
 ### Step 2 - Run the Deploy-AzureStackonAzureVM.ps1 script
 
 Once script downloaded from PowerShell gallery, run the following command to locate some examples. 
@@ -64,6 +62,12 @@ Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
 
 ### Step 2 - Run the Deploy-AzureStackonAzureVM script for Unattended Installation ASDK
 
+#### **Requirements**
+
+* Account with Azure AD Global Administrator role without MFA enabled.
+
+#### Code Sample
+
 Following code samples will deploy VM then starts ASDK deployment within the VM.
 
 Run the following code by changing **"\<TenantName>"** section accordingly. You will be prompted for passwords of VM and Azure AD GA user.
@@ -71,7 +75,9 @@ Run the following code by changing **"\<TenantName>"** section accordingly. You 
 ```powershell
 $VmCredential = Get-Credential -Credential "Administrator"
 $AzureADTenant = "<TenantName>.onmicrosoft.com"
-$AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant and MFA is not enabled.
+
+#Make sure the following account is Global Admin on the tenant and MFA is not enabled.
+$AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" 
 
 Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADGlobalAdminCredential -VmCredential $VmCredential -Verbose
 ```
@@ -96,6 +102,10 @@ Note: Values and permissions for **AzureADGlobalAdminCredential** and **AzureADT
 This solution (Running ASDK on top of Azure VM) is not officially support by **Microsoft** and experimental, may not work in the future.
 
 ## Issues and features
+
+## Release Notes
+
+### Version 0.2.0.0
 
 New Azcopy option implemented into the script to improve the copy performance as a default option.
 

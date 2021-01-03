@@ -27,7 +27,7 @@
 .RELEASENOTES
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
-   Creation Date:  24 November 2020
+   Creation Date:  03 January 2021
    Purpose/Change:
       New AzCopy parameters added with default value.
       Implemented AzCopy as an option copying storage blobs to extremely improve copy process. If copied within the same region (EastUS2) copy process takes at rate 5000+ Mb/s about 5 minutes, reduced from 20 minutes.
@@ -83,7 +83,6 @@ Deploys with default options and start Azure Stack Hub Develoepment kit installa
 the VM after VM starts. Currently there is no validation for credentials and Tenant existance
 Make sure tenant name and credentials are correct.
 #>
-<<<<<<< HEAD
 [CmdletBinding(
    ConfirmImpact='High',
    DefaultParameterSetName='VM Only'
@@ -155,6 +154,7 @@ param
    [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
    [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
    [Bool]$UseAzCopy = $true #setting the value to 'false' will utilize Start-AzStorageBlobCopy
+
 )
 
 #region Functions
@@ -188,48 +188,6 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
         }
     }
 }
-=======
-[CmdletBinding(ConfirmImpact='High')]
-
-param(
-        [Parameter(Mandatory=$false)]
-        [switch]$UseExistingStorageAccount,
-        
-        [Parameter(Mandatory=$false)]
-        [switch]$Overwrite,
-
-        [Parameter(Mandatory=$false)]
-        [string]$Region = 'East US 2',
-        
-        [Parameter(Mandatory=$false)]
-        [string]$ResourceGroupName = 'AzureStackVMOnAzureVM',
-        
-        [Parameter(Mandatory=$false)]
-        [string]$Version = "2008",
-        
-        [Parameter(Mandatory=$true)]
-        [pscredential]$VmCredential, #Local Administrator Credential for the VM
-        
-        [Parameter(Mandatory=$false)]
-        [ValidatePattern('^[a-z][a-z0-9-]{1,61}[a-z0-9]$')]
-        [string]$PublicDnsName = "asdkonazure" + "$(get-random)",
-
-        [Parameter(Mandatory=$false)]
-        [string]$VhdUri, #this must a Azure Storage Account Uri and must be under the same subscription that the VM is getting deployed.
-
-        [Parameter(Mandatory=$false)]
-        [int]$DataDiskCount = 6,
-
-        [Parameter(Mandatory=$false)]
-        [switch]$AutoInstallASDK,
-
-        [Parameter(Mandatory=$false)]
-        [string]$AzureADTenant,
-
-        [Parameter(Mandatory=$false)]
-        [pscredential]$AzureADGlobalAdminCredential
-    )
->>>>>>> e80c0cfb51c3e124110bcf436deefc3fafb1c4f8
 
 #endregion
     
@@ -319,27 +277,45 @@ else
    {
       if (-not ($PSCloudShellUtilityModuleInfo))
       {
-         $azCopyTemp = [System.IO.Path]::GetTempPath()
-         Write-Verbose -Message "Downloading azCopy to $azCopyTemp"
-         $azcopyDestFilePath = Join-Path -Path $azCopyTemp -ChildPath "azcopy.zip"
-         $azcopyDestFolderPath = Join-Path -Path $azCopyTemp -ChildPath "azcopy"
-         DownloadWithRetry -Uri https://aka.ms/downloadazcopy-v10-windows -DownloadLocation $azcopyDestFilePath
-         Unblock-File -Path $azcopyDestFilePath
-         Expand-Archive -Path $azcopyDestFilePath -DestinationPath $azcopyDestFolderPath
-         $azCopyExePath = Get-ChildItem -Path $azcopyDestFolderPath -Recurse | Where-Object Name -eq azcopy.exe | Select-Object -ExpandProperty FullName
+         Write-Verbose -Message "Script is not running on CloudShell"
+         if ($PSVersionTable.PSEdition -eq "Desktop" -or ($PSVersionTable.PSEdition -eq "core" -and $PSVersionTable.platform -like "win*"))
+         {
+            Write-Verbose -Message "Windows OS detected."
+            $azCopyTemp = [System.IO.Path]::GetTempPath()
+            Write-Verbose -Message "Downloading the latest version of AzCopy to $azCopyTemp"
+            $azcopyDestFilePath = Join-Path -Path $azCopyTemp -ChildPath "azcopy.zip"
+            $azcopyDestFolderPath = Join-Path -Path $azCopyTemp -ChildPath "azcopy"
+            DownloadWithRetry -Uri https://aka.ms/downloadazcopy-v10-windows -DownloadLocation $azcopyDestFilePath
+            Write-Verbose -Message "Unblocking AzCopy bits $azcopyDestFolderPath"
+            Unblock-File -Path $azcopyDestFilePath
+            Write-Verbose -Message "Extracting AzCopy bits $azcopyDestFolderPath"
+            Expand-Archive -Path $azcopyDestFilePath -DestinationPath $azcopyDestFolderPath -Force
+            $azCopyExePath = Get-ChildItem -Path $azcopyDestFolderPath -Recurse | Where-Object Name -eq azcopy.exe | Select-Object -ExpandProperty FullName
+         }
+         else
+         {
+            Write-Warning -Message "Non-Windows environment detected. We'll try to call AzCopy if it is in the path. It may fail to call AzCopy. If fails run the script from CloudShell or Windows machine"
+            $azCopyExePath = "azcopy"
+         }
       }
       else 
       {
          $azCopyExePath = "azcopy"
       }
 
+      Write-Verbose "`$azCopyExePath is now $azCopyExePath"
       $sastoken = New-AzStorageContainerSASToken -Context $sa.Context -name $container -Permission racwdl
       $destination = $sa.Context.BlobEndPoint+$container+$sastoken
-
-      & $azCopyExePath cp $sourceUri $destination
+      
+      & $azCopyExePath cp $sourceUri $destination   
+      if($LASTEXITCODE -ne 0){
+         throw "Something went wrong, check AzCopy output or error logs."
+         return
+      }      
    }
    else
    {
+      Write-Verbose -Message "Starting copy Using Start-AzStorageBlobCopy"
       Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
    
       do {
@@ -357,7 +333,8 @@ else
    $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container/$version.vhd"
 }
 
-Write-Verbose -Message $osDiskVhdUri
+Write-Verbose -Message "Copy completed, new VHD Uri: $osDiskVhdUri"
+
 if ($AutoInstallASDK)
 {
    if ($AzureADGlobalAdminCredential -and $AzureADTenant)
@@ -389,11 +366,8 @@ else
    }
 }
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM `
-<<<<<<< HEAD
+Write-Verbose -Message "Starting VM deployment by calling ARM template with parameters provided"
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName `
+   -Name AzureStackonAzureVM `
    -TemplateUri $templateUri `
    -TemplateParameterObject $templateParameterObject
-=======
-   -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/ARMv2/azuredeploy.json" `
-   -TemplateParameterObject $templateParameterObject
->>>>>>> e80c0cfb51c3e124110bcf436deefc3fafb1c4f8

@@ -83,6 +83,7 @@ Deploys with default options and start Azure Stack Hub Develoepment kit installa
 the VM after VM starts. Currently there is no validation for credentials and Tenant existance
 Make sure tenant name and credentials are correct.
 #>
+<<<<<<< HEAD
 [CmdletBinding(
    ConfirmImpact='High',
    DefaultParameterSetName='VM Only'
@@ -187,6 +188,48 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
         }
     }
 }
+=======
+[CmdletBinding(ConfirmImpact='High')]
+
+param(
+        [Parameter(Mandatory=$false)]
+        [switch]$UseExistingStorageAccount,
+        
+        [Parameter(Mandatory=$false)]
+        [switch]$Overwrite,
+
+        [Parameter(Mandatory=$false)]
+        [string]$Region = 'East US 2',
+        
+        [Parameter(Mandatory=$false)]
+        [string]$ResourceGroupName = 'AzureStackVMOnAzureVM',
+        
+        [Parameter(Mandatory=$false)]
+        [string]$Version = "2008",
+        
+        [Parameter(Mandatory=$true)]
+        [pscredential]$VmCredential, #Local Administrator Credential for the VM
+        
+        [Parameter(Mandatory=$false)]
+        [ValidatePattern('^[a-z][a-z0-9-]{1,61}[a-z0-9]$')]
+        [string]$PublicDnsName = "asdkonazure" + "$(get-random)",
+
+        [Parameter(Mandatory=$false)]
+        [string]$VhdUri, #this must a Azure Storage Account Uri and must be under the same subscription that the VM is getting deployed.
+
+        [Parameter(Mandatory=$false)]
+        [int]$DataDiskCount = 6,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$AutoInstallASDK,
+
+        [Parameter(Mandatory=$false)]
+        [string]$AzureADTenant,
+
+        [Parameter(Mandatory=$false)]
+        [pscredential]$AzureADGlobalAdminCredential
+    )
+>>>>>>> e80c0cfb51c3e124110bcf436deefc3fafb1c4f8
 
 #endregion
     
@@ -347,5 +390,10 @@ else
 }
 
 New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Name AzureStackonAzureVM `
+<<<<<<< HEAD
    -TemplateUri $templateUri `
    -TemplateParameterObject $templateParameterObject
+=======
+   -TemplateUri "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/ARMv2/azuredeploy.json" `
+   -TemplateParameterObject $templateParameterObject
+>>>>>>> e80c0cfb51c3e124110bcf436deefc3fafb1c4f8

@@ -1,6 +1,6 @@
-<mxfile host="65bd71144e" modified="2020-11-25T17:17:46.860Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="FFSIX3f0-8faSkN36v4F" version="13.6.5">
+<mxfile host="65bd71144e" modified="2020-12-02T17:13:54.260Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="1u_x741MBy4wRdQcoaCw" version="13.6.5">
     <diagram name="Page-1" id="c7558073-3199-34d8-9f00-42111426c3f3">
-        <mxGraphModel dx="1572" dy="722" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="826" pageHeight="1169" background="#F4F1DE" math="0" shadow="0">
+        <mxGraphModel dx="1301" dy="542" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="826" pageHeight="1169" background="#F4F1DE" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -106,29 +106,30 @@
                 <mxCell id="cG2_kJA4LDKCriuzKhNR-130" value="asdkvhd" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.vhd;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" parent="1" vertex="1">
                     <mxGeometry x="25" y="260" width="55" height="45" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#E07A5F;fillColor=#F2CC8F;fontColor=#393C56;" edge="1" parent="1" source="2" target="4">
+                <mxCell id="5" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#E07A5F;fillColor=#F2CC8F;fontColor=#393C56;" parent="1" source="6" target="4" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="99" y="315"/>
+                            <mxPoint x="1190" y="315"/>
+                            <mxPoint x="1190" y="280"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="2" value="&lt;span&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;b&gt;Deploy-AzureStackonAzureVM.ps1&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#006EAF;fillColor=#1ba1e2;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" vertex="1" parent="1">
+                <mxCell id="2" value="&lt;span&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;b&gt;Deploy-AzureStackonAzureVM.ps1&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#006EAF;fillColor=#1ba1e2;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" parent="1" vertex="1">
                     <mxGeometry x="213" y="290.5" width="53" height="49" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="&lt;b&gt;ASDKHelperModule.psm1&lt;/b&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.powershell_file;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" vertex="1" parent="1">
-                    <mxGeometry x="74" y="431" width="50" height="50" as="geometry"/>
+                <mxCell id="4" value="&lt;b&gt;ASDKHelperModule.psm1&lt;/b&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.powershell_file;pointerEvents=1;rounded=0;sketch=0;fontColor=#393C56;" parent="1" vertex="1">
+                    <mxGeometry x="1214" y="255" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="&lt;span style=&quot;color: rgb(57 , 60 , 86)&quot;&gt;&lt;b&gt;postconfig.ps1&lt;/b&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#006EAF;fillColor=#1ba1e2;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" vertex="1" parent="1">
+                <mxCell id="6" value="&lt;span style=&quot;color: rgb(57 , 60 , 86)&quot;&gt;&lt;b&gt;postconfig.ps1&lt;/b&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#006EAF;fillColor=#1ba1e2;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" parent="1" vertex="1">
                     <mxGeometry x="1050" y="290.5" width="53" height="49" as="geometry"/>
                 </mxCell>
-                <mxCell id="7" value="&lt;span style=&quot;color: rgb(57 , 60 , 86)&quot;&gt;&lt;b&gt;Install-ASDK.ps1&lt;/b&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#005700;fillColor=#008a00;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" vertex="1" parent="1">
+                <mxCell id="7" value="&lt;span style=&quot;color: rgb(57 , 60 , 86)&quot;&gt;&lt;b&gt;Install-ASDK.ps1&lt;/b&gt;&lt;/span&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#005700;fillColor=#008a00;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.script;rounded=0;sketch=0;fontColor=#ffffff;" parent="1" vertex="1">
                     <mxGeometry x="1094" y="60" width="53" height="49" as="geometry"/>
                 </mxCell>
-                <mxCell id="8" value="&lt;font color=&quot;#000000&quot; style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;VM Image&lt;/font&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/VM_Images.svg;rounded=0;sketch=0;strokeColor=#E07A5F;fillColor=#F2CC8F;" vertex="1" parent="1">
+                <mxCell id="8" value="&lt;font color=&quot;#000000&quot; style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;VM Image&lt;/font&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/VM_Images.svg;rounded=0;sketch=0;strokeColor=#E07A5F;fillColor=#F2CC8F;" parent="1" vertex="1">
                     <mxGeometry x="815" y="170" width="50" height="46" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" edge="1" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="8">
+                <mxCell id="9" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="8" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="840" y="150"/>
@@ -137,7 +138,7 @@
                         <mxPoint x="50" y="170" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="13" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E07A5F;fillColor=#F2CC8F;fontColor=#393C56;" edge="1" parent="1" source="11">
+                <mxCell id="13" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E07A5F;fillColor=#F2CC8F;fontColor=#393C56;" parent="1" source="11" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="870" y="190" as="targetPoint"/>
                         <Array as="points">
@@ -145,10 +146,10 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="11" value="&lt;font color=&quot;#000000&quot; style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Azure VM&lt;/font&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Virtual_Machine_2.svg;rounded=0;sketch=0;strokeColor=#E07A5F;fillColor=#F2CC8F;" vertex="1" parent="1">
+                <mxCell id="11" value="&lt;font color=&quot;#000000&quot; style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Azure VM&lt;/font&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Virtual_Machine_2.svg;rounded=0;sketch=0;strokeColor=#E07A5F;fillColor=#F2CC8F;" parent="1" vertex="1">
                     <mxGeometry x="936.2" y="290.5" width="53.8" height="49.5" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" edge="1" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="11">
+                <mxCell id="12" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=#F4F1DE;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" source="cG2_kJA4LDKCriuzKhNR-117" target="11" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="910" y="315" as="sourcePoint"/>
                         <mxPoint x="980" y="315" as="targetPoint"/>

@@ -25,17 +25,22 @@ Deploy-AzureStackonAzureVM.ps1 script prepares Storage Account and copy VHD file
 
 Run the following PowerShell command to install the new installation script. This will also downloads required modules from powershell gallery.
 
+Can be run from Azure **__Cloudshell__** as well. :) and it is highly recommended.
+
 ```powershell
+#Using CloudShell is the best option
 Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
+
 ```
 
-Can be run from Azure Cloudshell as well. :)
+
 
 ### Step 2 - Run the Deploy-AzureStackonAzureVM.ps1 script
 
 Once script downloaded from PowerShell gallery, run the following command to locate some examples. 
 
 ```powershell
+#Using CloudShell is the best option
 Get-Help Deploy-AzureStackonAzureVM.ps1 -Examples
 ```
 
@@ -43,12 +48,13 @@ If your scenario does not require customization, simply run Deploy-AzureStackonA
 if you provide any parameters, It will use default parameters and will prompt for local Administrator password for the new VM.
 
 ```powershell
+#Using CloudShell is the best option
 Deploy-AzureStackonAzureVM.ps1 -Verbose
 ```
 
 ## Step by Step Guidance for Unattended Installation ASDK
 
-### Step 1 - Download the Deploy-AzureStackonAzureVM.ps1 script
+### Step 1 - Download the Deploy-AzureStackonAzureVM script
 
 Run the following PowerShell command to install the new installation script. If it is not done so.
 
@@ -56,7 +62,7 @@ Run the following PowerShell command to install the new installation script. If 
 Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
 ```
 
-### Step 2 - Run the Deploy-AzureStackonAzureVM.ps1 script for Unattended Installation ASDK
+### Step 2 - Run the Deploy-AzureStackonAzureVM script for Unattended Installation ASDK
 
 Following code samples will deploy VM then starts ASDK deployment within the VM.
 
@@ -90,6 +96,8 @@ Note: Values and permissions for **AzureADGlobalAdminCredential** and **AzureADT
 This solution (Running ASDK on top of Azure VM) is not officially support by **Microsoft** and experimental, may not work in the future.
 
 ## Issues and features
+
+New Azcopy option implemented into the script to improve the copy performance as a default option.
 
 ### How to file a bug
 

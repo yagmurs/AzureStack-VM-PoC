@@ -151,6 +151,8 @@ Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
 Set-Location C:\CloudDeployment\Setup
 .\BootstrapAzureStackDeployment.ps1
 
+#region obsolute code section
+<#
 Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"
 
 Write-Log @writeLogParams -Message "Applying first workaround to tackle bare metal detection"
@@ -171,6 +173,11 @@ if ($SkipWorkaround -eq $false)
     Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $outFile -Verbose
     Unblock-File -Path $outFile -Confirm:$false -Verbose
 }
+ 
+#>
+
+#endregion
+
 $pocParameters = Get-Help C:\CloudDeployment\Setup\InstallAzureStackPOC.ps1 -Parameter Nat* -ErrorAction SilentlyContinue
 
 #if ($version -lt 1812)

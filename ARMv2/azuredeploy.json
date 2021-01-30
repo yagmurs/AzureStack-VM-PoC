@@ -10,7 +10,7 @@
             }
         },
         "virtualMachineSize": {
-            "defaultValue": "Standard_E16s_v3",
+            "defaultValue": "Standard_E20s_v3",
             "allowedValues": [
                 "Standard_E16s_v3",
                 "Standard_E20s_v3",

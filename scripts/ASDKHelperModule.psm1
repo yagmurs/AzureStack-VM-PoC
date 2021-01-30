@@ -261,6 +261,14 @@ function workaround5
     Write-Verbose "Applying workaround to fix RDAgent installation issue" -Verbose
     New-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\Windows Azure" -Name OsImageName -Value "MicrosoftAzureStack.vhdx"
 }
+function workaround6
+{
+    Write-Verbose "Applying workaround to fix Azure AD Global Administrator rename" -Verbose
+    $aadFilePath = "C:\CloudDeployment\Setup\Common\AzureADConfiguration.psm1"
+    $aadFile = Get-Content -Path $aadFilePath
+    $aadFile = $aadFile.Replace('Where displayName -EQ ''Company Administrator''','Where displayName -EQ ''Global Administrator''') 
+    Set-Content -Value $aadFile -Path $aadFilePath -Force
+}
 
 function createDesktopShortcuts
 {

@@ -151,6 +151,8 @@ Write-Log @writeLogParams -Message "Running BootstrapAzureStackDeployment"
 Set-Location C:\CloudDeployment\Setup
 .\BootstrapAzureStackDeployment.ps1
 
+workaround6
+
 #region obsolute code section
 <#
 Write-Log @writeLogParams -Message "Tweaking some files to run ASDK on Azure VM"

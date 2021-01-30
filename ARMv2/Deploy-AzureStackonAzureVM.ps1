@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.2.0.0
+.VERSION 0.2.1.0
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -27,13 +27,10 @@
 .RELEASENOTES
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
-   Creation Date:  03 January 2021
+   Creation Date:  31 January 2021
    Purpose/Change:
-      New AzCopy parameters added with default value.
-      Implemented AzCopy as an option copying storage blobs to extremely improve copy process. If copied within the same region (EastUS2) copy process takes at rate 5000+ Mb/s about 5 minutes, reduced from 20 minutes.
-      Cross region copy performance also increased (from East US2) to West Europe takes approximately 10 minutes at rate 2000 Mb/s
-      AzCopy will be used by default to improve the total deployment time.
-      AzCopy parameter behavior set to 'true' by default.
+      New VM size parameter with default value 'Standard_E20s_v3'
+      Example for VM size parameter
 
 #>
 
@@ -47,7 +44,8 @@
 Deploy-AzureStackonAzureVM
 
 Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
-Resource Group: AzureStackVMOnAzureVM on East US 2 region, New VM Credentials will be prompted.
+Resource Group: AzureStackVMOnAzureVM on East US 2 region use default VM Size 'Standard_E20s_v3'
+New VM Credentials will be prompted.
 
 .EXAMPLE
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Europe'
@@ -55,6 +53,13 @@ Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Eu
 Deploy new Storage Account (SA), copy VM image to new SA and then deploy Azure Stack 
 Hub Development kit VM under Resource Group: myResourceGroup on West Europe region, New VM
 Credentials will be prompted.
+
+.EXAMPLE
+Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Europe' -VirtualMachineSize 'Standard_E32s_v3'
+
+Deploy new Storage Account (SA), copy VM image to new SA and then deploy Azure Stack 
+Hub Development kit VM using 'Standard_E32s_v3' VM size under Resource Group: myResourceGroup on West Europe region, 
+New VM Credentials will be prompted.
 
 .EXAMPLE
 Deploy-AzureStackonAzureVM -UseExistingStorageAccount
@@ -115,6 +120,29 @@ param
    [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
    [string]$Version = "2008",
    
+   [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
+   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
+   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [ValidateSet(
+      "Standard_E16s_v3",
+      "Standard_E20s_v3",
+      "Standard_E32s_v3",
+      "Standard_E48s_v3",
+      "Standard_E64s_v3",
+      "Standard_D32s_v3",
+      "Standard_D48s_v3",
+      "Standard_D64s_v3",
+      "Standard_E16s_v4",
+      "Standard_E20s_v4",
+      "Standard_E32s_v4",
+      "Standard_E48s_v4",
+      "Standard_E64s_v4",
+      "Standard_D32s_v4",
+      "Standard_D48s_v4",
+      "Standard_D64s_v4"
+      )]
+   [string]$VirtualMachineSize = "Standard_E20s_v3",
+
    [Parameter(Mandatory=$true, ParameterSetName='Use Existing SA')]
    [Parameter(Mandatory=$true, ParameterSetName='VM Only')]
    [Parameter(Mandatory=$true, ParameterSetName='Auto Install')]
@@ -348,6 +376,7 @@ if ($AutoInstallASDK)
          AzureADTenant = $AzureADTenant
          AzureADGlobalAdmin = $AzureADGlobalAdminCredential.UserName
          AzureADGlobalAdminPassword = $AzureADGlobalAdminCredential.Password
+         VirtualMachineSize = $VirtualMachineSize
       }
    }
    else
@@ -363,6 +392,7 @@ else
       dataDiskCount = $DataDiskCount
       osDiskVhdUri = $osDiskVhdUri
       autoInstallASDK = $false
+      VirtualMachineSize = $VirtualMachineSize
    }
 }
 

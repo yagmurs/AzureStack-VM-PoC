@@ -14,15 +14,24 @@
             "allowedValues": [
                 "Standard_E16s_v3",
                 "Standard_E20s_v3",
-                "Standard_D32s_v3",
-                "Standard_E32-16s_v3",
                 "Standard_E32s_v3",
+                "Standard_E48s_v3",
+                "Standard_E64s_v3",
+                "Standard_D32s_v3",
+                "Standard_D48s_v3",
                 "Standard_D64s_v3",
-                "Standard_E64s_v3"
+                "Standard_E16s_v4",
+                "Standard_E20s_v4",
+                "Standard_E32s_v4",
+                "Standard_E48s_v4",
+                "Standard_E64s_v4",
+                "Standard_D32s_v4",
+                "Standard_D48s_v4",
+                "Standard_D64s_v4"
             ],
             "type": "string",
             "metadata": {
-                "name": "Standard_E16s_v3"
+                "name": "Standard_E20s_v3"
             }
         },
         "dataDiskSizeinGB": {

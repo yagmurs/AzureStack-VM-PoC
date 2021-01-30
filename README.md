@@ -35,7 +35,7 @@ Find-Script Deploy-AzureStackonAzureVM | Install-Module -Force
 
 ### Step 2 - Run the Deploy-AzureStackonAzureVM.ps1 script
 
-Once script downloaded from PowerShell gallery, run the following command to locate some examples. 
+Once script downloaded from PowerShell gallery, run the following command to locate some examples.
 
 ```powershell
 #Using CloudShell is the best option

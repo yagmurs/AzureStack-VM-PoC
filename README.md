@@ -54,6 +54,18 @@ Deploy-AzureStackonAzureVM.ps1 -Verbose
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region 'West Europe' -VirtualMachineSize 'Standard_E32s_v3'
 ```
 
+![alt](./.images/cloudshell.png)
+
+**Note**: The execution of the script takes appoximately 20 mins or so. Please do NOT close the browser or cloudshell window during execution.
+
+### Step 3 - Starting Azure Stack Hub deployment
+
+Once the VM deployed logon to VM using 'Administrator' username and the password provided during the deployment. There are 3 shortcut on the desktop to start ASDK deployment;
+
+* 'Install-ASDK' allow s you to select between ADFS based or AAD (Azure Ad)
+* 'ADFS_Install-ASDK' for ADFS based deployment
+* 'AAD_Install-ASDK' for Azure AD based deployment
+
 ## Step by Step Guidance for Unattended Installation ASDK
 
 ### Step 1 - Download the Deploy-AzureStackonAzureVM.ps1 script

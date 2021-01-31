@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.2.1.0
+.VERSION 0.2.1.1
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -131,15 +131,7 @@ param
       "Standard_E64s_v3",
       "Standard_D32s_v3",
       "Standard_D48s_v3",
-      "Standard_D64s_v3",
-      "Standard_E16s_v4",
-      "Standard_E20s_v4",
-      "Standard_E32s_v4",
-      "Standard_E48s_v4",
-      "Standard_E64s_v4",
-      "Standard_D32s_v4",
-      "Standard_D48s_v4",
-      "Standard_D64s_v4"
+      "Standard_D64s_v3"
       )]
    [string]$VirtualMachineSize = "Standard_E20s_v3",
 

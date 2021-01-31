@@ -47,11 +47,13 @@ if you provide any parameters, It will use default parameters and will prompt fo
 ```powershell
 Deploy-AzureStackonAzureVM.ps1 -Verbose
 ```
+
 #### Example 2
 
 ```powershell
-Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region 'West Europe' -VirtualMachineSize 'Standard_E32s_v4'
+Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region 'West Europe' -VirtualMachineSize 'Standard_E32s_v3'
 ```
+
 ## Step by Step Guidance for Unattended Installation ASDK
 
 ### Step 1 - Download the Deploy-AzureStackonAzureVM.ps1 script

@@ -92,7 +92,7 @@ Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -A
 
 or
 
-Once the following code run, you will be prompted for Azure AD Tenant, Azure AD GA Credentials and VM Credentails.
+Once the following code run, you will be prompted for Azure AD Tenant, Azure AD GA Credentials and VM Credentials.
 
 ```powershell
 $VmCredential = Get-Credential -Credential "Administrator"

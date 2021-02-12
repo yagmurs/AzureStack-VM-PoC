@@ -48,14 +48,14 @@ Resource Group: AzureStackVMOnAzureVM on East US 2 region use default VM Size 'S
 New VM Credentials will be prompted.
 
 .EXAMPLE
-Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Europe'
+Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region 'West Europe'
 
 Deploy new Storage Account (SA), copy VM image to new SA and then deploy Azure Stack 
 Hub Development kit VM under Resource Group: myResourceGroup on West Europe region, New VM
 Credentials will be prompted.
 
 .EXAMPLE
-Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region = 'West Europe' -VirtualMachineSize 'Standard_E32s_v3'
+Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -Region 'West Europe' -VirtualMachineSize 'Standard_E32s_v3'
 
 Deploy new Storage Account (SA), copy VM image to new SA and then deploy Azure Stack 
 Hub Development kit VM using 'Standard_E32s_v3' VM size under Resource Group: myResourceGroup on West Europe region, 
@@ -70,7 +70,7 @@ Credentials will be prompted. The Uri of ASDK image (VHD file) on the Storage Ac
 belong to the same subscription that the VM is getting deployed.
 
 .EXAMPLE
-$VmCredential = Get-Credentail = "Administrator"
+$VmCredential = Get-Credential "Administrator"
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -VmCredential $VmCredential
 
 Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to
@@ -373,7 +373,7 @@ if ($AutoInstallASDK)
    }
    else
    {
-      Write-Error -Message "Make sure Azure AD Global Administrator Credentails and Azure AD Tenant name is specified" -ErrorAction Stop
+      Write-Error -Message "Make sure Azure AD Global Administrator Credentials and Azure AD Tenant name is specified" -ErrorAction Stop
    }
 }
 else

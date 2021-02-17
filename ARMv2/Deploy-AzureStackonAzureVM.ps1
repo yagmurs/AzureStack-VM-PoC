@@ -273,8 +273,12 @@ if ($UseExistingStorageAccount)
 }
 else
 {
-   #Create new Resource Group
-   New-AzResourceGroup -Name $ResourceGroupName -Location $Region
+   #Create new Resource Group if it does not already exist
+   if (!(Get-AzResourceGroup -Name $ResourceGroupName -Location $Region -ErrorAction SilentlyContinue))
+   {
+	   write-verbose -Message "Create Ressource Group"
+	   New-AzResourceGroup -Name $ResourceGroupName -Location $Region
+   }
    $i = 0
    do 
    {

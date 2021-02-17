@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.2.1.1
+.VERSION 0.2.1.2
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -27,10 +27,12 @@
 .RELEASENOTES
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
-   Creation Date:  31 January 2021
+   Creation Date:  18 February 2021
    Purpose/Change:
-      New VM size parameter with default value 'Standard_E20s_v3'
-      Example for VM size parameter
+      Fixed some typos.
+      Create new Resource Group if it does not already exist.
+      
+      Thanks @yellowpanda :)
 
 #>
 

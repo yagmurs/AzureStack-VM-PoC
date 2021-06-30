@@ -2,12 +2,19 @@
 
 Creates new VM and install prerequisites for Azure Stack Hub Development kit (ASDK) to run Proof of Concept.
 
+## Azure Stack Hub ASF repository
+
+https://github.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/tree/master/ASF-Training/ASF-slides
+
 ## Version Compatibility
 
 The current version of the Deploy-AzureStackonAzureVM.ps1 script has been tested with the following versions:
 
-* ASDK build 1.2008.0.59 (2008)
-* ASDK build 1.2005.0.40 (2005)
+* ASDK build 1.2102.0.9 (2102)
+
+Starting from  build 2102 the following repository is getting used for ARM template deployment developed by Azure Stack Hub PG.
+
+https://github.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/tree/master/Tools/ASDKscripts
 
 **IMPORTANT** - this version of the Deploy-AzureStackonAzureVM.ps1 script has been tested with ASDK build 2008 and 2005, and requires minimum of following PowerShell modules
 
@@ -87,7 +94,7 @@ $VmCredential = Get-Credential -Credential "Administrator"
 $AzureADTenant = "<TenantName>.onmicrosoft.com"
 $AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant
 
-Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADTenant -VmCredential $VmCredential -Verbose
+Deploy-AzureStackonAzureVM.ps1 -DeploymentType AAD -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADGlobalAdminCredential -VmCredential $VmCredential -Verbose
 ```
 
 or
@@ -100,7 +107,7 @@ $AzureADTenant = Read-Host -Prompt "Enter Azure AD Tenant name in the following 
 $AzureADGlobalAdmin = Read-Host -Prompt "Enter Azure AD Tenant Global Administrator's UPN in the following format: <Admin>@<TenantName>.onmicrosoft.com"
 $AzureADGlobalAdminCredential = Get-Credential $AzureADGlobalAdmin
 
-Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADTenant -VmCredential $VmCredential -Verbose
+Deploy-AzureStackonAzureVM.ps1 -DeploymentType AAD -AzureADTenant $AzureADTenant -AzureADGlobalAdminCredential $AzureADGlobalAdminCredential -VmCredential $VmCredential -Verbose
 ```
 
 Note: Values and permissions for **AzureADGlobalAdminCredential** and **AzureADTenant** not getting validated at the moment. Make sure them are correct.

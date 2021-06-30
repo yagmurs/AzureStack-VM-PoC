@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.2.1.2
+.VERSION 0.3.0.0
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -27,12 +27,13 @@
 .RELEASENOTES
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
-   Creation Date:  18 February 2021
+   Creation Date:  01 July 2021
    Purpose/Change:
       Fixed some typos.
       Create new Resource Group if it does not already exist.
       
-      Thanks @yellowpanda :)
+      New ARM template used developed by Azure Stack PG
+      https://github.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/tree/master/Tools/ASDKscripts
 
 #>
 
@@ -46,7 +47,7 @@
 Deploy-AzureStackonAzureVM
 
 Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to 
-Resource Group: AzureStackVMOnAzureVM on East US 2 region use default VM Size 'Standard_E20s_v3'
+Resource Group: AzureStackVMOnAzureVM on East US 2 region use default VM Size 'Standard_E32s_v3'
 New VM Credentials will be prompted.
 
 .EXAMPLE
@@ -72,7 +73,7 @@ Credentials will be prompted. The Uri of ASDK image (VHD file) on the Storage Ac
 belong to the same subscription that the VM is getting deployed.
 
 .EXAMPLE
-$VmCredential = Get-Credential "Administrator"
+$VmCredential = Get-Credential "asdk-vm"
 Deploy-AzureStackonAzureVM -ResourceGroupName myResourceGroup -VmCredential $VmCredential
 
 Deploy new Storage copy VM image and then deploys Azure Stack Hub Development kit VM to
@@ -80,11 +81,11 @@ Resource Group: AzureStackVMOnAzureVM Credential specified beforehand. May be us
 deployment.
 
 .EXAMPLE
-$VmCredential = Get-Credential -Credential "Administrator"
+$VmCredential = Get-Credential -Credential "asdk-vm"
 $AzureADTenant = "<TenantName>.onmicrosoft.com"
 $AzureADGlobalAdminCredential = Get-Credential "<Admin>@<TenantName>.onmicrosoft.com" #Make sure this account is Global Admin on the tenant
 
-Deploy-AzureStackonAzureVM.ps1 -AutoInstallASDK -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential <admin>@<TenantName>.onmicrosoft.com -Verbose
+Deploy-AzureStackonAzureVM.ps1 -DeploymentType AAD -AzureADTenant <TenantName>.onmicrosoft.com -AzureADGlobalAdminCredential <admin>@<TenantName>.onmicrosoft.com -Verbose
 
 Deploys with default options and start Azure Stack Hub Develoepment kit installation within
 the VM after VM starts. Currently there is no validation for credentials and Tenant existance
@@ -92,89 +93,81 @@ Make sure tenant name and credentials are correct.
 #>
 [CmdletBinding(
    ConfirmImpact='High',
-   DefaultParameterSetName='VM Only'
+   DefaultParameterSetName='ADFS or NoDeployment'
 )]
 
 param
 (
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [switch]$UseExistingStorageAccount,
    
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [switch]$Overwrite,
 
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [string]$Region = 'East US 2',
    
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [string]$ResourceGroupName = 'AzureStackVMOnAzureVM',
    
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
-   [string]$Version = "2008",
-   
-   [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [ValidateSet(
-      "Standard_E16s_v3",
-      "Standard_E20s_v3",
       "Standard_E32s_v3",
-      "Standard_E48s_v3",
-      "Standard_E64s_v3",
-      "Standard_D32s_v3",
-      "Standard_D48s_v3",
-      "Standard_D64s_v3"
-      )]
-   [string]$VirtualMachineSize = "Standard_E20s_v3",
+      "Standard_E48s_v3"
+   )]
+   [string]$VirtualMachineSize = "Standard_E32s_v3",
 
    [Parameter(Mandatory=$true, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$true, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$true, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$true, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$true, ParameterSetName='AAD')]
    [pscredential]$VmCredential, #Local Administrator Credential for the VM
    
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [string]$PublicDnsName = "asdkonazure" + "$(get-random)",
 
    [Parameter(Mandatory=$true, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
-   [string]$VhdUri, #this must a Azure Storage Account Uri and must be under the same subscription that the VM is getting deployed.
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
+   [string]$VhdUri, #this must be a Azure Storage Account Uri and must be under the same subscription that the VM is getting deployed.
 
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [int]$DataDiskCount = 6,
 
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$true, ParameterSetName='Auto Install')]
-   [switch]$AutoInstallASDK,
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
+   [ValidateSet(
+      "AAD",
+      "ADFS",
+      "NoDeployment"
+   )]
+   [string]$DeploymentType = "NoDeployment",
 
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$true, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$true, ParameterSetName='AAD')]
    [string]$AzureADTenant,
 
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$true, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$true, ParameterSetName='AAD')]
    [pscredential]$AzureADGlobalAdminCredential,
 
    [Parameter(Mandatory=$false, ParameterSetName='Use Existing SA')]
-   [Parameter(Mandatory=$false, ParameterSetName='VM Only')]
-   [Parameter(Mandatory=$false, ParameterSetName='Auto Install')]
+   [Parameter(Mandatory=$false, ParameterSetName='ADFS or NoDeployment')]
+   [Parameter(Mandatory=$false, ParameterSetName='AAD')]
    [Bool]$UseAzCopy = $true #setting the value to 'false' will utilize Start-AzStorageBlobCopy
 
 )
@@ -218,7 +211,8 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
 
 #region variables
 
-$templateUri = "https://raw.githubusercontent.com/yagmurs/AzureStack-VM-PoC/master/ARMv2/azuredeploy.json"
+$sourceUri = "https://azstcenus2.blob.core.windows.net/azsforazure/Cloudbuilder.vhd"
+$templateUri = "https://raw.githubusercontent.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/master/Tools/ASDKscripts/ASDKAzureVMTemplate.json"
 $sleepTimer = 60
 $container = "asdk"
 $saPrefix = "asdk"
@@ -295,8 +289,7 @@ else
    
    Write-Verbose -Message "Creating Storage Account: $saName"
    $sa = New-AzStorageAccount -Location $Region -ResourceGroupName $ResourceGroupName -SkuName Standard_LRS -Name $saName
-   $sourceUri = "https://asdkstore.blob.core.windows.net/asdk/$version.vhd"
-   
+      
    New-AzStorageContainer -Name $container -Context $sa.context
    
    if ($UseAzCopy)
@@ -342,7 +335,7 @@ else
    else
    {
       Write-Verbose -Message "Starting copy Using Start-AzStorageBlobCopy"
-      Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob "$version.vhd" -ConcurrentTaskCount 100 -Force
+      Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob "cloudbuilder.vhd" -ConcurrentTaskCount 100 -Force
    
       do {
          Start-Sleep -Seconds $sleepTimer
@@ -356,25 +349,26 @@ else
       } until ($result.Status -eq "success") 
    }
    
-   $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container/$version.vhd"
+   $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container\cloudbuilder.vhd"
 }
 
 Write-Verbose -Message "Copy completed, new VHD Uri: $osDiskVhdUri"
 
-if ($AutoInstallASDK)
+if ($DeploymentType -eq "AAD")
 {
    if ($AzureADGlobalAdminCredential -and $AzureADTenant)
    {
       $templateParameterObject = @{
+         adminUsername = $VmCredential.UserName
          adminPassword = $VmCredential.Password
-         publicDnsName = $publicDnsName
-         dataDiskCount = $DataDiskCount
-         osDiskVhdUri = $osDiskVhdUri
-         autoInstallASDK = $true
-         AzureADTenant = $AzureADTenant
-         AzureADGlobalAdmin = $AzureADGlobalAdminCredential.UserName
-         AzureADGlobalAdminPassword = $AzureADGlobalAdminCredential.Password
-         VirtualMachineSize = $VirtualMachineSize
+         DnsLabelPrefix = $publicDnsName
+         NumDataDisks = $DataDiskCount
+         VhdUri = $osDiskVhdUri
+         DeploymentType = $DeploymentType
+         AzureDirectoryTenantName = $AzureADTenant
+         AADUserName = $AzureADGlobalAdminCredential.UserName
+         AADPassword = $AzureADGlobalAdminCredential.Password
+         VMSize = $VirtualMachineSize
       }
    }
    else
@@ -382,15 +376,33 @@ if ($AutoInstallASDK)
       Write-Error -Message "Make sure Azure AD Global Administrator Credentials and Azure AD Tenant name is specified" -ErrorAction Stop
    }
 }
+elseif ($DeploymentType -eq "ADFS") 
+{
+   $templateParameterObject = @{
+      adminUsername = $VmCredential.UserName
+      adminPassword = $VmCredential.Password
+      DnsLabelPrefix = $publicDnsName
+      NumDataDisks = $DataDiskCount
+      VhdUri = $osDiskVhdUri
+      DeploymentType = $DeploymentType
+      VMSize = $VirtualMachineSize
+      AADUserName = "adm@yourtenant.onmicrosoft.com"
+      AADPassword = "bogusPassword123!"
+   }
+   
+}
 else
 {
    $templateParameterObject = @{
+      adminUsername = $VmCredential.UserName
       adminPassword = $VmCredential.Password
-      publicDnsName = $publicDnsName
-      dataDiskCount = $DataDiskCount
-      osDiskVhdUri = $osDiskVhdUri
-      autoInstallASDK = $false
-      VirtualMachineSize = $VirtualMachineSize
+      DnsLabelPrefix = $publicDnsName
+      NumDataDisks = $DataDiskCount
+      VhdUri = $osDiskVhdUri
+      DeploymentType = $DeploymentType
+      VMSize = $VirtualMachineSize
+      AADUserName = "adm@yourtenant.onmicrosoft.com"
+      AADPassword = "bogusPassword123!"
    }
 }
 

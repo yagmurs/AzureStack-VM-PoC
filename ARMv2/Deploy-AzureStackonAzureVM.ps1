@@ -27,7 +27,7 @@
 .RELEASENOTES
    Author:         Yagmur Sahin
    Twitter:        @yagmurs
-   Creation Date:  01 July 2021
+   Creation Date:  09 July 2021
    Purpose/Change:
       Fixed some typos.
       Create new Resource Group if it does not already exist.

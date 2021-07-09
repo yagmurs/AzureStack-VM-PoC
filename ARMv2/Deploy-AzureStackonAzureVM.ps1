@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.3.0.0
+.VERSION 0.3.0.1
 
 .GUID 523642c3-73da-49a0-8ae8-08b835c426e2
 
@@ -31,7 +31,8 @@
    Purpose/Change:
       Fixed some typos.
       Create new Resource Group if it does not already exist.
-      
+      Fixed blob file case sensitivity issue by providing name in the variable.
+
       New ARM template used developed by Azure Stack PG
       https://github.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/tree/master/Tools/ASDKscripts
 
@@ -211,7 +212,8 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
 
 #region variables
 
-$sourceUri = "https://azstcenus2.blob.core.windows.net/azsforazure/Cloudbuilder.vhd"
+$blobFileName = "Cloudbuilder.vhd"
+$sourceUri = "https://azstcenus2.blob.core.windows.net/azsforazure/$blobFileName"
 $templateUri = "https://raw.githubusercontent.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/master/Tools/ASDKscripts/ASDKAzureVMTemplate.json"
 $sleepTimer = 60
 $container = "asdk"
@@ -335,7 +337,7 @@ else
    else
    {
       Write-Verbose -Message "Starting copy Using Start-AzStorageBlobCopy"
-      Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob "cloudbuilder.vhd" -ConcurrentTaskCount 100 -Force
+      Start-AzStorageBlobCopy -AbsoluteUri $sourceUri -DestContainer $container -DestContext $sa.context -DestBlob $blobFileName -ConcurrentTaskCount 100 -Force
    
       do {
          Start-Sleep -Seconds $sleepTimer
@@ -349,7 +351,7 @@ else
       } until ($result.Status -eq "success") 
    }
    
-   $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container\cloudbuilder.vhd"
+   $osDiskVhdUri = $sa.PrimaryEndpoints.Blob + "$container\$blobFileName"
 }
 
 Write-Verbose -Message "Copy completed, new VHD Uri: $osDiskVhdUri"

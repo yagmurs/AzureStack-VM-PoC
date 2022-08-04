@@ -331,7 +331,7 @@ else
       $sastoken = New-AzStorageContainerSASToken -Context $sa.Context -name $container -Permission racwdl
       $destination = $sa.Context.BlobEndPoint+$container+$sastoken
       
-      & $azCopyExePath cp $sourceUri $destination   
+      & $azCopyExePath cp $sourceUri $destination
       if($LASTEXITCODE -ne 0){
          throw "Something went wrong, check AzCopy output or error logs."
          return
@@ -416,3 +416,6 @@ New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName `
    -Name AzureStackonAzureVM `
    -TemplateUri $templateUri `
    -TemplateParameterObject $templateParameterObject
+
+Write-Verbose -Message "Run post-config script"
+Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName "asdk-vm" -ScriptPath "scripts\post-config.ps1" -CommandId RunPowerShellScript

@@ -213,7 +213,10 @@ function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Ret
 #region variables
 
 $blobFileName = "Cloudbuilder.vhd"
-$sourceUri = "https://azstcenus2.blob.core.windows.net/azsforazure/$blobFileName"
+#$folderName = "azsforazure" # 2102 image
+$folderName = "azsforazure-2108" # 2108 image
+
+$sourceUri = "https://azstcenus2.blob.core.windows.net/$folderName/$blobFileName"
 $templateUri = "https://raw.githubusercontent.com/Azure-Samples/Azure-Stack-Hub-Foundation-Core/master/Tools/ASDKscripts/ASDKAzureVMTemplate.json"
 $sleepTimer = 60
 $container = "asdk"
@@ -328,7 +331,7 @@ else
       $sastoken = New-AzStorageContainerSASToken -Context $sa.Context -name $container -Permission racwdl
       $destination = $sa.Context.BlobEndPoint+$container+$sastoken
       
-      & $azCopyExePath cp $sourceUri $destination   
+      & $azCopyExePath cp $sourceUri $destination
       if($LASTEXITCODE -ne 0){
          throw "Something went wrong, check AzCopy output or error logs."
          return
@@ -413,3 +416,6 @@ New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName `
    -Name AzureStackonAzureVM `
    -TemplateUri $templateUri `
    -TemplateParameterObject $templateParameterObject
+
+Write-Verbose -Message "Run post-config script"
+Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName "asdk-vm" -ScriptPath "scripts\post-config.ps1" -CommandId RunPowerShellScript

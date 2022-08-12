@@ -1,47 +1,18 @@
-Param (
-    [Parameter(Mandatory = $true)]
-    [string]
-    $Username = "__administrator",
+$Username = "Administrator"
+$ASDKImage = $true
+$branch = "master"
+$EnableDownloadASDK
+$AzureImage
+$ASDKImage
+$AutoDownloadASDK
+$EnableRDSH
+$AutoInstallASDK
+$AzureADTenant
+$AzureADGlobalAdmin
+$AzureADGlobalAdminPass
+$LocalAdminPass
+$ASDKConfiguratorObject
 
-    [string]
-    $LocalAdminUsername = "Administrator",
-
-    [switch]
-    $EnableDownloadASDK,
-    
-    [switch]
-    $AzureImage,
-
-    [switch]
-    $ASDKImage,
-
-    [string]
-    $AutoDownloadASDK,
-
-    [string]
-    $EnableRDSH,
-
-    [switch]
-    $AutoInstallASDK,
-
-    [string]
-    $AzureADTenant,
-
-    [string]
-    $AzureADGlobalAdmin,
-
-    [string]
-    $AzureADGlobalAdminPass,
-
-    [string]
-    $LocalAdminPass,
-
-    [string]
-    $branch = "master",
-
-    [string]
-    $ASDKConfiguratorObject
-)
 
 function DownloadWithRetry([string] $Uri, [string] $DownloadLocation, [int] $Retries = 5, [int]$RetryInterval = 10) {
     while ($true) {
